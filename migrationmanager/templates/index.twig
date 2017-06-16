@@ -1,0 +1,222 @@
+{% extends "_layouts/cp" %}
+{% set title = "Migration Manager"|t %}
+
+{% import "_includes/forms" as forms %}
+
+{% set tabs = {
+    tab1: { label: "Create Migration"|t, url: url('migrationmanager') },
+    tab2: { label: "Migrations"|t, url: url('migrationmanager/migrations') },
+    tab3: {label: "Log"|t, url: url('migrationmanager/log')}
+} %}
+
+{% set selectedTab = 'tab1' %}
+
+{% set content %}
+<div class="migration-manager">
+    <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+        <input type="hidden" name="action" value="migrationManager/createMigration">
+        {{ getCsrfInput() }}
+        <h1>Fields</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Handle</th>
+                    <th>Type</th>
+                    <th>Group</th>
+                </tr>
+            </thead>
+            <tbody class="fields">
+                {% for field in craft.fields.getAllFields() %}
+
+                <tr class="field" >
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="field{{ field.id }}" class="checkbox" name="field[]" value="{{ field.id }}"> <label for="field{{ field.id }}">{{ field }}</label>
+                    </th>
+                    <td>
+                        <code>{{ field.handle }}</code>
+                    </td>
+                    <td>
+                        {{ field.type }}
+                    </td>
+                    <td>
+                        {{ field.group }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+
+        <h1>Sections</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Handle</th>
+                    <th>Type</th>
+                    <th>URL Format</th>
+                </tr>
+            </thead>
+            <tbody class="sections">
+                {% for section in craft.sections.getAllSections() %}
+
+                <tr class="section" >
+                    <th scope="row" class="name">
+                        <div class="section checkboxsection">
+                            <input type="checkbox" id="section{{ section.id }}" class="checkbox" name="section[]" value="{{ section.id }}"> <label for="section{{ section.id }}">{{ section }}</label>
+                        </div>
+                    </th>
+                    <td>
+                        <code>{{ section.handle }}</code>
+                    </td>
+                    <td>
+                        {{ section.type }}
+                    </td>
+                    <td>
+                        {{ section.urlFormat }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <!--
+        <h1>Asset Sources</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Handle</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody class="assetSources">
+                {% for assetSource in assetSources %}
+
+                <tr class="assetSource">
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="assetSource{{ assetSource.id }}" class="checkbox" name="assetSource[]" value="{{ assetSource.id }}"> <label for="assetSource{{ assetSource.id }}">{{ assetSource }}</label>
+                    </th>
+                    <td>
+                        <code>{{ assetSource.handle }}</code>
+                    </td>
+                    <td>
+                        {{ assetSource.type }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <h1>Image Transforms</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Handle</th>
+                    <th>Mode</th>
+                    <th>Dimensions</th>
+                    <th>Format</th>
+                </tr>
+            </thead>
+            <tbody class="assetTransforms">
+                {% for assetTransform in assetTransforms %}
+                <tr>
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="assetTransform{{ assetTransform.id }}" class="checkbox" name="assetTransform[]" value="{{ assetTransform.id }}"> <label for="assetTransform{{ assetTransform.id }}">{{ assetTransform }}</label>
+                    </th>
+                    <td>
+                        <code>{{ assetTransform.handle }}</code>
+                    </td>
+                    <td>
+                        {{ assetTransform.mode }}
+                    </td>
+                    <td>
+                        <code>{{ assetTransform.width }} &times; {{ assetTransform.height }}</code>
+                    </td>
+                    <td>
+                        {{ (assetTransform.format) ? assetTransform.format : 'auto' }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <h1>Globals</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Handle</th>
+                </tr>
+            </thead>
+            <tbody class="globals">
+                {% for global in craft.globals.getAllSets() %}
+
+                <tr class="global">
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="global{{ global.id }}" class="checkbox" name="global[]" value="{{ global.id }}"> <label for="global{{ global.id }}">{{ global }}</label>
+                    </th>
+                    <td>
+                        <code>{{ global.handle }}</code>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <h1>Categories</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Handle</th>
+                </tr>
+            </thead>
+            <tbody class="categories">
+                {% for category in craft.categoryGroups.getAllGroups() %}
+
+                <tr class="category">
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="category{{ category.id }}" class="checkbox" name="category[]" value="{{ category.id }}"> <label for="category{{ category.id }}">{{ category }}</label>
+                    </th>
+                    <td>
+                        <code>{{ category.handle }}</code>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <h1>Routes</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>URI</th>
+                    <th>Template</th>
+                </tr>
+            </thead>
+            <tbody class="routes">
+                {% for route in craft.routes.getDbRoutes() %}
+                <tr class="route" data-id="{{ route.id }}">
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="route{{ route.id }}" class="checkbox" name="route[]" value="{{ route.id }}"> <label for="route{{ route.id }}">{{ route.urlDisplayHtml | raw }}</label>
+                    </th>
+                    <td>
+                        <code>{{ route.template }}</code>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        -->
+
+        <div class="buttons clearafter">
+            <input type="submit" class="btn submit export-btn" value="Create Migration">
+        </div>
+    </form>
+
+</div>
+{% endset %}

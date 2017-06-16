@@ -1,0 +1,32 @@
+{% extends "_layouts/cp" %}
+{% set title = "Migration Manager"|t %}
+
+{% import "_includes/forms" as forms %}
+
+{% includeCssResource "migrationmanager/css/migration-manager.css" %}
+
+
+{% set tabs = {
+    tab1: { label: "Create Migration"|t, url: url('migrationmanager') },
+    tab2: { label: "Migrations"|t, url: url('migrationmanager/migrations') },
+    tab3: {label: "Log"|t, url: url('migrationmanager/log')}
+} %}
+
+{% set selectedTab = 'tab3' %}
+
+{% set content %}
+    <div class="migration-manager">
+        <h1>Migration Log</h1>
+
+        {% for logEntry in logEntries %}
+            <h3>{{ logEntry.dateTime.format('Y-m-d H:i:s') }}</h3>
+            <p><span class="error-type">{{ logEntry.level }}</span>&nbsp;{{ logEntry.message }}</p>
+            <hr/>
+        {% endfor %}
+
+
+
+
+    </div>
+
+{% endset %}

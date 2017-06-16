@@ -1,0 +1,45 @@
+{% extends "_layouts/cp" %}
+{% set title = "Migration Manager"|t %}
+
+{% import "_includes/forms" as forms %}
+
+{% set tabs = {
+    tab1: { label: "Create Migration"|t, url: url('migrationmanager') },
+    tab2: { label: "Migrations"|t, url: url('migrationmanager/migrations') },
+    tab3: {label: "Log"|t, url: url('migrationmanager/log')}
+} %}
+
+{% set selectedTab = 'tab2' %}
+
+{% set content %}
+<div class="migration-manager">
+    {% set migrations = craft.migrationManager.getNewMigrations() %}
+    {%  if migrations | length %}
+        <h1>New migration{{ migrations|length > 1 ? 's' : '' }}</h1>
+    {%  else %}
+        <h1>No pending migrations</h1>
+    {%  endif %}
+
+
+    {% for migration in migrations %}
+        {{ migration }}
+        <hr/>
+    {% endfor %}
+
+    {% if migrations|length %}
+
+    <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+        <input type="hidden" name="action" value="migrationManager/runMigration">
+        {{ getCsrfInput() }}
+
+
+        <input type="submit" class="btn submit export-btn" value="Run Migration{{ migrations|length > 1 ? 's' : '' }}">
+    </form>
+
+    {% endif %}
+
+
+
+</div>
+
+{% endset %}

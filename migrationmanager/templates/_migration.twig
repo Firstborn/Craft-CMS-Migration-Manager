@@ -1,0 +1,21 @@
+<?php
+namespace Craft;
+
+/**
+ * The class name is the UTC timestamp in the format of mYYMMDD_HHMMSS_pluginHandle_migrationName
+ */
+class {{ className }} extends BaseMigration
+{
+	/**
+	 * Any migration code in here is wrapped inside of a transaction.
+	 *
+	 * @return bool
+	 */
+	public function safeUp()
+	{
+	    $migrationJson = '{{ migration|json_encode|raw }}';
+        $data = json_decode($migrationJson, true);
+        return craft()->migrationManager_migrations->import($data);
+    }
+
+}
