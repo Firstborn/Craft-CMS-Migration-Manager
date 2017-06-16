@@ -25,7 +25,6 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
             return false;
         }
 
-
         $urlFormat = $section->getUrlFormat();
         $locales = $section->getLocales();
         $primaryLocale = craft()->i18n->getPrimarySiteLocaleId();
@@ -79,10 +78,9 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
                 'titleFormat' => $entryType->attributes['titleFormat'],
                 'name' => $entryType->attributes['name'],
                 'handle' => $entryType->attributes['handle'],
-                'titleLabel' => $entryType->attributes['titleLabel'],
-                'fieldLayout' => [],
+                'fieldLayout' => array(),
+                'requiredFields' => array()
             ];
-
 
             if ($newEntryType['titleFormat'] === null) {
                 unset($newEntryType['titleFormat']);
@@ -91,9 +89,14 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
             $fieldLayout = $entryType->getFieldLayout();
 
             foreach ($fieldLayout->getTabs() as $tab) {
-                $newEntryType['fieldLayout'][$tab->name] = [];
+                $newEntryType['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
-                    array_push($newEntryType['fieldLayout'][$tab->name], craft()->fields->getFieldById($tabField->fieldId)->handle);
+
+                    $newEntryType['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    if ($tabField->required)
+                    {
+                        $newEntryType['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    }
                 }
             }
 
@@ -120,56 +123,42 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
 
     public function import($data)
     {
-
         $existing = craft()->sections->getSectionByHandle($data['handle']);
 
         if ($existing) {
               $this->mergeUpdates($data, $existing);
-        } else {
-            //$data['id'] = 'new';
         }
 
-        MigrationManagerPlugin::log(JsonHelper::encode($data), LogLevel::Error);
-
         $section = $this->createSection($data);
-
-        MigrationManagerPlugin::log(JsonHelper::encode($section), LogLevel::Error);
-
         $result = craft()->sections->saveSection($section);
 
-        echo 'saved section ' . ($result ? 'yes' : 'no') . PHP_EOL;
         if ($result) {
             //add entry types
-            foreach($data['entrytypes'] as $type)
-            {
-                $existing = craft()->sections->getEntryTypesByHandle($type['handle']);
-                if ($existing)
-                {
-                    //$entrytype = $this->createEntryType($type);
+            foreach($data['entrytypes'] as $key => $newEntryType) {
+                $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
+                if ($existingType) {
+                    $this->mergeEntryType($newEntryType, $existingType);
                 }
 
+                $entryType = $this->createEntryType($newEntryType, $section);
 
+                if (!craft()->sections->saveEntryType($entryType))
+                {
+                    $result = false;
+                }
             }
 
         } else {
-            echo 'save failed' . PHP_EOL;
-            $errors = $section->getAllErrors();
-            echo JsonHelper::encode($errors) . PHP_EOL;
-            MigrationManagerPlugin::log('Could not save the ' . $data['handle'] . ' section.', LogLevel::Error);
+            MigrationManagerPlugin::log($section->getAllErrors() . ' section.', LogLevel::Error);
             return false;
         }
-
-
-
-
-
 
         return $result;
     }
 
     private function createSection($data)
     {
-        echo JsonHelper::encode($data) . PHP_EOL;
+
         $section = new SectionModel();
         if (array_key_exists('id', $data)){
             $section->id = $data['id'];
@@ -203,7 +192,6 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
         {
             $locales = array();
             foreach($data['locales'] as $key => $locale){
-                echo 'set locales' . JsonHelper::encode($key . ' ' . $locale["urlFormat"]) . PHP_EOL;
                 $locales[$key] = new SectionLocaleModel(array(
                     'locale' => $key,
                     'enabledByDefault' => $locale['enabledByDefault'],
@@ -211,15 +199,60 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
                     'nestedUrlFormat' => $locale['nestedUrlFormat'],
                 ));
             }
-
             $section->setLocales($locales);
-
         }
-
-
 
         return $section;
 
+    }
+
+    private function createEntryType($data, $section)
+    {
+        $entryType = new EntryTypeModel(array(
+            'sectionId' => $section->id,
+            'name' => $data['name'] ,
+            'handle' => $data['handle'] ,
+            'hasTitleField' => $data['hasTitleField'],
+            'titleLabel' => $data['titleLabel']
+        ));
+
+        if (array_key_exists('titleFormat', $data))
+        {
+            $entryType->titleFormat = $data['titleFormat'];
+        }
+
+        if (array_key_exists('id', $data)){
+            $entryType->id = $data['id'];
+        }
+
+        $requiredFields = array();
+        foreach($data['requiredFields'] as $handle)
+        {
+            $field = craft()->fields->getFieldByHandle($handle);
+            if ($field)
+            {
+                $requiredFields[] = $field->id;
+            }
+        }
+
+        $layout = array();
+        foreach($data['fieldLayout'] as $key => $fields)
+        {
+            $fieldIds = array();
+            foreach($fields as $field) {
+                $existingField = craft()->fields->getFieldByHandle($field);
+                if ($existingField) {
+                    $fieldIds[] = $existingField->id;
+                }
+            }
+            $layout[$key] = $fieldIds;
+        }
+
+
+        $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+        $entryType->fieldLayout = $fieldLayout;
+
+        return $entryType;
 
 
     }
@@ -228,6 +261,47 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
     private function mergeUpdates(&$newSection, $section)
     {
         $newSection['id'] = $section->id;
+    }
 
+    private function mergeEntryType(&$newEntryType, $entryType)
+    {
+        $newEntryType['id'] = $entryType->id;
+    }
+
+    private function getSectionEntryTypeByHandle($handle, $sectionId)
+    {
+        $entryTypes = craft()->sections->getEntryTypesBySectionId($sectionId);
+        foreach($entryTypes as $entryType)
+        {
+            if ($entryType->handle == $handle)
+            {
+                return $entryType;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param $fieldLayout
+     * @return array
+     */
+    private function checkFieldLayout($fieldLayout)
+    {
+        $problemFields = [];
+        $problemFields['handle'] = [];
+        foreach ($fieldLayout as $tab => $fields) {
+            foreach ($fields as $fieldHandle) {
+                $field = craft()->fields->getFieldByHandle($fieldHandle);
+                if ($field === null) {
+                    $field = craft()->fields->getFieldById($fieldHandle);
+                    if ($field === null) {
+                        array_push($problemFields['handle'], 'Handle "'.$fieldHandle.'" is not a valid field.');
+                    }
+                }
+            }
+        }
+
+        return $problemFields;
     }
 }
