@@ -156,3 +156,4 @@
         'allowedKinds'                 => AttributeType::Mixed,
     }
     */
+
