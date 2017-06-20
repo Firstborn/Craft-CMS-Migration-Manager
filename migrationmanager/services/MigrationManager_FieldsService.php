@@ -211,8 +211,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
         if ($field['type'] == 'Matrix')
         {
-            foreach ($field['typesettings']['blockTypes'] as $blockType) {
-                foreach ($blockType['fields'] as $childField) {
+            foreach ($field['typesettings']['blockTypes'] as &$blockType) {
+                foreach ($blockType['fields'] as &$childField) {
                     $this->getSettingHandles($childField);
                 }
             }
@@ -220,8 +220,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
         if ($field['type'] == 'SuperTable')
         {
-            foreach ($field['typesettings']['blockTypes'] as $blockType) {
-                foreach ($blockType['fields'] as $childField) {
+            foreach ($field['typesettings']['blockTypes'] as &$blockType) {
+                foreach ($blockType['fields'] as &$childField) {
                      $this->getSettingHandles($childField);
                 }
             }
@@ -231,14 +231,19 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
     private function getSourceHandles(&$field)
     {
+        Craft::log('getSourceHandles: '. JsonHelper::encode($field), LogLevel::Error);
          if ($field['type'] == 'Assets') {
+             Craft::log('getAsset srouces',LogLevel::Error);
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
+                    Craft::log('get source: ' . $key . ' ' . $value, LogLevel::Error);
                     if (substr($value, 0, 7) == 'folder:') {
                         $source = craft()->assetSources->getSourceById(intval(substr($value, 7)));
                         if ($source) {
                             $field['typesettings']['sources'][$key] = $source->handle;
                         }
+                    } else {
+                        Craft::log('this one is empty ' . $key . ' ' . $value, LogLevel::Error);
                     }
                 }
             } else {
@@ -258,6 +263,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }
             }
+
+            Craft::log('after: '. JsonHelper::encode($field), LogLevel::Error);
         }
 
         if ($field['type'] == 'RichText') {
@@ -409,8 +416,10 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         if ($field['type'] == 'Matrix')
         {
 
-            foreach ($field['typesettings']['blockTypes'] as $blockType) {
-                foreach ($blockType as $childField) {
+            Craft::log('getSettingIds: ' . JsonHelper::encode($field), LogLevel::Error);
+            foreach ($field['typesettings']['blockTypes'] as &$blockType) {
+                foreach ($blockType['fields'] as &$childField) {
+                    Craft::log('getSettingIds: ' . JsonHelper::encode($childField), LogLevel::Error);
                     $this->getSettingIds($childField);
                 }
             }
@@ -418,8 +427,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
         if ($field['type'] == 'SuperTable')
         {
-            foreach ($field['typesettings']['blockTypes'] as $blockType) {
-                foreach ($blockType as $childField) {
+            foreach ($field['typesettings']['blockTypes'] as &$blockType) {
+                foreach ($blockType['fields'] as &$childField) {
                     $this->getSettingIds($childField);
                 }
             }
@@ -430,8 +439,10 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
     private function getSourceIds(&$field)
     {
         Craft::log(JsonHelper::encode($field), LogLevel::Error);
+
         if ($field['type'] == 'Assets') {
             $newSources = array();
+
             foreach ($field['typesettings']['sources'] as $source) {
                 $newSource = $this->getAssetSourceByHandle($source);
                 if ($newSource) {
@@ -457,9 +468,6 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                     $field['typesettings']['singleUploadLocationSource'] = '';
                 }
             }
-
-            Craft::log('after: ' . JsonHelper::encode($field), LogLevel::Error);
-
         }
 
         if ($field['type'] == 'RichText') {
@@ -688,7 +696,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         $existingFields = craft()->fields->getAllFields(null, 'matrixBlockType:' . $block->id);
 
         foreach($fields as $key => &$field){
-            $existingField = $this->getMatrixFieldByHanlde($field['handle'], $existingFields);
+            $existingField = $this->getMatrixFieldByHandle($field['handle'], $existingFields);
 
             if ($existingField){
                 $newFields[$existingField->id] = $field;
@@ -702,7 +710,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         $newBlock['fields'] = $newFields;
     }
 
-    private function getMatrixFieldByHanlde($handle, $fields)
+    private function getMatrixFieldByHandle($handle, $fields)
     {
         foreach($fields as $field)
         {
