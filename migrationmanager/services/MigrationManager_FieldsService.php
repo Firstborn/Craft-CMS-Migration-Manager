@@ -24,6 +24,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
             return false;
         }
 
+        Craft::log('export: ' . JsonHelper::encode($field), LogLevel::Error);
+
         $newField = [
             'group' => $field->group->name,
             'name' => $field->name,
@@ -237,8 +239,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
     private function getSourceHandles(&$field)
     {
-        if ($field['type'] == 'Assets') {
-            if (is_array($field['typesettings']['sources'])) {
+         if ($field['type'] == 'Assets') {
+            if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 7) == 'folder:') {
                         $source = craft()->assetSources->getSourceById(intval(substr($value, 7)));
@@ -249,14 +251,14 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                 }
             }
 
-            if (isset($field['typesettings']['defaultUploadLocationSource']) && $field['typesettings']['defaultUploadLocationSource']) {
+            if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
                 $source = craft()->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
                 }
             }
 
-            if (isset($field['typesettings']['singleUploadLocationSource']) && $field['typesettings']['singleUploadLocationSource']) {
+            if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
                 $source = craft()->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
@@ -265,7 +267,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         }
 
         if ($field['type'] == 'RichText') {
-            if (isset($field['typesettings']['availableAssetSources'])) {
+            if (array_key_exists('availableAssetSources', $field['typesettings'])) {
                 if ($field['typesettings']['availableAssetSources'] !== '*' && $field['typesettings']['availableAssetSources'] != '') {
                     foreach ($field['typesettings']['availableAssetSources'] as $key => $value) {
                         $source = craft()->assetSources->getSourceById($value);
@@ -276,27 +278,24 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                 }
             }
 
-            if (isset($field['typesettings']['defaultUploadLocationSource'])) {
-                if (isset($field['typesettings']['defaultUploadLocationSource']) && $field['typesettings']['defaultUploadLocationSource']) {
-                    $source = craft()->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
-                    if ($source) {
-                        $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
-                    }
+            if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
+                $source = craft()->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
+                if ($source) {
+                    $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
                 }
+
             }
 
-            if (isset($field['typesettings']['singleUploadLocationSource'])) {
-                if (isset($field['typesettings']['singleUploadLocationSource']) && $field['typesettings']['singleUploadLocationSource']) {
-                    $source = craft()->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
-                    if ($source) {
-                        $field['typesettings']['singleUploadLocationSource'] = $source->handle;
-                    }
+            if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
+                $source = craft()->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
+                if ($source) {
+                    $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }
             }
         }
 
         if ($field['type'] == 'Categories') {
-            if ($field['typesettings']['source']) {
+            if (array_key_exists('source', $field['typesettings'])) {
                 if (substr($field['typesettings']['source'], 0, 6) == 'group:') {
                     $category = craft()->categories->getGroupById(intval(substr($field['typesettings']['source'], 6)));
                     if ($category) {
@@ -307,7 +306,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         }
 
         if ($field['type'] == 'Entries') {
-            if ($field['typesettings']['sources']) {
+            if (array_key_exists('sources', $field['typesettings'])) {
                 if (is_array($field['typesettings']['sources'])) {
                     foreach ($field['typesettings']['sources'] as $key => $value) {
                         if (substr($value, 0, 8) == 'section:') {
@@ -324,7 +323,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         }
 
         if ($field['type'] == 'Tags') {
-            if ($field['typesettings']['source']) {
+            if (array_key_exists('source', $field['typesettings'])) {
                 if (substr($field['typesettings']['source'], 0, 9) == 'taggroup:') {
                     $tag = craft()->tags->getTagGroupById(intval(substr($field['typesettings']['source'], 9)));
                     if ($tag) {
@@ -335,8 +334,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         }
 
         if ($field['type'] == 'Users') {
-            if ($field['typesettings']['sources']) {
-                if (is_array($field['typesettings']['sources'])) {
+            if (array_key_exists('sources', $field['typesettings'])) {
+               // if (is_array($field['typesettings']['sources'])) {
                     foreach ($field['typesettings']['sources'] as $key => $value) {
                         if (substr($value, 0, 6) == 'group:') {
                             $userGroup = craft()->userGroups->getGroupById(intval(substr($value, 6)));
@@ -345,7 +344,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                             }
                         }
                     }
-                }
+               // }
             }
         }
 
@@ -354,7 +353,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
     private function getTransformHandles(&$field)
     {
         if ($field['type'] == 'RichText') {
-            if (is_array($field['typesettings']['availableTransforms'])) {
+            if (array_key_exists('availableTransforms', $field['typesettings'])) {
                 foreach ($field['typesettings']['availableTransforms'] as $key => $value) {
                     $transform = $this->getTransformById($value);
 
@@ -408,11 +407,10 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
     private function getSettingIds(&$field)
     {
-        if ($field['type'] == 'Assets')
-        {
-            $this->findSources($field);
-        }
 
+        $this->getSourceIds($field);
+
+        //get ids for children items
         if ($field['type'] == 'Matrix')
         {
 
@@ -434,31 +432,140 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         }
     }
 
-    private function findSources(&$newField)
+    private function getSourceIds(&$field)
     {
-        $newSources = array();
-        foreach($newField['typesettings']['sources'] as $source)
-        {
-            $newSource = $this->getAssetSourceByHandle($source);
-            if ($newSource){
-                $newSources[] = 'folder:' . $newSource->id;
+
+        Craft::log(JsonHelper::encode($field), LogLevel::Error);
+        if ($field['type'] == 'Assets') {
+            $newSources = array();
+            foreach ($field['typesettings']['sources'] as $source) {
+                $newSource = $this->getAssetSourceByHandle($source);
+                if ($newSource) {
+                    $newSources[] = 'folder:' . $newSource->id;
+                }
+            }
+
+            $field['typesettings']['sources'] = join($newSources);
+
+            if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
+                $source = $this->getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
+                if ($source) {
+                    $field['typesettings']['defaultUploadLocationSource'] = $source->id;
+                }
+            }
+            if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
+                $source = $this->getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
+                if ($source) {
+                    $field['typesettings']['singleUploadLocationSource'] = $source->id;
+                }
             }
         }
 
-        $newField['typesettings']['sources'] = $newSources;
+        if ($field['type'] == 'RichText') {
+            $newSources = array();
+            foreach ($field['typesettings']['sources'] as $source) {
+                $newSource = $this->getAssetSourceByHandle($source);
+                if ($newSource) {
+                    $newSources[] = 'folder:' . $newSource->id;
+                }
+            }
 
-        if (isset($newField['typesettings']['defaultUploadLocationSource']) ) {
-            $source = $this->getAssetSourceByHandle($newField['typesettings']['defaultUploadLocationSource']);
-            if ($source) {
-                $newField['typesettings']['defaultUploadLocationSource'] = $source->id;
+            $field['typesettings']['sources'] = $newSources;
+
+            if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
+                $source = $this->getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
+                if ($source) {
+                    $field['typesettings']['defaultUploadLocationSource'] = $source->id;
+                }
+            }
+            if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
+                $source = $this->getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
+                if ($source) {
+                    $field['typesettings']['singleUploadLocationSource'] = $source->id;
+                }
             }
         }
-        if (isset($newField['typesettings']['singleUploadLocationSource']) ) {
-            $source = $this->getAssetSourceByHandle($newField['typesettings']['singleUploadLocationSource']);
-            if ($source) {
-                $newField['typesettings']['singleUploadLocationSource'] = $source->id;
+
+        if ($field['type'] == 'Categories') {
+            $newSources = array();
+            $newSource = craft()->categories->getGroupByHandle($field['typesettings']['source']);
+            if ($newSource) {
+                $newSources[] = 'group:' . $newSource->id;
+            }
+            $field['typesettings']['source'] = $newSources;
+        }
+
+
+        if ($field['type'] == 'Entries') {
+            $newSources = array();
+            foreach ($field['typesettings']['sources'] as $source) {
+                $newSource = craft()->sections->getSectionByHandle($source);
+                if ($newSource)
+                {
+                    $newSources[] = 'section:' . $newSource->id;
+                }
+                elseif ($source == 'singles')
+                {
+                    $newSources[] = $source;
+                }
+            }
+
+            $field['typesettings']['sources'] = join($newSources);
+        }
+
+        if ($field['type'] == 'Tags') {
+            $newSources = array();
+            $newSource = craft()->tags->getTagGroupByHandle($field['typesettings']['source']);
+            if ($newSource) {
+                $newSources[] = 'taggroup:' . $newSource->id;
+            }
+            $field['typesettings']['source'] = $newSources;
+        }
+
+        if ($field['type'] == 'Users') {
+            $newSources = array();
+            foreach ($field['typesettings']['sources'] as $source) {
+                $newSource = craft()->userGroups->getGroupByHandle($source);
+                if ($newSource)
+                {
+                    $newSources[] = 'group:' . $newSource->id;
+                }
+                elseif ($source == 'admins')
+                {
+                    $newSources[] = $source;
+                }
+            }
+
+            $field['typesettings']['sources'] = join($newSources);
+        }
+
+
+        /*
+        if ($field['type'] == 'Tags') {
+            if (array_key_exists('source', $field['typesettings'])) {
+                if (substr($field['typesettings']['source'], 0, 9) == 'taggroup:') {
+                    $tag = craft()->tags->getTagGroupById(intval(substr($field['typesettings']['source'], 9)));
+                    if ($tag) {
+                        $field['typesettings']['source'] = $tag->handle;
+                    }
+                }
             }
         }
+
+        if ($field['type'] == 'Users') {
+            if (array_key_exists('source', $field['typesettings'])) {
+                if (is_array($field['typesettings']['sources'])) {
+                    foreach ($field['typesettings']['sources'] as $key => $value) {
+                        if (substr($value, 0, 6) == 'group:') {
+                            $userGroup = craft()->userGroups->getGroupById(intval(substr($value, 6)));
+                            if ($userGroup) {
+                                $field['typesettings']['sources'][$key] = $userGroup->handle;
+                            }
+                        }
+                    }
+                }
+            }
+        }*/
 
     }
 

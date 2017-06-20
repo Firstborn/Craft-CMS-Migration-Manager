@@ -17,6 +17,20 @@ class MigrationManagerController extends BaseController
             craft()->user->setError(Craft::t('Could not create migration.'));
         }
 
+        try {
+
+            $result = shell_exec('cd ..;git add .;git commit -m "migration";git push;');
+            Craft::log($result, LogLevel::Error);
+            //shell_exec('cd ..');
+            //$result = shell_exec('pwd');
+            //Craft::log($result, LogLevel::Error);
+            //shell_exec('git add .');
+            //shell_exec('git commit -am "updates"');
+            //shell_exec('git push');
+        } catch (\Exception $e) {
+            Craft::log($e->getMessage(), LogLevel::Error);
+        }
+
         $this->renderTemplate('migrationmanager/index');
     }
 
