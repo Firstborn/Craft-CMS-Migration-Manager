@@ -1,3 +1,9 @@
 span.error-type {
     text-transform: uppercase;
 }
+
+button.btn.submit {
+    font-size:13px;
+    font-weight:600;
+    font-family: HelveticaNeue, sans-serif;
+}

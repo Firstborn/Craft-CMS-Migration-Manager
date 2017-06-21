@@ -46,5 +46,4 @@ class MigrationManagerPlugin extends BasePlugin
     }
 
 
-
 }

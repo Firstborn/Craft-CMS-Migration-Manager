@@ -25,9 +25,7 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
             return false;
         }
 
-        $urlFormat = $section->getUrlFormat();
         $locales = $section->getLocales();
-        $primaryLocale = craft()->i18n->getPrimarySiteLocaleId();
 
         $newSection = [
             'name' => $section->attributes['name'],

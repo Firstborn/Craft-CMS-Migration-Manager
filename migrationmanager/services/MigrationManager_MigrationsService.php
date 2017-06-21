@@ -20,27 +20,32 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     public function create($data)
     {
         $migration = array();
+        $empty = true;
 
         if (array_key_exists('field', $data))
         {
             $migration['fields'] = craft()->migrationManager_fields->exportFields($data['field']);
+            $empty = false;
         }
 
         if (array_key_exists('section', $data))
         {
-             $migration['sections'] = craft()->migrationManager_sections->exportSections($data['section']);
+            $migration['sections'] = craft()->migrationManager_sections->exportSections($data['section']);
+            $empty = false;
         }
 
         //assetSource, imageTransform, global, category, route
+
 
         $date = new DateTime();
         $filename = sprintf('m%s_migrationmanager_import', $date->format('ymd_His'));
         $plugin = craft()->plugins->getPlugin('migrationmanager', false);
         $migrationPath = craft()->migrations->getMigrationPath($plugin);
-        $path = sprintf($migrationPath .'generated/%s.php', $filename);
-        $content = craft()->templates->render('migrationmanager/_migration', array('migration' => $migration, 'className' => $filename, true));
+        $path = sprintf($migrationPath . 'generated/%s.php', $filename);
+        $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, true));
         IOHelper::writeToFile($path, $content);
         return true;
+
     }
 
     public function import($data)

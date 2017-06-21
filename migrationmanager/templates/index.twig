@@ -226,12 +226,15 @@
         -->
 
         <div class="buttons clearafter">
-            <input type="submit" class="btn submit export-btn" value="Create Migration">
+            <button class="btn submit export-btn" name="submit" value="create">Create Migration</button>
+
         </div>
     </form>
 
 </div>
 {% endset %}
+
+{% includeCssResource "migrationmanager/css/migration-manager.css" %}
 
 {% includeJsResource "migrationmanager/js/MigrationManagerExport.js" %}
 
