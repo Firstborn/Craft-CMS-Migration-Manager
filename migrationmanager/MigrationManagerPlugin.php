@@ -10,7 +10,7 @@ class MigrationManagerPlugin extends BasePlugin
 
     function getVersion()
     {
-        return '1.0.4';
+        return '1.0.5';
     }
 
     function getDeveloper()
@@ -29,7 +29,6 @@ class MigrationManagerPlugin extends BasePlugin
             return true;
         }
     }
-
 
     public function registerCpRoutes()
     {

@@ -2,12 +2,13 @@
 namespace Craft;
 
 /**
- * The class name is the UTC timestamp in the format of mYYMMDD_HHMMSS_pluginHandle_migrationName
+ * Generated migration
  */
 class {{ className }} extends BaseMigration
 {
 	/**
 	 * Any migration code in here is wrapped inside of a transaction.
+	 * Returning false will rollback the migration
 	 *
 	 * @return bool
 	 */
@@ -15,7 +16,7 @@ class {{ className }} extends BaseMigration
 	{
 	    {% spaceless %}
 	    {% if empty %}
-        //add your custom migration code
+        //add your custom migration code, see the EXAMPLES.md for examples
         return true;
         {% else %}
         $migrationJson = '{{ migration|json_encode|raw }}';

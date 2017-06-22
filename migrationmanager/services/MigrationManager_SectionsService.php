@@ -279,27 +279,5 @@ class MigrationManager_SectionsService extends BaseApplicationComponent
         return false;
     }
 
-    /**
-     *
-     * @param $fieldLayout
-     * @return array
-     */
-    private function checkFieldLayout($fieldLayout)
-    {
-        $problemFields = [];
-        $problemFields['handle'] = [];
-        foreach ($fieldLayout as $tab => $fields) {
-            foreach ($fields as $fieldHandle) {
-                $field = craft()->fields->getFieldByHandle($fieldHandle);
-                if ($field === null) {
-                    $field = craft()->fields->getFieldById($fieldHandle);
-                    if ($field === null) {
-                        array_push($problemFields['handle'], 'Handle "'.$fieldHandle.'" is not a valid field.');
-                    }
-                }
-            }
-        }
 
-        return $problemFields;
-    }
 }
