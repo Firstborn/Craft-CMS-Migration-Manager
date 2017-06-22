@@ -44,5 +44,6 @@ In addition to generated migrations you can use the MigrationManger to create em
 View the [examples](migrationmanager/EXAMPLES.md).
 
 
+
 ##### Icon Credit
 Flying Duck by Agne Alesiute from the Noun Project

@@ -2,21 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d7c62cd-047d-4618-b402-6c1c5ccdb323" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/screenshots/create-migration.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/screenshots/pending-migrations.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/craft-cms-migration-plugin.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/migrationmanager/EXAMPLES.md" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/migrationmanager/README.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/migrationmanager/migrations/generated/m170621_154823_migrationmanager_import.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/migrationmanager/migrations/generated/m170621_170730_migrationmanager_import.php" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/MigrationManagerPlugin.php" afterPath="$PROJECT_DIR$/migrationmanager/MigrationManagerPlugin.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_SectionsService.php" afterPath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_SectionsService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/templates/_migration.twig" afterPath="$PROJECT_DIR$/migrationmanager/templates/_migration.twig" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/templates/index.twig" afterPath="$PROJECT_DIR$/migrationmanager/templates/index.twig" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/EXAMPLES.md" afterPath="$PROJECT_DIR$/migrationmanager/EXAMPLES.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -32,8 +19,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="54">
-                <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+              <first_editor relative-caret-position="828">
+                <caret line="46" column="0" lean-forward="true" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -45,8 +32,8 @@
         <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="285">
-                <caret line="17" column="19" lean-forward="true" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
+              <first_editor relative-caret-position="968">
+                <caret line="114" column="228" lean-forward="false" selection-start-line="114" selection-start-column="228" selection-end-line="114" selection-end-column="228" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -76,7 +63,7 @@
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds">
     <option name="x" value="22" />
-    <option name="y" value="171" />
+    <option name="y" value="170" />
     <option name="width" value="2223" />
     <option name="height" value="1250" />
   </component>
@@ -247,15 +234,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1498071154310</updated>
-      <workItem from="1498071155462" duration="3913000" />
+      <workItem from="1498071155462" duration="4678000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3913000" />
+    <option name="totallyTimeSpent" value="4678000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="22" y="171" width="2223" height="1250" extended-state="0" />
+    <frame x="22" y="170" width="2223" height="1250" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1754386" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -315,8 +302,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="54">
-            <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <first_editor relative-caret-position="828">
+            <caret line="46" column="0" lean-forward="true" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
             <folding />
           </first_editor>
           <second_editor />
@@ -326,8 +313,8 @@
     <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="285">
-            <caret line="17" column="19" lean-forward="true" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
+          <first_editor relative-caret-position="968">
+            <caret line="114" column="228" lean-forward="false" selection-start-line="114" selection-start-column="228" selection-end-line="114" selection-end-column="228" />
             <folding />
           </first_editor>
           <second_editor />
