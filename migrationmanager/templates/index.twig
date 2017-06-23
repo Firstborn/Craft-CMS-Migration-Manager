@@ -61,10 +61,8 @@
                     <th>
                         <div class="field checkboxfield">
                             <input type="checkbox" id="allSections" class="checkbox checkbox-toggle" name="allSections" value="all" data-selector="section"> <label for="allSections">Name</label>
-
                         </div>
                     </th>
-
                     <th>Handle</th>
                     <th>Type</th>
                     <th>URL Format</th>
@@ -93,18 +91,22 @@
             </tbody>
         </table>
         <hr>
-        <!--
+
         <h1>Asset Sources</h1>
         <table class="data fullwidth collapsible">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>
+                        <div class="field checkboxfield">
+                            <input type="checkbox" id="allAssetSources" class="checkbox checkbox-toggle" name="allAssetSources" value="all" data-selector="assetSource"> <label for="allAssetSources">Name</label>
+                        </div>
+                    </th>
                     <th>Handle</th>
                     <th>Type</th>
                 </tr>
             </thead>
             <tbody class="assetSources">
-                {% for assetSource in assetSources %}
+                {% for assetSource in craft.migrationManager.getAssetSources() %}
 
                 <tr class="assetSource">
                     <th scope="row" class="name">
@@ -121,6 +123,7 @@
             </tbody>
         </table>
         <hr>
+
         <h1>Image Transforms</h1>
         <table class="data fullwidth collapsible">
             <thead>
@@ -133,7 +136,7 @@
                 </tr>
             </thead>
             <tbody class="assetTransforms">
-                {% for assetTransform in assetTransforms %}
+                {% for assetTransform in craft.migrationManager.getAssetTransforms() %}
                 <tr>
                     <th scope="row" class="name">
                         <input type="checkbox" id="assetTransform{{ assetTransform.id }}" class="checkbox" name="assetTransform[]" value="{{ assetTransform.id }}"> <label for="assetTransform{{ assetTransform.id }}">{{ assetTransform }}</label>
@@ -155,6 +158,7 @@
             </tbody>
         </table>
         <hr>
+        {#
         <h1>Globals</h1>
         <table class="data fullwidth collapsible">
             <thead>
@@ -223,7 +227,7 @@
             </tbody>
         </table>
         <hr>
-        -->
+        #}
 
         <div class="buttons clearafter">
             <button class="btn submit export-btn" name="submit" value="create">Create Migration</button>

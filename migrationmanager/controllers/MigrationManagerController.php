@@ -30,8 +30,6 @@ class MigrationManagerController extends BaseController
 
         $plugin = craft()->plugins->getPlugin('migrationmanager');
 
-        MigrationManagerPlugin::log(JsonHelper::encode($plugin), LogLevel::Error);
-
         $data = array(
             'data' => array(
                 'handle' => craft()->security->hashData($plugin->getClassHandle()),

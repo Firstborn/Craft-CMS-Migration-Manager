@@ -10,7 +10,7 @@ class MigrationManagerPlugin extends BasePlugin
 
     function getVersion()
     {
-        return '1.0.5';
+        return '1.0.4';
     }
 
     function getDeveloper()
@@ -41,7 +41,10 @@ class MigrationManagerPlugin extends BasePlugin
     }
 
     function init(){
-        require CRAFT_PLUGINS_PATH.'/migrationshelper/helpers/MigrationsHelper.php';
+        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_IMigrationService.php');
+        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_BaseMigrationService.php');
+
+
     }
 
 

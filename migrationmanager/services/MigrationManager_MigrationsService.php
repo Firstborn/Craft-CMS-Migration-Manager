@@ -6,6 +6,19 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
     private $_migrationTable;
 
+    private $_migrationTypes =  array(
+        'field' => array(
+            'source' => 'field',
+            'destination' => 'fields',
+            'service' => 'migrationManager_fields'
+        ),
+        'section' => array(
+            'source' => 'section',
+            'destination' => 'sections',
+            'service' => 'migrationManager_sections'
+        )
+    );
+
     public function init()
     {
         $migration = new MigrationRecord('migrationmanager');
@@ -22,20 +35,16 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $migration = array();
         $empty = true;
 
-        if (array_key_exists('field', $data))
+        foreach($this->_migrationTypes as $key => $type)
         {
-            $migration['fields'] = craft()->migrationManager_fields->exportFields($data['field']);
-            $empty = false;
+            if (array_key_exists($type['source'], $data)) {
+                $service = craft()->getComponent($type['service']);
+                $migration[$type['destination']] = $service->export($data[$type['source']]);
+                $empty = false;
+            }
         }
 
-        if (array_key_exists('section', $data))
-        {
-            $migration['sections'] = craft()->migrationManager_sections->exportSections($data['section']);
-            $empty = false;
-        }
-
-        //assetSource, imageTransform, global, category, route
-
+        //imageTransform, global, category, route
 
         $date = new DateTime();
         $filename = sprintf('m%s_migrationmanager_import', $date->format('ymd_His'));
@@ -50,26 +59,30 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
     public function import($data)
     {
-        $result = true;
-        if (array_key_exists('fields', $data))
+        try
         {
-            if (craft()->migrationManager_fields->importFields($data['fields']) == false)
-            {
-                $result = false;
+            foreach ($this->_migrationTypes as $key => $type) {
+                if (array_key_exists($type['destination'], $data)) {
+                    $service = craft()->getComponent($type['service']);
+                    $service->import($data[$type['destination']]);
+                    if ($service->hasErrors())
+                    {
+                        $errors = $service->getErrors();
+                        foreach($errors as $error){
+                            MigrationManagerPlugin::log($error, LogLevel::Error);
+                        }
+                        return false;
+                     }
+                }
             }
         }
-
-        if (array_key_exists('sections', $data))
+        catch (Exception $e)
         {
-            if (craft()->migrationManager_sections->importSections($data['sections']) == false)
-            {
-                $result = false;
-            }
+            MigrationManagerPlugin::log('Exception handled: ' . $e->getMessage(), LogLevel::Error);
+            return false;
         }
 
-        return $result;
-
-
+        return true;
     }
 
     /**
@@ -101,7 +114,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
             if ($this->migrateUp($migration, $plugin) === false)
             {
-                MigrationManagerPlugin::log('Migration ' . $migration . ' failed . All later migrations are canceled.', LogLevel::Error);
+                MigrationManagerPlugin::log('Migration ' . $migration . ' failed . All later migrations are canceled.', LogLevel::Info, true);
 
                 // Refresh the DB cache
                 craft()->db->getSchema()->refresh();
@@ -127,19 +140,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         return true;
     }
 
-    /*public function getNewMigrations($plugin = null)
-    {
-
-        if ($plugin == null){
-            $plugin = craft()->plugins->getPlugin('migrationmanager', false);
-        }
-
-        $migrations = craft()->migrations->getNewMigrations($plugin);
-        return $migrations;
-    }*/
-
     /**
-     * Gets migrations that have no been applied yet AND have a later timestamp than the current Craft release.
+     * Gets migrations that have no been applied yet
      *
      * @param $plugin
      *
@@ -244,8 +246,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         }
         else
         {
-            $time = microtime(true) - $start;
-            MigrationManagerPlugin::log('Failed to apply migration: '.$class.' (time: '.sprintf("%.3f", $time).'s)', LogLevel::Error);
+            //$time = microtime(true) - $start;
+            //MigrationManagerPlugin::log('Failed to apply migration: '.$class.' (time: '.sprintf("%.3f", $time).'s)', LogLevel::Error);
             return false;
         }
     }

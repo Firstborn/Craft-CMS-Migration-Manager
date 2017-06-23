@@ -1,30 +1,15 @@
 <?php
 
 namespace Craft;
-class MigrationManager_FieldsService extends BaseApplicationComponent
+class MigrationManager_FieldsService extends MigrationManager_BaseMigrationService
 {
 
-    /**
-     * @param $ids array of fields ids to export
-     */
-    public function exportFields($ids)
-    {
-        $fields = array();
-        foreach($ids as $id)
-        {
-            $fields[] = $this->export($id);
-        }
-        return $fields;
-    }
-
-    public function export($id){
+    public function exportItem($id){
         $includeID = false;
         $field = craft()->fields->getFieldById($id);
         if (!$field){
             return false;
         }
-
-        Craft::log('export: ' . JsonHelper::encode($field), LogLevel::Error);
 
         $newField = [
             'group' => $field->group->name,
@@ -61,24 +46,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         return $newField;
     }
 
-    /**
-     * @param $ids array of fields ids to export
-     */
-    public function importFields($data)
-    {
-        $result = true;
-        foreach($data as $field)
-        {
-            if ($this->import($field) === false)
-            {
-                $result = false;
-            }
-        }
 
-        return $result;
-    }
-
-    public function import($data)
+    public function importItem(Array $data)
     {
 
         $existing = craft()->fields->getFieldByHandle($data['handle']);
@@ -89,13 +58,13 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
             $data['id'] = 'new';
         }
 
-        $field = $this->createField($data);
+        $field = $this->createModel($data);
 
         $result = craft()->fields->saveField($field);
         if ($result) {
 
         } else {
-            MigrationManagerPlugin::log('Could not save the ' . $data['handle'] . ' field.', LogLevel::Error);
+            $this->addError('Could not save the ' . $data['handle'] . ' field.');
         }
 
         return $result;
@@ -159,42 +128,42 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
     private function getSuperTableField(&$newField, $fieldId, $includeID = false)
     {
         $blockTypes = craft()->superTable->getBlockTypesByFieldId($fieldId);
-        $sTFieldCount = 1;
+        $fieldCount = 1;
         foreach ($blockTypes as $blockType) {
             if ($includeID) {
                 $blockId = $blockType->id;
             } else {
                 $blockId = 'new';
             }
-            foreach ($blockType->getFields() as $sTField) {
+            foreach ($blockType->getFields() as $field) {
                 if ($includeID) {
-                    $fieldId = $sTField->id;
+                    $fieldId = $field->id;
                 } else {
-                    $fieldId = 'new'.$sTFieldCount;
+                    $fieldId = 'new'.$fieldCount;
                 }
                 $columns = array_values($newField['typesettings']['columns']);
                 $newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId] = [
-                    'name' => $sTField->name,
-                    'handle' => $sTField->handle,
-                    'instructions' => $sTField->instructions,
-                    'required' => $sTField->required,
-                    'type' => $sTField->type,
-                    'width' => isset($columns[$sTFieldCount - 1]['width']) ? $columns[$sTFieldCount - 1]['width'] : '',
-                    'typesettings' => $sTField->settings,
+                    'name' => $field->name,
+                    'handle' => $field->handle,
+                    'instructions' => $field->instructions,
+                    'required' => $field->required,
+                    'type' => $field->type,
+                    'width' => isset($columns[$field - 1]['width']) ? $columns[$field - 1]['width'] : '',
+                    'typesettings' => $field->settings,
                 ];
 
-                if ($sTField->type == 'PositionSelect') {
+                if ($field->type == 'PositionSelect') {
                     $options = [];
-                    foreach ($sTField->settings['options'] as $value) {
+                    foreach ($field->settings['options'] as $value) {
                         $options[$value] = true;
                     }
                     $newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId]['typesettings']['options'] = $options;
                 }
-                if ($sTField->type == 'Matrix') {
-                    $this->getMatrixField($newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId], $sTField->id);
+                if ($field->type == 'Matrix') {
+                    $this->getMatrixField($newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId], $field->id);
                 }
 
-                ++$sTFieldCount;
+                ++$fieldCount;
             }
         }
         unset($newField['typesettings']['columns']);
@@ -231,19 +200,14 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
     private function getSourceHandles(&$field)
     {
-        Craft::log('getSourceHandles: '. JsonHelper::encode($field), LogLevel::Error);
          if ($field['type'] == 'Assets') {
-             Craft::log('getAsset srouces',LogLevel::Error);
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
-                    Craft::log('get source: ' . $key . ' ' . $value, LogLevel::Error);
                     if (substr($value, 0, 7) == 'folder:') {
                         $source = craft()->assetSources->getSourceById(intval(substr($value, 7)));
                         if ($source) {
                             $field['typesettings']['sources'][$key] = $source->handle;
                         }
-                    } else {
-                        Craft::log('this one is empty ' . $key . ' ' . $value, LogLevel::Error);
                     }
                 }
             } else {
@@ -264,7 +228,6 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                 }
             }
 
-            Craft::log('after: '. JsonHelper::encode($field), LogLevel::Error);
         }
 
         if ($field['type'] == 'RichText') {
@@ -310,9 +273,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
 
         if ($field['type'] == 'Entries') {
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
-                Craft::log('entries: '. JsonHelper::encode($field['typesettings']['sources']), LogLevel::Error);
                 foreach ($field['typesettings']['sources'] as $key => $value) {
-                    Craft::log($value, LogLevel::Error);
                     if (substr($value, 0, 8) == 'section:') {
                         $section = craft()->sections->getSectionById(intval(substr($value, 8)));
                         if ($section) {
@@ -321,7 +282,6 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                     }
                 }
             } else {
-                Craft::log($field['typesettings']['sources'], LogLevel::Error);
                 $field['typesettings']['sources'] = [];
             }
         }
@@ -357,14 +317,13 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
     private function getTransformHandles(&$field)
     {
         if ($field['type'] == 'RichText') {
-            if (array_key_exists('availableTransforms', $field['typesettings'])) {
+            if (array_key_exists('availableTransforms', $field['typesettings']) && is_array($field['typesettings']['availableTransforms'])) {
                 foreach ($field['typesettings']['availableTransforms'] as $key => $value) {
                     $transform = $this->getTransformById($value);
 
                     if ($transform) {
                         $field['typesettings']['availableTransforms'][$key] = $transform->handle;
                     }
-
                 }
             }
         }
@@ -412,15 +371,13 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
     private function getSettingIds(&$field)
     {
         $this->getSourceIds($field);
+        $this->getTransformIds($field);
         //get ids for children items
         if ($field['type'] == 'Matrix')
         {
-
-            Craft::log('getSettingIds: ' . JsonHelper::encode($field), LogLevel::Error);
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
-                    Craft::log('getSettingIds: ' . JsonHelper::encode($childField), LogLevel::Error);
-                    $this->getSettingIds($childField);
+                     $this->getSettingIds($childField);
                 }
             }
         }
@@ -436,10 +393,24 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         }
     }
 
+    private function getTransformIds(&$field)
+    {
+        if ($field['type'] == 'RichText') {
+            if (array_key_exists('availableTransforms', $field['typesettings']) && is_array($field['typesettings']['availableTransforms'])) {
+                $newTransforms = array();
+                foreach ($field['typesettings']['availableTransforms'] as $value) {
+                    $transform = craft()->assetTransforms->getTransformByHandle($value);
+                    if ($transform) {
+                        $newTransforms[] = $transform->id;
+                    }
+                }
+                $field['typesettings']['availableTransforms'] = $newTransforms;
+            }
+        }
+    }
+
     private function getSourceIds(&$field)
     {
-        Craft::log(JsonHelper::encode($field), LogLevel::Error);
-
         if ($field['type'] == 'Assets') {
             $newSources = array();
 
@@ -447,6 +418,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                 $newSource = $this->getAssetSourceByHandle($source);
                 if ($newSource) {
                     $newSources[] = 'folder:' . $newSource->id;
+                } else {
+                    $this->addError('Asset source: ' . $source . ' is not defined in system');
                 }
             }
 
@@ -476,6 +449,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                 $newSource = $this->getAssetSourceByHandle($source);
                 if ($newSource) {
                     $newSources[] = 'folder:' . $newSource->id;
+                } else {
+                    $this->addError('Asset source: ' . $source . ' is not defined in system');
                 }
             }
 
@@ -504,6 +479,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
             $newSource = craft()->categories->getGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
                 $newSources[] = 'group:' . $newSource->id;
+            } else {
+                $this->addError('Category: ' . $field['typesettings']['source'] . ' is not defined in system');
             }
             $field['typesettings']['source'] = $newSources;
         }
@@ -520,6 +497,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                 elseif ($source == 'singles')
                 {
                     $newSources[] = $source;
+                } else {
+                    $this->addError('Section : ' . $source . ' is not defined in system');
                 }
             }
 
@@ -531,6 +510,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
             $newSource = craft()->tags->getTagGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
                 $newSources[] = 'taggroup:' . $newSource->id;
+            } else {
+                $this->addError('Tag: ' . $field['typesettings']['source'] . ' is not defined in system');
             }
             $field['typesettings']['source'] = $newSources;
         }
@@ -546,6 +527,8 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
                 elseif ($source == 'admins')
                 {
                     $newSources[] = $source;
+                } else {
+                    $this->addError('User Group: ' . $source . ' is not defined in system');
                 }
             }
 
@@ -553,7 +536,7 @@ class MigrationManager_FieldsService extends BaseApplicationComponent
         }
     }
 
-    private function createField($data)
+    public function createModel(Array $data)
     {
         $field = new FieldModel();
         //find group id
