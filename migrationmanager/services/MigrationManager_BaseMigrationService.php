@@ -6,9 +6,22 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
 {
     protected $errors = array();
 
+    protected $source;
+    protected $destination;
+
     public function __construct()
     {
 
+    }
+
+    public function getDestination()
+    {
+        return $this->destination;
+    }
+
+    public function getSource()
+    {
+        return $this->source;
     }
 
     public function addError($value){
@@ -28,16 +41,15 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
         $this->errors = array();
     }
 
-
-
     /**
      * @param $ids array of fields ids to export
+     * @param $fullExport flag to export all element data including extending settings and field tabs
      */
-    public function export(Array $ids)
+    public function export(Array $ids, $fullExport = true)
     {
         $items = array();
         foreach ($ids as $id) {
-            $obj = $this->exportItem($id);
+            $obj = $this->exportItem($id, $fullExport);
             if ($obj) {
                 $items[] = $obj;
             }
@@ -45,7 +57,7 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
         return $items;
     }
 
-    abstract public function exportItem($id);
+    abstract public function exportItem($id, $fullExport);
 
     /**
      * @param $data array of items to import

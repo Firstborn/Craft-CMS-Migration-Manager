@@ -7,16 +7,23 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     private $_migrationTable;
 
     private $_migrationTypes =  array(
-        'field' => array(
-            'source' => 'field',
-            'destination' => 'fields',
-            'service' => 'migrationManager_fields'
-        ),
-        'section' => array(
-            'source' => 'section',
-            'destination' => 'sections',
-            'service' => 'migrationManager_sections'
-        )
+        'field' => 'migrationManager_fields',
+        'section' => 'migrationManager_sections',
+        'assetSource' => 'migrationManager_assetSources',
+        'assetTransform' => 'migrationManager_assetTransforms',
+        'global' => 'migrationManager_globals',
+        'tag' => 'migrationManager_tags',
+        'category' => 'migrationManager_categories',
+        'locale' => 'migrationManager_locales'
+    );
+
+    private $_dependencyTypes =  array(
+        'section' => 'migrationManager_sections',
+        'assetSource' => 'migrationManager_assetSources',
+        'assetTransform' => 'migrationManager_assetTransforms',
+        'tag' => 'migrationManager_tags',
+        'category' => 'migrationManager_categories',
+        'locale' => 'migrationManager_locales'
     );
 
     public function init()
@@ -32,20 +39,59 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      */
     public function create($data)
     {
-        $migration = array();
+        $migration = array(
+            'dependencies' => array(),
+            'elements' => array()
+        );
+
         $empty = true;
 
-        foreach($this->_migrationTypes as $key => $type)
+        //build a list of dependencies first to avoid potential cases where items are requested by fields before being created
+        //export them without additional fields to prevent conflicts with missing fields, field tabs can be added on the second pass
+        //after all the fields have been created
+
+        foreach($this->_dependencyTypes as $key => $value)
         {
-            if (array_key_exists($type['source'], $data)) {
-                $service = craft()->getComponent($type['service']);
-                $migration[$type['destination']] = $service->export($data[$type['source']]);
+            $service = craft()->getComponent($value);
+            if (array_key_exists($service->getSource(), $data))
+            {
+                $migration['dependencies'][$service->getDestination()] = $service->export($data[$service->getSource()], false);
                 $empty = false;
+
+                if ($service->hasErrors())
+                {
+                    $errors = $service->getErrors();
+                    foreach($errors as $error){
+                        MigrationManagerPlugin::log($error, LogLevel::Error);
+                    }
+                    return false;
+                }
+
             }
         }
 
-        //imageTransform, global, category, route
 
+        foreach($this->_migrationTypes as $key => $value)
+        {
+            $service = craft()->getComponent($value);
+            if (array_key_exists($service->getSource(), $data))
+            {
+                $migration['elements'][$service->getDestination()] = $service->export($data[$service->getSource()]);
+                $empty = false;
+
+                if ($service->hasErrors())
+                {
+                    $errors = $service->getErrors();
+                     foreach($errors as $error){
+                        MigrationManagerPlugin::log($error, LogLevel::Error);
+                    }
+                    return false;
+                }
+
+            }
+        }
+
+        // route
         $date = new DateTime();
         $filename = sprintf('m%s_migrationmanager_import', $date->format('ymd_His'));
         $plugin = craft()->plugins->getPlugin('migrationmanager', false);
@@ -61,13 +107,37 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     {
         try
         {
-            foreach ($this->_migrationTypes as $key => $type) {
-                if (array_key_exists($type['destination'], $data)) {
-                    $service = craft()->getComponent($type['service']);
-                    $service->import($data[$type['destination']]);
+            //run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
+            foreach ($this->_dependencyTypes as $key => $value) {
+                $service = craft()->getComponent($value);
+
+                if (array_key_exists($service->getDestination(), $data['dependencies']))
+                {
+                    $service->import($data['dependencies'][$service->getDestination()]);
+
                     if ($service->hasErrors())
                     {
                         $errors = $service->getErrors();
+                        Craft::log('get errors: ', LogLevel::Error);
+                        foreach($errors as $error){
+                            MigrationManagerPlugin::log($error, LogLevel::Error);
+                        }
+                        return false;
+                    }
+                }
+            }
+
+            foreach ($this->_migrationTypes as $key => $value) {
+                $service = craft()->getComponent($value);
+
+                if (array_key_exists($service->getDestination(), $data['elements']))
+                {
+                    $service->import($data['elements'][$service->getDestination()]);
+
+                    if ($service->hasErrors())
+                    {
+                        $errors = $service->getErrors();
+                        Craft::log('get errors: ', LogLevel::Error);
                         foreach($errors as $error){
                             MigrationManagerPlugin::log($error, LogLevel::Error);
                         }
@@ -90,20 +160,38 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      *
      * @return mixed
      */
-    public function runToTop()
+    public function runToTop($migrationsToRun)
     {
         // This might take a while
         craft()->config->maxPowerCaptain();
 
         $plugin = craft()->plugins->getPlugin('migrationmanager');
 
-        if (($migrations = $this->getNewMigrations($plugin)) === array())
-        {
-            MigrationManagerPlugin::log('No new migration(s) found. Your system is up-to-date.', LogLevel::Info, true);
-            return true;
+        if (is_array($migrationsToRun)) {
+
+            Craft::log('use the incomign migrations', LogLevel::Error);
+            Craft::log(JsonHelper::encode($migrationsToRun), LogLevel::Error);
+            $migrations = array();
+            foreach($migrationsToRun as $migrationFile){
+                $migration = $this->getNewMigration($migrationFile);
+                if ($migration){
+                    $migrations[] = $migration;
+                }
+
+            }
+        } else {
+
+            Craft::log('get all migrations', LogLevel::Error);
+            $migrations = $this->getNewMigrations();
+
         }
 
         $total = count($migrations);
+
+        if ($total == 0){
+            MigrationManagerPlugin::log('No new migration(s) found. Your system is up-to-date.', LogLevel::Info, true);
+            return true;
+        }
 
         MigrationManagerPlugin::log("Total $total new ".($total === 1 ? 'migration' : 'migrations')." to be applied for Craft:", LogLevel::Info, true);
 
@@ -173,19 +261,17 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     continue;
                 }
 
-                $path = IOHelper::normalizePathSeparators($migrationPath.$file);
-                $class = IOHelper::getFileName($path, false);
+                $migration = $this->getMigration($file, $plugin);
+                if ($migration){
 
-                // Have we already run this migration?
-                if (in_array($class, $applied))
-                {
-                    continue;
+                    // Have we already run this migration?
+                    if (in_array($migration, $applied))
+                    {
+                        continue;
+                    }
+                    $migrations[] = $migration;
                 }
 
-                if (preg_match('/^m(\d\d)(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_\w+\.php$/', $file, $matches))
-                {
-                    $migrations[] = $class;
-                }
             }
 
             closedir($handle);
@@ -193,6 +279,47 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         }
 
         return $migrations;
+    }
+
+    public function getNewMigration($id)
+    {
+        $plugin = craft()->plugins->getPlugin('migrationmanager', false);
+
+        $applied = array();
+        foreach (craft()->migrations->getMigrationHistory($plugin) as $migration)
+        {
+            $applied[] = $migration['version'];
+        }
+
+        $migration = $this->getMigration($id . '.php', $plugin);
+
+        if ($migration){
+
+            // Have we already run this migration?
+            if (in_array($migration, $applied))
+            {
+                return false;
+            }
+
+            return $migration;
+        }
+
+        return false;
+    }
+
+    public function getMigration($file, $plugin)
+    {
+        $migrationPath = craft()->migrations->getMigrationPath($plugin) . 'generated/';
+        $path = IOHelper::normalizePathSeparators($migrationPath.$file);
+        $class = IOHelper::getFileName($path, false);
+
+        if (preg_match('/^m(\d\d)(\d\d)(\d\d)_(\d\d)(\d\d)(\d\d)_\w+\.php$/', $file, $matches))
+        {
+            return $class;
+        } else {
+            return false;
+        }
+
     }
 
     /**

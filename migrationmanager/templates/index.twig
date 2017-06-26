@@ -128,7 +128,11 @@
         <table class="data fullwidth collapsible">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>
+                        <div class="field checkboxfield">
+                            <input type="checkbox" id="allAssetTransforms" class="checkbox checkbox-toggle" name="allAssetTransforms" value="all" data-selector="assetTransform"> <label for="allAssetTransforms">Name</label>
+                        </div>
+                    </th>
                     <th>Handle</th>
                     <th>Mode</th>
                     <th>Dimensions</th>
@@ -158,12 +162,16 @@
             </tbody>
         </table>
         <hr>
-        {#
+
         <h1>Globals</h1>
         <table class="data fullwidth collapsible">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>
+                        <div class="field checkboxfield">
+                            <input type="checkbox" id="allGlobals" class="checkbox checkbox-toggle" name="allGlobals" value="all" data-selector="global"> <label for="allGlobals">Name</label>
+                        </div>
+                    </th>
                     <th>Handle</th>
                 </tr>
             </thead>
@@ -182,11 +190,16 @@
             </tbody>
         </table>
         <hr>
+        
         <h1>Categories</h1>
         <table class="data fullwidth collapsible">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>
+                        <div class="field checkboxfield">
+                            <input type="checkbox" id="allCategories" class="checkbox checkbox-toggle" name="allCategories" value="all" data-selector="category"> <label for="allCategories">Name</label>
+                        </div>
+                    </th>
                     <th>Handle</th>
                 </tr>
             </thead>
@@ -205,6 +218,35 @@
             </tbody>
         </table>
         <hr>
+
+        <h1>Tags</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+            <tr>
+                <th>
+                    <div class="field checkboxfield">
+                        <input type="checkbox" id="allTags" class="checkbox checkbox-toggle" name="allTags" value="all" data-selector="tag"> <label for="allTags">Name</label>
+                    </div>
+                </th>
+                <th>Handle</th>
+            </tr>
+            </thead>
+            <tbody class="tags">
+            {% for tag in craft.migrationManager.getAllTagGroups() %}
+
+                <tr class="tag">
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="tag{{ tag.id }}" class="checkbox" name="tag[]" value="{{ tag.id }}"> <label for="tag{{ tag.id }}">{{ tag }}</label>
+                    </th>
+                    <td>
+                        <code>{{ tag.handle }}</code>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        {#
         <h1>Routes</h1>
         <table class="data fullwidth collapsible">
             <thead>
@@ -228,6 +270,34 @@
         </table>
         <hr>
         #}
+
+        <h1>Locales</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    <th>
+                        <div class="field checkboxfield">
+                            <input type="checkbox" id="allLocales" class="checkbox checkbox-toggle" name="allLocales" value="all" data-selector="locale"> <label for="allLocales">Name</label>
+                        </div>
+                    </th>
+                    <th>Code</th>
+                </tr>
+            </thead>
+            <tbody class="routes">
+                {% for locale in craft.i18n.getSiteLocales() %}
+                <tr class="route" data-id="{{ locale.id }}">
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="locale{{ locale.id }}" class="checkbox" name="locale[]" value="{{ locale.id }}"> <label for="locale{{ locale.id }}">{{ locale.getName() }}</label>
+                    </th>
+                    <td>
+                        <code>{{ locale }}</code>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+
 
         <div class="buttons clearafter">
             <button class="btn submit export-btn" name="submit" value="create">Create Migration</button>

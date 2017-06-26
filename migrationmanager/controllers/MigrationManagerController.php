@@ -14,7 +14,7 @@ class MigrationManagerController extends BaseController
         {
             craft()->userSession->setNotice(Craft::t('Migration created.'));
         } else {
-            craft()->userSession->setError(Craft::t('Could not create migration.'));
+            craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
         }
 
         $this->renderTemplate('migrationmanager/index');
@@ -33,7 +33,9 @@ class MigrationManagerController extends BaseController
         $data = array(
             'data' => array(
                 'handle' => craft()->security->hashData($plugin->getClassHandle()),
-                'uid' => craft()->security->hashData(StringHelper::UUID())
+                'uid' => craft()->security->hashData(StringHelper::UUID()),
+                'migrations' => craft()->request->getPost('migration')
+
             )
         );
 
@@ -46,7 +48,6 @@ class MigrationManagerController extends BaseController
         $this->requirePostRequest();
         $this->requireAjaxRequest();
         $data = craft()->request->getRequiredPost('data');
-
 
         $this->returnJson(array('alive' => true, 'nextStatus' => Craft::t('Backing-up database ...'), 'nextAction' => 'migrationManager/backupDatabase', 'data' => $data));
     }
@@ -128,7 +129,11 @@ class MigrationManagerController extends BaseController
         //give a little on screen pause
         sleep(2);
 
-        if (craft()->migrationManager_migrations->runToTop())
+        Craft::log(JsonHelper::encode($data), LogLevel::Error);
+
+
+
+        if (craft()->migrationManager_migrations->runToTop($data['migrations']))
         {
             $this->returnJson(array('alive' => true, 'finished' => true, 'returnUrl' => 'migrationManager/migrations'));
         } else {
@@ -221,6 +226,69 @@ class MigrationManagerController extends BaseController
             craft()->user->setError(Craft::t('Could not create migration.'));
         }
 
+
+        $this->returnJson(true);
+    }
+
+    public function actionEntry()
+    {
+        HeaderHelper::setHeader(['Content-Type: text/json']);
+
+        $entry = craft()->entries->getEntryById(24, 'en_us');
+
+        echo JsonHelper::encode($entry);
+
+        $entryType = $entry->getType();
+
+        echo JsonHelper::encode($entryType);
+
+        $tabs = array();
+
+        foreach ($entryType->getFieldLayout()->getTabs() as $index => $tab)
+        {
+            // Do any of the fields on this tab have errors?
+            $hasErrors = false;
+
+            /*if ($variables['entry']->hasErrors())
+            {
+                foreach ($tab->getFields() as $field)
+                {
+                    if ($variables['entry']->getErrors($field->getField()->handle))
+                    {
+                        $hasErrors = true;
+                        break;
+                    }
+                }
+            }*/
+
+            $tabs[] = array(
+                'label' => Craft::t($tab->name),
+                'url'   => '#tab',
+                'class' => null
+            );
+
+            $fields = $tab->getFields();
+
+            foreach($fields as $field) {
+                echo PHP_EOL . 'FIELD' . PHP_EOL;
+                //echo JsonHelper::encode($field) . PHP_EOL;
+                $field = $field->getField();
+
+                $value = $entry->getFieldValue($field->handle);
+                $fieldType = $field->getFieldType();
+                $fieldType->setElement($entry);
+                echo PHP_EOL . 'FIELD TYPE' . PHP_EOL;
+                print_r(json_encode(json_decode(JsonHelper::encode($fieldType->model)), JSON_PRETTY_PRINT));
+                echo PHP_EOL . 'VALUE' . PHP_EOL;
+                print_r(json_encode(json_decode(JsonHelper::encode($value)), JSON_PRETTY_PRINT)) . PHP_EOL . PHP_EOL;
+
+                if ($fieldType->model->type == 'RichText') {
+                    //$content = $value->getContent();
+                    //echo $content;
+
+                }
+            }
+        }
 
         $this->returnJson(true);
     }

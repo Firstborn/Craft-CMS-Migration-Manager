@@ -21,22 +21,23 @@
     {%  endif %}
 
 
-    {% for migration in migrations %}
-        {{ migration }}
-        <hr/>
-    {% endfor %}
-
-    {% if migrations|length %}
-
     <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
         <input type="hidden" name="action" value="migrationManager/runMigration">
         {{ getCsrfInput() }}
 
+        {% for migration in migrations %}
+            <input type="checkbox" id="{{ migration }}" class="checkbox" name="migration[]" value="{{ migration }}"> <label for="{{ migration }}">{{ migration }}</label>
+            <hr/>
+        {% endfor %}
 
-        <input type="submit" class="btn submit export-btn" value="Run Migration{{ migrations|length > 1 ? 's' : '' }}">
+        {% if migrations|length %}
+            <p>You can select specific migrations to run, otherwise all migrations will be run.</p>
+            <input type="submit" class="btn submit export-btn" value="Run Migration{{ migrations|length > 1 ? 's' : '' }}">
+
+        {% endif %}
     </form>
 
-    {% endif %}
+
 
 
 

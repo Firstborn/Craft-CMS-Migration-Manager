@@ -8,9 +8,9 @@ interface MigrationManager_IMigrationService {
 
     public function importItem(Array $data);
 
-    public function export(Array $ids);
+    public function export(Array $ids, $fullExport);
 
-    public function exportItem($id);
+    public function exportItem($id, $fullExport);
 
     public function createModel(Array $data);
 
@@ -21,6 +21,16 @@ interface MigrationManager_IMigrationService {
     public function addError($value);
 
     public function resetErrors();
+
+    /**
+     * @return string the post field to pull export ids from
+     */
+    public function getSource();
+
+    /**
+     * @return string the property to write export data to
+     */
+    public function getDestination();
 
 
 

@@ -25,6 +25,11 @@ class MigrationManagerVariable
         return craft()->assetTransforms->getAllTransforms();
     }
 
+    public function getAllTagGroups()
+    {
+        return craft()->tags->getAllTagGroups();
+    }
+
 
 
 

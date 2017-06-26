@@ -3,8 +3,10 @@
 namespace Craft;
 class MigrationManager_FieldsService extends MigrationManager_BaseMigrationService
 {
+    protected $source = 'field';
+    protected $destination = 'fields';
 
-    public function exportItem($id){
+    public function exportItem($id, $fullExport){
         $includeID = false;
         $field = craft()->fields->getFieldById($id);
         if (!$field){
@@ -148,7 +150,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                     'instructions' => $field->instructions,
                     'required' => $field->required,
                     'type' => $field->type,
-                    'width' => isset($columns[$field - 1]['width']) ? $columns[$field - 1]['width'] : '',
+                    'width' => isset($columns[$fieldCount - 1]['width']) ? $columns[$fieldCount - 1]['width'] : '',
                     'typesettings' => $field->settings,
                 ];
 
@@ -175,6 +177,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
     private function getSettingHandles(&$field)
     {
+
         $this->getSourceHandles($field);
         $this->getTransformHandles($field);
 
@@ -200,7 +203,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
     private function getSourceHandles(&$field)
     {
-         if ($field['type'] == 'Assets') {
+          if ($field['type'] == 'Assets') {
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 7) == 'folder:') {
@@ -261,11 +264,23 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
 
         if ($field['type'] == 'Categories') {
-            if (array_key_exists('source', $field['typesettings'])) {
-                if (substr($field['typesettings']['source'], 0, 6) == 'group:') {
-                    $category = craft()->categories->getGroupById(intval(substr($field['typesettings']['source'], 6)));
-                    if ($category) {
-                        $field['typesettings']['source'] = $category->handle;
+            if (array_key_exists('source', $field['typesettings']) && is_array($field['typesettings']['source'])) {
+                foreach ($field['typesettings']['source'] as $key => $value) {
+
+                    if (substr($value, 0, 6) == 'group:') {
+                        $categories = craft()->categories->getAllGroupIds();
+                        $categoryId = intval(substr($value, 6));
+                        if (in_array($categoryId, $categories))
+                        {
+                            $category = craft()->categories->getGroupById($categoryId);
+                            if ($category) {
+                                $field['typesettings']['source'] = $category->handle;
+                            } else {
+                                $field['typesettings']['source'] = [];
+                            }
+                        } else {
+                            $this->addError('Can not export field: ' . $field['handle'] . ' category id: ' . $categoryId . ' does not exist in system');
+                        }
                     }
                 }
             }
@@ -311,7 +326,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                 $field['typesettings']['sources'] = [];
             }
         }
-
     }
 
     private function getTransformHandles(&$field)
@@ -319,7 +333,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         if ($field['type'] == 'RichText') {
             if (array_key_exists('availableTransforms', $field['typesettings']) && is_array($field['typesettings']['availableTransforms'])) {
                 foreach ($field['typesettings']['availableTransforms'] as $key => $value) {
-                    $transform = $this->getTransformById($value);
+                    $transform = MigrationManagerHelper::getTransformById($value);
 
                     if ($transform) {
                         $field['typesettings']['availableTransforms'][$key] = $transform->handle;
@@ -358,15 +372,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         return false;
     }
 
-    private function getTransformById($id)
-    {
-        $transforms = craft()->assetTransforms->getAllTransforms();
-        foreach ($transforms as $key => $transform) {
-            if ($transform->id == $id) {
-                return $transform;
-            }
-        }
-    }
 
     private function getSettingIds(&$field)
     {

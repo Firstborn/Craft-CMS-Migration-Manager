@@ -5,16 +5,16 @@ namespace Craft;
 
 class MigrationManager_SectionsService extends MigrationManager_BaseMigrationService
 {
+    protected $source = 'section';
+    protected $destination = 'sections';
 
-    public function exportItem($id)
+    public function exportItem($id, $fullExport)
     {
         $section = craft()->sections->getSectionById($id);
 
         if (!$section) {
             return false;
         }
-
-        $locales = $section->getLocales();
 
         $newSection = [
             'name' => $section->attributes['name'],
@@ -26,12 +26,7 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             'maxLevels' => $section->attributes['maxLevels']
         ];
 
-
-        /*
-        if ($newSection['type'] === 'single') {
-            //    unset($newSection['typesettings']['hasUrls']);
-        }*/
-
+        $locales = $section->getLocales();
 
         if ((bool) $section->attributes['hasUrls'] === false ) {
             $newSection['locales'] = [];

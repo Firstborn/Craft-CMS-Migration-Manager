@@ -41,6 +41,7 @@ class MigrationManagerPlugin extends BasePlugin
     }
 
     function init(){
+        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/helpers/MigrationManagerHelper.php');
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_IMigrationService.php');
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_BaseMigrationService.php');
 
