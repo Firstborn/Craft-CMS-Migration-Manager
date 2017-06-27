@@ -7,6 +7,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     private $_migrationTable;
 
     private $_migrationTypes =  array(
+        'locale' => 'migrationManager_locales',
         'field' => 'migrationManager_fields',
         'section' => 'migrationManager_sections',
         'assetSource' => 'migrationManager_assetSources',
@@ -14,7 +15,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         'global' => 'migrationManager_globals',
         'tag' => 'migrationManager_tags',
         'category' => 'migrationManager_categories',
-        'locale' => 'migrationManager_locales'
+        'route' => 'migrationManager_routes'
     );
 
     private $_dependencyTypes =  array(
@@ -87,7 +88,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     }
                     return false;
                 }
-
             }
         }
 
@@ -97,14 +97,19 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $plugin = craft()->plugins->getPlugin('migrationmanager', false);
         $migrationPath = craft()->migrations->getMigrationPath($plugin);
         $path = sprintf($migrationPath . 'generated/%s.php', $filename);
+
+        $migration = json_encode($migration);
+
         $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, true));
         IOHelper::writeToFile($path, $content);
         return true;
-
     }
 
     public function import($data)
     {
+
+        $data = json_decode($data, true);
+
         try
         {
             //run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
@@ -118,7 +123,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     if ($service->hasErrors())
                     {
                         $errors = $service->getErrors();
-                        Craft::log('get errors: ', LogLevel::Error);
                         foreach($errors as $error){
                             MigrationManagerPlugin::log($error, LogLevel::Error);
                         }
@@ -137,7 +141,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     if ($service->hasErrors())
                     {
                         $errors = $service->getErrors();
-                        Craft::log('get errors: ', LogLevel::Error);
                         foreach($errors as $error){
                             MigrationManagerPlugin::log($error, LogLevel::Error);
                         }
@@ -168,9 +171,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $plugin = craft()->plugins->getPlugin('migrationmanager');
 
         if (is_array($migrationsToRun)) {
-
-            Craft::log('use the incomign migrations', LogLevel::Error);
-            Craft::log(JsonHelper::encode($migrationsToRun), LogLevel::Error);
             $migrations = array();
             foreach($migrationsToRun as $migrationFile){
                 $migration = $this->getNewMigration($migrationFile);
@@ -180,8 +180,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
             }
         } else {
-
-            Craft::log('get all migrations', LogLevel::Error);
             $migrations = $this->getNewMigrations();
 
         }

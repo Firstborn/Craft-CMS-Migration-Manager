@@ -230,6 +230,8 @@ class MigrationManagerController extends BaseController
         $this->returnJson(true);
     }
 
+
+
     public function actionEntry()
     {
         HeaderHelper::setHeader(['Content-Type: text/json']);

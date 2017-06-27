@@ -19,9 +19,8 @@ class {{ className }} extends BaseMigration
         //add your custom migration code, see the EXAMPLES.md for examples
         return true;
         {% else %}
-        $migrationJson = '{{ migration|json_encode|raw }}';
-        $data = json_decode($migrationJson, true);
-        return craft()->migrationManager_migrations->import($data);
+        $json = '{{ migration|raw }}';
+        return craft()->migrationManager_migrations->import($json);
         {% endif %}
         {% endspaceless %}
 

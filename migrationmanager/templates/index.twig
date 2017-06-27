@@ -16,6 +16,7 @@
     <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
         <input type="hidden" name="action" value="migrationManager/createMigration">
         {{ getCsrfInput() }}
+
         <h1>Fields</h1>
         <table class="data fullwidth collapsible">
             <thead>
@@ -246,20 +247,24 @@
             </tbody>
         </table>
         <hr>
-        {#
+
         <h1>Routes</h1>
         <table class="data fullwidth collapsible">
             <thead>
                 <tr>
-                    <th>URI</th>
+                    <th>
+                        <div class="field checkboxfield">
+                            <input type="checkbox" id="allRoutes" class="checkbox checkbox-toggle" name="allRoutes" value="all" data-selector="route"> <label for="allRoutes">URI (* routes can not be exported individually)</label>
+                        </div>
+                    </th>
                     <th>Template</th>
                 </tr>
             </thead>
             <tbody class="routes">
                 {% for route in craft.routes.getDbRoutes() %}
-                <tr class="route" data-id="{{ route.id }}">
+                <tr class="route">
                     <th scope="row" class="name">
-                        <input type="checkbox" id="route{{ route.id }}" class="checkbox" name="route[]" value="{{ route.id }}"> <label for="route{{ route.id }}">{{ route.urlDisplayHtml | raw }}</label>
+                        <input type="checkbox" id="route{{ route.id }}" class="checkbox checkbox-all" data-selector="route" name="route[]" value="{{ route.id }}"> <label for="route{{ route.id }}">{{ route.urlDisplayHtml | raw }}</label>
                     </th>
                     <td>
                         <code>{{ route.template }}</code>
@@ -268,8 +273,9 @@
                 {% endfor %}
             </tbody>
         </table>
+        <p>Either all or no routes must be exported.</p>
         <hr>
-        #}
+
 
         <h1>Locales</h1>
         <table class="data fullwidth collapsible">
