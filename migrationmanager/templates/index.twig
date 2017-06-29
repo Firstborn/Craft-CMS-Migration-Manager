@@ -248,35 +248,6 @@
         </table>
         <hr>
 
-        <h1>Routes</h1>
-        <table class="data fullwidth collapsible">
-            <thead>
-                <tr>
-                    <th>
-                        <div class="field checkboxfield">
-                            <input type="checkbox" id="allRoutes" class="checkbox checkbox-toggle" name="allRoutes" value="all" data-selector="route"> <label for="allRoutes">URI (* routes can not be exported individually)</label>
-                        </div>
-                    </th>
-                    <th>Template</th>
-                </tr>
-            </thead>
-            <tbody class="routes">
-                {% for route in craft.routes.getDbRoutes() %}
-                <tr class="route">
-                    <th scope="row" class="name">
-                        <input type="checkbox" id="route{{ route.id }}" class="checkbox checkbox-all" data-selector="route" name="route[]" value="{{ route.id }}"> <label for="route{{ route.id }}">{{ route.urlDisplayHtml | raw }}</label>
-                    </th>
-                    <td>
-                        <code>{{ route.template }}</code>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p>Either all or no routes must be exported.</p>
-        <hr>
-
-
         <h1>Locales</h1>
         <table class="data fullwidth collapsible">
             <thead>
@@ -302,6 +273,64 @@
                 {% endfor %}
             </tbody>
         </table>
+        <hr>
+
+        <h1>User Groups</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+            <tr>
+                <th>
+                    <div class="field checkboxfield">
+                        <input type="checkbox" id="allUserGroups" class="checkbox checkbox-toggle" name="allUserGroups" value="all" data-selector="userGroup"> <label for="allUserGroups">Name</label>
+                    </div>
+                </th>
+                <th>Handle</th>
+            </tr>
+            </thead>
+            <tbody class="userGroups">
+            {% for group in craft.userGroups.getAllGroups %}
+                <tr class="userGroup" data-id="{{ group.id }}">
+                    <th scope="row" class="name">
+                        <input type="checkbox" id="userGroup{{ group.id }}" class="checkbox" name="userGroup[]" value="{{ group.id }}"> <label for="userGroup{{ group.id }}">{{ group }}</label>
+                    </th>
+                    <td>
+                        <code>{{ group.handle }}</code>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+
+        <h1>Other Settings</h1>
+        <table class="data fullwidth collapsible">
+            <thead>
+            <tr>
+                <th>
+                    <div class="field checkboxfield">
+                        <input type="checkbox" id="allSettings" class="checkbox checkbox-toggle" name="allSettings" value="all" data-selector="settings"> <label for="allSettings">Setting</label>
+                    </div>
+                </th>
+
+            </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td scope="row" class="name">
+                        <input type="checkbox" id="settingsRoutes" class="checkbox" name="settingsRoutes[]" value="1"> <label for="settingsRoutes">Routes</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td scope="row" class="name">
+                        <input type="checkbox" id="settingsEmails" class="checkbox" name="settingsEmailMessages[]" value="1"> <label for="settingsEmails">Email Messages</label>
+                    </td>
+
+                </tr>
+
+            </tbody>
+        </table>
+
         <hr>
 
 

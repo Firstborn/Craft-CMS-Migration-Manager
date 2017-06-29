@@ -244,6 +244,8 @@ class MigrationManagerController extends BaseController
 
         echo JsonHelper::encode($entryType);
 
+
+
         $tabs = array();
 
         foreach ($entryType->getFieldLayout()->getTabs() as $index => $tab)
@@ -272,23 +274,62 @@ class MigrationManagerController extends BaseController
             $fields = $tab->getFields();
 
             foreach($fields as $field) {
-                echo PHP_EOL . 'FIELD' . PHP_EOL;
-                //echo JsonHelper::encode($field) . PHP_EOL;
                 $field = $field->getField();
+                echo PHP_EOL . 'FIELD ' . $field->handle . ' - '. $field->type . PHP_EOL;
+                //echo $field->getName() . PHP_EOL;
+                //var_dump($field->type);
+                //echo PHP_EOL . 'FIELD TYPE' .$field->getFieldType() . PHP_EOL;
+                //echo JsonHelper::encode($field) . PHP_EOL;
+
 
                 $value = $entry->getFieldValue($field->handle);
-                $fieldType = $field->getFieldType();
-                $fieldType->setElement($entry);
-                echo PHP_EOL . 'FIELD TYPE' . PHP_EOL;
-                print_r(json_encode(json_decode(JsonHelper::encode($fieldType->model)), JSON_PRETTY_PRINT));
-                echo PHP_EOL . 'VALUE' . PHP_EOL;
-                print_r(json_encode(json_decode(JsonHelper::encode($value)), JSON_PRETTY_PRINT)) . PHP_EOL . PHP_EOL;
 
-                if ($fieldType->model->type == 'RichText') {
-                    //$content = $value->getContent();
-                    //echo $content;
+                //var_dump($value);
+
+                //echo $value->getContent();
+
+                switch($field->type){
+                    case 'RichText':
+                        echo $value->getRawContent() . PHP_EOL;
+                        break;
+                    case 'Dropdown':
+                        echo $value . PHP_EOL;
+                        break;
+                    case 'PlainText';
+                        echo $value . PHP_EOL;
+                        break;
+                    case 'Checkboxes':
+                       // echo $value . PHP_EOL;
+                       $options = $value->getOptions();
+                       foreach($options as $option)
+                       {
+                           echo $option->value . ' ' . $option->selected . PHP_EOL;
+                       }
+
+                       break;
+                    case 'Date':
+                        echo $value->getTimestamp() . PHP_EOL;
+                        //var_dump($value->iso8601());
+                        break;
+                    case 'Lightswitch':
+                        echo $value . PHP_EOL;
+                        break;
 
                 }
+
+
+                //$fieldType = $field->getFieldType();
+                //$fieldType->setElement($entry);
+
+
+                //print_r(json_encode(json_decode(JsonHelper::encode($fieldType->model)), JSON_PRETTY_PRINT));
+                //echo PHP_EOL . 'VALUE' . PHP_EOL;
+                //print_r(json_encode(json_decode(JsonHelper::encode($value)), JSON_PRETTY_PRINT)) . PHP_EOL . PHP_EOL;
+
+                //if ($fieldType->model->type == 'RichText') {
+                    //$content = $value->getContent();
+                    //echo $content;
+                //}
             }
         }
 

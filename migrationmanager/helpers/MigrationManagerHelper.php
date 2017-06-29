@@ -15,4 +15,17 @@ class MigrationManagerHelper
 
         return false;
     }
+
+    public static function getAssetSourceByHandle($handle)
+    {
+        $sources = craft()->assetSources->getAllSources();
+        foreach($sources as $source)
+        {
+            if ($source->handle == $handle)
+            {
+                return $source;
+            }
+        }
+        return false;
+    }
 }

@@ -15,7 +15,9 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         'global' => 'migrationManager_globals',
         'tag' => 'migrationManager_tags',
         'category' => 'migrationManager_categories',
-        'route' => 'migrationManager_routes'
+        'route' => 'migrationManager_routes',
+        'userGroup' => 'migrationManager_userGroups',
+        'emailMessages' => 'migrationManager_emailMessages'
     );
 
     private $_dependencyTypes =  array(
@@ -75,8 +77,10 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         foreach($this->_migrationTypes as $key => $value)
         {
             $service = craft()->getComponent($value);
+
             if (array_key_exists($service->getSource(), $data))
             {
+
                 $migration['elements'][$service->getDestination()] = $service->export($data[$service->getSource()]);
                 $empty = false;
 

@@ -48,7 +48,7 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
     public function importItem(Array $data)
     {
 
-        $existing = $this->getAssetSourceByHandle($data['handle']);
+        $existing = MigrationManagerHelper::getAssetSourceByHandle($data['handle']);
 
         if ($existing) {
             $this->mergeUpdates($data, $existing);
@@ -114,18 +114,7 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
         $newSource['id'] = $source->id;
     }
 
-    private function getAssetSourceByHandle($handle)
-    {
-        $sources = craft()->assetSources->getAllSources();
-        foreach($sources as $source)
-        {
-            if ($source->handle == $handle)
-            {
-                return $source;
-            }
-        }
-        return false;
-    }
+
 
 
 }
