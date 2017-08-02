@@ -264,23 +264,21 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
 
         if ($field['type'] == 'Categories') {
-            if (array_key_exists('source', $field['typesettings']) && is_array($field['typesettings']['source'])) {
-                foreach ($field['typesettings']['source'] as $key => $value) {
-
-                    if (substr($value, 0, 6) == 'group:') {
-                        $categories = craft()->categories->getAllGroupIds();
-                        $categoryId = intval(substr($value, 6));
-                        if (in_array($categoryId, $categories))
-                        {
-                            $category = craft()->categories->getGroupById($categoryId);
-                            if ($category) {
-                                $field['typesettings']['source'] = $category->handle;
-                            } else {
-                                $field['typesettings']['source'] = [];
-                            }
+             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
+                $value = $field['typesettings']['source'];
+                if (substr($value, 0, 6) == 'group:') {
+                    $categories = craft()->categories->getAllGroupIds();
+                    $categoryId = intval(substr($value, 6));
+                    if (in_array($categoryId, $categories))
+                    {
+                        $category = craft()->categories->getGroupById($categoryId);
+                        if ($category) {
+                            $field['typesettings']['source'] = $category->handle;
                         } else {
-                            $this->addError('Can not export field: ' . $field['handle'] . ' category id: ' . $categoryId . ' does not exist in system');
+                            $field['typesettings']['source'] = [];
                         }
+                    } else {
+                        $this->addError('Can not export field: ' . $field['handle'] . ' category id: ' . $categoryId . ' does not exist in system');
                     }
                 }
             }

@@ -21,12 +21,12 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     );
 
     private $_dependencyTypes =  array(
+        'locale' => 'migrationManager_locales',
         'section' => 'migrationManager_sections',
         'assetSource' => 'migrationManager_assetSources',
         'assetTransform' => 'migrationManager_assetTransforms',
         'tag' => 'migrationManager_tags',
-        'category' => 'migrationManager_categories',
-        'locale' => 'migrationManager_locales'
+        'category' => 'migrationManager_categories'
     );
 
     public function init()
