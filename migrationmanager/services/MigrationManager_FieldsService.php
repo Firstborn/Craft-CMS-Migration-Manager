@@ -24,8 +24,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             'typesettings' => $field->settings
         ];
 
-        if ($field->type == 'PositionSelect')
-        {
+        if ($field->type == 'PositionSelect') {
             $options = [];
             foreach ($newField['typesettings']['options'] as $value) {
                 $options[$value] = true;
@@ -33,19 +32,32 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             $newField['typesettings']['options'] = $options;
         }
 
-        if ($field->type == 'Matrix')
-        {
+        if ($field->type == 'Matrix') {
             $this->getMatrixField($newField, $field->id, $includeID);
         }
 
-        if ($field->type == 'SuperTable')
-        {
+        if ($field->type == 'SuperTable') {
             $this->getSuperTableField($newField, $field->id, $includeID);
         }
 
         $this->getSettingHandles($newField);
 
-        return $newField;
+
+        // Fire an 'onExportField' event
+        $event = new Event($this, array(
+            'field' => $field,
+            'value' => $newField
+        ));
+        $this->onExportField($event);
+
+        if ($event->performAction){
+            return $event->params['value'];
+        } else {
+            $this->addError('Error exporting ' . $field->handle . ' field.');
+            $this->addError($event->params['error']);
+            return false;
+        }
+
     }
 
 
@@ -60,17 +72,63 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             $data['id'] = 'new';
         }
 
-        $field = $this->createModel($data);
+        // Fire an 'onImportField' event
+        $event = new Event($this, array(
+            'field' => $existing,
+            'value' => $data
+        ));
+        $this->onImportField($event);
 
-        $result = craft()->fields->saveField($field);
-        if ($result) {
+        if ($event->performAction) {
+            $field = $this->createModel($event->params['value']);
 
+
+            $result = craft()->fields->saveField($field);
+            if ($result) {
+
+            } else {
+                $this->addError('Could not save the ' . $data['handle'] . ' field.');
+            }
+
+            return $result;
         } else {
-            $this->addError('Could not save the ' . $data['handle'] . ' field.');
+            $this->addError('Error importing ' . $data['handle'] . ' field.');
+            $this->addError($event->params['error']);
+            return false;
         }
-
-        return $result;
     }
+
+    /**
+     * Fires an 'onExportField' event. To prevent execution of the export set $event->performAction to false and set a reason in $event->params['error'] to be logged.
+     *
+     * @param Event $event
+     *          $event->params['field'] - field to export
+     *          $event->params['value'] - field data that will be written to migration file, change this value to affect the migration export
+     *
+     * @return null
+     */
+    public function onExportField(Event $event)
+    {
+        $this->raiseEvent('onExportField', $event);
+    }
+
+    /**
+     * Fires an 'onImportField' event. To prevent execution of the import set $event->performAction to false and set a reason in $event->params['error'] to be logged.
+     *
+     * @param Event $event
+     *          $event->params['field'] - field
+     *          $event->params['value'] - field data that will be imported, change this value to affect the migration import
+     *
+     * @return null
+     */
+    public function onImportField(Event $event)
+    {
+        $this->raiseEvent('onImportField', $event);
+    }
+
+
+
+
 
     private function getMatrixField(&$newField, $fieldId, $includeID = false)
     {
@@ -341,7 +399,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
     }
 
-    private function getAssetSourceByHandle($handle){
+    /*private function getAssetSourceByHandle($handle){
         $sources = craft()->assetSources->getAllSources();
         foreach($sources as $source)
         {
@@ -352,7 +410,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
 
         return false;
-    }
+    }*/
 
     private function getFieldGroupByName($name)
     {
@@ -418,7 +476,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             $newSources = array();
 
             foreach ($field['typesettings']['sources'] as $source) {
-                $newSource = $this->getAssetSourceByHandle($source);
+                $newSource = MigrationManagerHelper::getAssetSourceByHandle($source);
                 if ($newSource) {
                     $newSources[] = 'folder:' . $newSource->id;
                 } else {
@@ -429,7 +487,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             $field['typesettings']['sources'] = join($newSources);
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = $this->getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
+                $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->id;
                 } else {
@@ -437,7 +495,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                 }
             }
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = $this->getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
+                $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->id;
                 } else {
@@ -449,7 +507,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         if ($field['type'] == 'RichText') {
             $newSources = array();
             foreach ($field['typesettings']['availableAssetSources'] as $source) {
-                $newSource = $this->getAssetSourceByHandle($source);
+                $newSource = MigrationManagerHelper::getAssetSourceByHandle($source);
                 if ($newSource) {
                     $newSources[] = 'folder:' . $newSource->id;
                 } else {
@@ -460,7 +518,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             $field['typesettings']['availableAssetSources'] = $newSources;
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = $this->getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
+                $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['defaultUploadLocationSource']);
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->id;
                 } else {
@@ -468,7 +526,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                 }
             }
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = $this->getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
+                $source = MigrationManagerHelper::getAssetSourceByHandle($field['typesettings']['singleUploadLocationSource']);
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->id;
                 } else {
@@ -566,7 +624,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
         $field->type = $data['type'];
         $field->settings = $data['typesettings'];
-
 
         return $field;
     }

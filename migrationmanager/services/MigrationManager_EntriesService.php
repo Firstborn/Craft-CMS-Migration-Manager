@@ -34,87 +34,83 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         $field = $fieldModel->getField();
         $value = $parent->getFieldValue($field->handle);
 
-        switch ($field->type) {
-            case 'RichText':
-                $value = $value->getRawContent();
-                break;
-            case 'Matrix':
-                $model = $parent[$field->handle];
-                $value = $this->getIteratorValues($model, function ($item) {
-                    $itemType = $item->getType();
-                    $value = [
-                        'type' => $itemType->handle,
-                        'enabled' => $item->enabled,
-                        'fields' => []
-                    ];
+        // Fire an 'onExportField' event
+        $event = new Event($this, array(
+            'field' => $field,
+            'parent' => $parent,
+            'value' => $value
+        ));
 
-                    return $value;
-                });
-                break;
-            case 'SuperTable':
-                $model = $defaultParent[$field->handle];
-                $value = $this->getIteratorValues($model, function () {
-                    $value = [
-                        'type' => 1,
-                        'fields' => []
-                    ];
+        echo 'before event';
 
-                    return $value;
-                });
+        $this->onExportField($event);
 
-                break;
-            default:
+        echo 'after event: ' .$event->params['value'] . PHP_EOL;
 
+        if ($event->performAction == false) {
+            $value = $event->params['value'];
+        } else {
+            switch ($field->type) {
+                case 'RichText':
+                    $value = $value->getRawContent();
+                    break;
+                case 'Matrix':
+                    $model = $parent[$field->handle];
+                    $value = $this->getIteratorValues($model, function ($item) {
+                        $itemType = $item->getType();
+                        $value = [
+                            'type' => $itemType->handle,
+                            'enabled' => $item->enabled,
+                            'fields' => []
+                        ];
 
-                if ($field->getFieldType() instanceof BaseElementFieldType) {
-                    $elements = $value->elements();
+                        return $value;
+                    });
+                    break;
+                case 'SuperTable':
+                    $model = $defaultParent[$field->handle];
+                    $value = $this->getIteratorValues($model, function () {
+                        $value = [
+                            'type' => 1,
+                            'fields' => []
+                        ];
 
+                        return $value;
+                    });
 
+                    break;
+                default:
+                    if ($field->getFieldType() instanceof BaseElementFieldType) {
+                        $elements = $value->elements();
 
+                        $value = [];
+                        if ($elements) {
+                            foreach ($elements as $element) {
+                                switch ($element->getElementType()) {
+                                    case 'Asset':
+                                        $value[] = [
+                                            'slug' => $element->slug,
+                                            'folder' => $element->getFolder()->name,
+                                            'source' => $element->getSource()->name
+                                        ];
+                                        break;
+                                    case 'Category':
 
-                    echo 'after event: ' .$event->params['value'] . PHP_EOL;
-
-
-
-
-                    $value = [];
-                    if ($elements) {
-                        foreach ($elements as $element) {
-                            switch($element->getElementType())
-                            {
-                                case 'Asset':
-                                    $value[] = [
-                                        'slug' => $element->slug,
-                                        'folder' => $element->getFolder()->name,
-                                        'source' => $element->getSource()->name
-                                    ];
-                                    break;
-                                case 'Category':
-
-                                    $value[] = [
-                                        'slug' => $element->slug,
-                                        'category' => $element->getGroup()->handle
-                                    ];
-                                    break;
-                                default:
-                                    $value[] = $element;
+                                        $value[] = [
+                                            'slug' => $element->slug,
+                                            'category' => $element->getGroup()->handle
+                                        ];
+                                        break;
+                                    default:
+                                        $value[] = $element;
+                                }
                             }
                         }
                     }
-                }
-
-                // Fire an 'onBeforeSaveEntry' event
-                $event = new Event($this, array(
-                    'field'      => $field,
-                    'value' => 'hi'
-                ));
-
-                echo 'before event';
-
-                $this->onExportField($event);
 
 
-                break;
+                    break;
+            }
         }
 
         //echo 'field: ' . $field->handle . ' value: ' . json_encode($value) . PHP_EOL;
@@ -150,9 +146,12 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
 
 
     /**
-     * Fires an 'onExportField' event.
+     * Fires an 'onExportField' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
      *
      * @param Event $event
+     *          $event->params['field'] - field
+     *          $event->params['parent'] - field parent
+     *          $event->params['value'] - current field value, change this value in the event handler to output a different value
      *
      * @return null
      */

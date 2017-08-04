@@ -227,6 +227,7 @@ class MigrationManagerController extends BaseController
         }
 
 
+
         $this->returnJson(true);
     }
 
