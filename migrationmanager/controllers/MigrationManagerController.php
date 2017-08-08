@@ -237,9 +237,7 @@ class MigrationManagerController extends BaseController
     {
         HeaderHelper::setHeader(['Content-Type: text/json']);
 
-        $content = craft()->migrationManager_entries->export([24]);
-
-
+        $content = craft()->migrationManager_entries->export([35]);
 
         echo JsonHelper::encode($content);
 

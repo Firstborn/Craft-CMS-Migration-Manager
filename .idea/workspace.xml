@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7d7c62cd-047d-4618-b402-6c1c5ccdb323" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,8 +18,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="1319">
-                <caret line="154" column="0" lean-forward="true" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
+              <first_editor relative-caret-position="1094">
+                <caret line="154" column="0" lean-forward="false" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
                 <folding />
               </first_editor>
               <second_editor />
@@ -41,9 +40,14 @@
       <file leaf-file-name="MigrationManager_EntriesService.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EntriesService.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2898">
-              <caret line="161" column="5" lean-forward="false" selection-start-line="151" selection-start-column="4" selection-end-line="161" selection-end-column="5" />
-              <folding />
+            <state relative-caret-position="2880">
+              <caret line="160" column="5" lean-forward="false" selection-start-line="153" selection-start-column="129" selection-end-line="160" selection-end-column="5" />
+              <folding>
+                <marker date="1501776422000" expanded="true" signature="107:5171" ph="{...}" />
+                <marker date="1501776422000" expanded="true" signature="737:852" ph="{...}" />
+                <marker date="1501776422000" expanded="true" signature="5021:5054" ph=" Fires an 'onExportField' event. ..." />
+                <marker date="1501776422000" expanded="true" signature="5104:5169" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -51,9 +55,27 @@
       <file leaf-file-name="MigrationManager_FieldsService.php" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1296">
-              <caret line="72" column="5" lean-forward="false" selection-start-line="72" selection-start-column="5" selection-end-line="72" selection-end-column="5" />
-              <folding />
+            <state relative-caret-position="2016">
+              <caret line="112" column="5" lean-forward="false" selection-start-line="112" selection-start-column="5" selection-end-line="112" selection-end-column="5" />
+              <folding>
+                <marker date="1501793120000" expanded="true" signature="231:802" ph="..." />
+                <marker date="1501793120000" expanded="true" signature="23726:23756" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="23812:24189" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="23904:24183" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="23956:24039" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="24086:24173" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="24247:25012" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="24572:24795" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="24802:24860" ph="..." />
+                <marker date="1501793120000" expanded="true" signature="25095:25814" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="25304:25762" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="25451:25683" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="25519:25605" ph="..." />
+                <marker date="1501793120000" expanded="true" signature="25690:25751" ph="..." />
+                <marker date="1501793120000" expanded="true" signature="25881:26059" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="25922:26031" ph="{...}" />
+                <marker date="1501793120000" expanded="true" signature="25976:26020" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -319,8 +341,8 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -423,17 +445,17 @@
       <workItem from="1501705665081" duration="1191000" />
       <workItem from="1501773759765" duration="2468000" />
       <workItem from="1501791131271" duration="1176000" />
+      <workItem from="1501855022600" duration="467000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="10870000" />
+    <option name="totallyTimeSpent" value="11337000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="284" y="97" width="1920" height="1250" extended-state="1" />
-    <editor active="true" />
+    <frame x="284" y="97" width="1920" height="1250" extended-state="0" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.203125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.203125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -634,8 +656,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="1319">
-            <caret line="154" column="0" lean-forward="true" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
+          <first_editor relative-caret-position="1094">
+            <caret line="154" column="0" lean-forward="false" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
             <folding />
           </first_editor>
           <second_editor />
@@ -652,17 +674,40 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EntriesService.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2898">
-          <caret line="161" column="5" lean-forward="false" selection-start-line="151" selection-start-column="4" selection-end-line="161" selection-end-column="5" />
-          <folding />
+        <state relative-caret-position="2880">
+          <caret line="160" column="5" lean-forward="false" selection-start-line="153" selection-start-column="129" selection-end-line="160" selection-end-column="5" />
+          <folding>
+            <marker date="1501776422000" expanded="true" signature="107:5171" ph="{...}" />
+            <marker date="1501776422000" expanded="true" signature="737:852" ph="{...}" />
+            <marker date="1501776422000" expanded="true" signature="5021:5054" ph=" Fires an 'onExportField' event. ..." />
+            <marker date="1501776422000" expanded="true" signature="5104:5169" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1296">
-          <caret line="72" column="5" lean-forward="false" selection-start-line="72" selection-start-column="5" selection-end-line="72" selection-end-column="5" />
-          <folding />
+        <state relative-caret-position="2016">
+          <caret line="112" column="5" lean-forward="false" selection-start-line="112" selection-start-column="5" selection-end-line="112" selection-end-column="5" />
+          <folding>
+            <marker date="1501793120000" expanded="true" signature="231:802" ph="..." />
+            <marker date="1501793120000" expanded="true" signature="23726:23756" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="23812:24189" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="23904:24183" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="23956:24039" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="24086:24173" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="24247:25012" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="24572:24795" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="24802:24860" ph="..." />
+            <marker date="1501793120000" expanded="true" signature="25095:25814" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="25304:25762" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="25451:25683" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="25519:25605" ph="..." />
+            <marker date="1501793120000" expanded="true" signature="25690:25751" ph="..." />
+            <marker date="1501793120000" expanded="true" signature="25881:26059" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="25922:26031" ph="{...}" />
+            <marker date="1501793120000" expanded="true" signature="25976:26020" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>

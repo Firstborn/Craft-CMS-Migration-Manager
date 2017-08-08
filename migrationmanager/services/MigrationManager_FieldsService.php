@@ -82,6 +82,8 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         if ($event->performAction) {
             $field = $this->createModel($event->params['value']);
 
+            Craft::log(JsonHelper::encode($field->settings), LogLevel::Error);
+
 
             $result = craft()->fields->saveField($field);
             if ($result) {
@@ -113,7 +115,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
     }
 
     /**
-     * Fires an 'onImportField' event. To prevent execution of the import set $event->performAction to false and set a reason in $event->params['error'] to be logged.
+     * Fires an 'onImportField' event. To prevent execution of the import set $event->performAction to false and set a reason in $event->params['error'] to be logged. When checking the field type use the $event->params['value'] object as the ['field'] could be empty (ie field doesn't exist yet)
      *
      * @param Event $event
      *          $event->params['field'] - field

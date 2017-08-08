@@ -6,7 +6,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
     private $_migrationTable;
 
-    private $_migrationTypes =  array(
+    private $_settingsMigrationTypes =  array(
         'locale' => 'migrationManager_locales',
         'field' => 'migrationManager_fields',
         'section' => 'migrationManager_sections',
@@ -20,7 +20,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         'emailMessages' => 'migrationManager_emailMessages'
     );
 
-    private $_dependencyTypes =  array(
+    private $_settingsDependencyTypes =  array(
         'locale' => 'migrationManager_locales',
         'section' => 'migrationManager_sections',
         'assetSource' => 'migrationManager_assetSources',
@@ -28,6 +28,11 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         'tag' => 'migrationManager_tags',
         'category' => 'migrationManager_categories'
     );
+
+    private $_contentMigrationTypes = array(
+        'entry' => 'migrationManager_entries'
+    );
+
 
     public function init()
     {
@@ -43,8 +48,11 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     public function create($data)
     {
         $migration = array(
-            'dependencies' => array(),
-            'elements' => array()
+            'settings' => array(
+                'dependencies' => array(),
+                'elements' => array()
+            ),
+            'content' => array()
         );
 
         $empty = true;
@@ -53,12 +61,12 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         //export them without additional fields to prevent conflicts with missing fields, field tabs can be added on the second pass
         //after all the fields have been created
 
-        foreach($this->_dependencyTypes as $key => $value)
+        foreach($this->_settingsDependencyTypes as $key => $value)
         {
             $service = craft()->getComponent($value);
             if (array_key_exists($service->getSource(), $data))
             {
-                $migration['dependencies'][$service->getDestination()] = $service->export($data[$service->getSource()], false);
+                $migration['settings']['dependencies'][$service->getDestination()] = $service->export($data[$service->getSource()], false);
                 $empty = false;
 
                 if ($service->hasErrors())
@@ -74,20 +82,42 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         }
 
 
-        foreach($this->_migrationTypes as $key => $value)
+        foreach($this->_settingsMigrationTypes as $key => $value)
         {
             $service = craft()->getComponent($value);
 
             if (array_key_exists($service->getSource(), $data))
             {
 
-                $migration['elements'][$service->getDestination()] = $service->export($data[$service->getSource()]);
+                $migration['settings']['elements'][$service->getDestination()] = $service->export($data[$service->getSource()]);
                 $empty = false;
 
                 if ($service->hasErrors())
                 {
                     $errors = $service->getErrors();
                      foreach($errors as $error){
+                        MigrationManagerPlugin::log($error, LogLevel::Error);
+                    }
+                    return false;
+                }
+            }
+        }
+
+        foreach($this->_contentMigrationTypes as $key => $value)
+        {
+            $service = craft()->getComponent($value);
+
+            if (array_key_exists($service->getSource(), $data))
+            {
+
+
+                $migration['content'][$service->getDestination()] = $service->export($data[$service->getSource()]);
+                $empty = false;
+
+                if ($service->hasErrors())
+                {
+                    $errors = $service->getErrors();
+                    foreach($errors as $error){
                         MigrationManagerPlugin::log($error, LogLevel::Error);
                     }
                     return false;
@@ -117,12 +147,12 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         try
         {
             //run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
-            foreach ($this->_dependencyTypes as $key => $value) {
+            foreach ($this->_settingsDependencyTypes as $key => $value) {
                 $service = craft()->getComponent($value);
 
-                if (array_key_exists($service->getDestination(), $data['dependencies']))
+                if (array_key_exists($service->getDestination(), $data['settings']['dependencies']))
                 {
-                    $service->import($data['dependencies'][$service->getDestination()]);
+                    $service->import($data['settings']['dependencies'][$service->getDestination()]);
 
                     if ($service->hasErrors())
                     {
@@ -135,12 +165,12 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                 }
             }
 
-            foreach ($this->_migrationTypes as $key => $value) {
+            foreach ($this->_settingsMigrationTypes as $key => $value) {
                 $service = craft()->getComponent($value);
 
-                if (array_key_exists($service->getDestination(), $data['elements']))
+                if (array_key_exists($service->getDestination(), $data['settings']['elements']))
                 {
-                    $service->import($data['elements'][$service->getDestination()]);
+                    $service->import($data['settings']['elements'][$service->getDestination()]);
 
                     if ($service->hasErrors())
                     {
@@ -150,6 +180,24 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                         }
                         return false;
                      }
+                }
+            }
+
+            foreach ($this->_contentMigrationTypes as $key => $value) {
+                $service = craft()->getComponent($value);
+
+                if (array_key_exists($service->getDestination(), $data['content']))
+                {
+                    $service->import($data['content'][$service->getDestination()]);
+
+                    if ($service->hasErrors())
+                    {
+                        $errors = $service->getErrors();
+                        foreach($errors as $error){
+                            MigrationManagerPlugin::log($error, LogLevel::Error);
+                        }
+                        return false;
+                    }
                 }
             }
         }

@@ -29,4 +29,17 @@ class MigrationManagerHelper
         return false;
     }
 
+    public static function getFieldByHandleContext($handle, $context){
+        $fields = craft()->fields->getAllFields(null, $context);
+        foreach($fields as $field){
+            if ($field->handle == $handle){
+                return $field;
+            }
+        }
+        return false;
+
+    }
+
+
+
 }

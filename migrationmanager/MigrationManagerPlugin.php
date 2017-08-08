@@ -1,6 +1,7 @@
 <?php
 namespace Craft;
 
+
 class MigrationManagerPlugin extends BasePlugin
 {
     function getName()
@@ -30,6 +31,14 @@ class MigrationManagerPlugin extends BasePlugin
         }
     }
 
+    public function addEntryActions($source)
+    {
+        return array(
+            'Migrate',
+            new MigrationManager_MigrateElementAction()
+        );
+    }
+
     public function registerCpRoutes()
     {
         return array(
@@ -44,6 +53,7 @@ class MigrationManagerPlugin extends BasePlugin
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/helpers/MigrationManagerHelper.php');
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_IMigrationService.php');
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_BaseMigrationService.php');
+        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateElementAction.php');
 
 
     }
