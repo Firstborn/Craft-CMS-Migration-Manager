@@ -19,6 +19,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
 
         foreach($locales as $locale){
             $entry = craft()->entries->getEntryById($id, $locale->locale);
+            $entries[] = $entry;
             $entryContent = array(
                 'slug' => $entry->slug,
                 'section' => $entry->getSection()->handle,
@@ -31,11 +32,12 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
                 'entryType' => $entry->type->handle
             );
 
-            foreach ($entry->getFieldLayout()->getFields() as $fieldModel) {
-                $this->getElementContent($entryContent, $fieldModel, $entry);
-            }
+            $this->getContent($entryContent, $entry);
+
+
             $content['locales'][$locale->locale] = $entryContent;
         }
+
         return $content;
     }
 
@@ -44,68 +46,27 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         $criteria = craft()->elements->getCriteria(ElementType::Entry);
         $criteria->section = $data['section'];
         $criteria->slug = $data['slug'];
-
-        Craft::log('find entry: ' . $data['section'] . ' ' . $data['slug'] , LogLevel::Error);
-
         $primaryEntry = $criteria->first();
+        //$entry = false;
 
-        foreach($data['locales'] as $key => $value) {
-
-            //Craft::log('entries: ' . count($primaryEntry), LogLevel::Error);
+        foreach($data['locales'] as $value) {
 
             if ($primaryEntry) {
-                $entry = craft()->entries->getEntryById($primaryEntry->id, $key);
 
-                if ($entry) {
-                    //Craft::log('found locale entry', LogLevel::Error);
-                    //Craft::log(JsonHelper::encode($entry), LogLevel::Error);
-                } else {
-                    //Craft::log('no locale entry found', LogLevel::Error);
-                    //Craft::log(JsonHelper::encode($value), LogLevel::Error);
-                    $entry = new EntryModel();
-                    $entry->id = $primaryEntry->id;
-                    $entry->sectionId = $primaryEntry->section->id;
-                    $entry->locale = $key;
-
-                    $entryType = $this->getEntryType($value['entryType'], $entry->sectionId);
-                    if ($entryType) {
-                        $entry->typeId = $entryType->id;
-                    }
-                }
-            } else {
-                Craft::log('could not find primary entry', LogLevel::Error);
-                Craft::log(JsonHelper::encode($value), LogLevel::Error);
-                $entry = new EntryModel();
-                $section = craft()->sections->getSectionByHandle($value['section']);
-                $entry->sectionId = $section->id;
-                $entry->locale = $key;
-
-                $entryType = $this->getEntryType($value['entryType'], $section->id);
-                if ($entryType) {
-                    $entry->typeId = $entryType->id;
-                }
+                //$entry = craft()->entries->getEntryById($primaryEntry->id, $key);
+                //if (!$entry) {
+                $value['id'] = $primaryEntry->id;
+                //}
             }
 
-            $entry->slug = $value['slug'];
-            $entry->postDate = $value['postDate'];
-            $entry->expiryDate = $value['expiryDate'];
-            $entry->enabled = $value['enabled'];
-            $entry->localeEnabled = $value['localeEnabled'];
-            $entry->getContent()->title = $value['title'];
+            $entry = $this->createModel($value);
 
             $this->getSourceIds($value);
-
-            Craft::log('SAVE ENTRY ' . $entry->id, LogLevel::Error);
-            Craft::log(JsonHelper::encode($value), LogLevel::Error);
-
             $entry->setContentFromPost($value);
 
             // save entry
             if (!$success = craft()->entries->saveEntry($entry)) {
-
                 throw new Exception(print_r($entry->getErrors(), true));
-            } else {
-                Craft::log('entry was saved', LogLevel::Error);
             }
 
             if (!$primaryEntry) {
@@ -115,17 +76,47 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
 
         return true;
 
-        //return true;
     }
 
 
 
     public function createModel(Array $data)
     {
-        return false;
+
+        $entry = new EntryModel();
+
+        if (array_key_exists('id', $data)){
+            $entry->id = $data['id'];
+        }
+
+        $section = craft()->sections->getSectionByHandle($data['section']);
+        $entry->sectionId = $section->id;
+
+
+
+        $entryType = $this->getEntryType($data['entryType'], $entry->sectionId);
+        if ($entryType) {
+            $entry->typeId = $entryType->id;
+        }
+
+        $entry->locale = $data['locale'];
+        $entry->slug = $data['slug'];
+        $entry->postDate = $data['postDate'];
+        $entry->expiryDate = $data['expiryDate'];
+        $entry->enabled = $data['enabled'];
+        $entry->localeEnabled = $data['localeEnabled'];
+        $entry->getContent()->title = $data['title'];
+
+        return $entry;
     }
 
-    private function getElementContent(&$content, $fieldModel, $parent)
+    private function getContent(&$content, $element){
+        foreach ($element->getFieldLayout()->getFields() as $fieldModel) {
+            $this->getFieldContent($content, $fieldModel, $element);
+        }
+    }
+
+    private function getFieldContent(&$content, $fieldModel, $parent)
     {
         $field = $fieldModel->getField();
         $value = $parent->getFieldValue($field->handle);
@@ -172,22 +163,17 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
                             'type' => 1,
                             'fields' => []
                         ];
-
                         return $value;
                     });
-
                     break;
                 default:
                     if ($field->getFieldType() instanceof BaseElementFieldType) {
-
                         $this->getSourceHandles($value);
                     }
                     break;
             }
         }
-
         $content[$field->handle] = $value;
-
     }
 
     private function getIteratorValues($element, $settingsFunc)
@@ -204,7 +190,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
             $fields = [];
 
             foreach ($itemFields as $field) {
-                $this->getElementContent($fields, $field, $item);
+                $this->getFieldContent($fields, $field, $item);
             }
 
             $itemValue['fields'] = $fields;
@@ -236,6 +222,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         $value = [];
         if ($elements) {
             foreach ($elements as $element) {
+
                 switch ($element->getElementType()) {
                     case 'Asset':
                         $item = [
@@ -257,6 +244,17 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
                             'elementType' => 'Entry',
                             'slug' => $element->slug,
                             'section' => $element->getSection()->handle
+                        ];
+                        break;
+                    case 'Tag':
+                        Craft::log('get tag', LogLevel::Error);
+                        $tagValue = [];
+                        $this->getContent($tagValue, $element);
+                        $item = [
+                            'elementType' => 'Tag',
+                            'slug' => $element->slug,
+                            'group' => $element->getGroup()->handle,
+                            'value' => $tagValue
                         ];
                         break;
                     case 'User':
@@ -281,10 +279,8 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         return $value;
     }
 
-    private function getSourceIds(&$value){
-
-        //Craft::log('getSourceIds: ' . JsonHelper::encode($value), LogLevel::Error);
-
+    private function getSourceIds(&$value)
+    {
         if (is_array($value))
         {
             if (is_array($value)) {
@@ -298,86 +294,52 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
 
     private function populateIds(&$value)
     {
-        //Craft::log('populateIds ' . JsonHelper::encode($value), LogLevel::Error);
-
-        //$elements = $value->elements();
-        $ids = [];
-        //if ($elements) {
         $isElementField = true;
+        $ids = [];
         foreach ($value as &$element) {
-
             if (is_array($element) && key_exists('elementType', $element)) {
-
+                $func = null;
                 switch ($element['elementType']) {
                     case 'Asset':
-                        $source = $newSource = MigrationManagerHelper::getAssetSourceByHandle($element['source']);
-                        Craft::log('find asset: ' . JsonHelper::encode($element), LogLevel::Error);
-
-                        if ($source) {
-                            $folderCriteria = new FolderCriteriaModel();
-                            $folderCriteria->name = $element['folder'];
-                            $folderCriteria->sourceId = $source->id;
-                            $folder = craft()->assets->findFolder($folderCriteria);
-                            //$folder = $folderCriteria->find();
-                            if ($folder) {
-                                $criteria = craft()->elements->getCriteria(ElementType::Asset);
-                                $criteria->sourceId = $source->id;
-                                $criteria->folderId = $folder->id;
-                                $criteria->filename = $element['filename'];
-
-                                $asset = $criteria->first();
-                                if ($asset) {
-
-                                    $ids[] = $asset->id;
-                                    Craft::log('found asset: ' . serialize($asset), LogLevel::Error);
-                                } else {
-                                    Craft::log('no asset: ' . $element['filename'], LogLevel::Error);
-                                }
-                            } else {
-                                Craft::log('no folder: ' . $element['folder'], LogLevel::Error);
-                            }
-                        } else {
-                            Craft::log('no source:' . $element['source'], LogLevel::Error);
-                        }
-
-
+                        $func = '\Craft\MigrationManagerHelper::getAssetByHandle';
                         break;
                     case 'Category':
-                        Craft::log('find category: ' . $element['slug'], LogLevel::Error);
-
+                        $func = '\Craft\MigrationManagerHelper::getCategoryByHandle';
                         break;
                     case 'Entry':
-                        Craft::log('find entry: ' . $element['slug'], LogLevel::Error);
-
+                        $func = '\Craft\MigrationManagerHelper::getEntryByHandle';
+                        break;
+                    case 'Tag':
+                        $func = '\Craft\MigrationManagerHelper::getTagByHandle';
                         break;
                     case 'User':
-                        Craft::log('find user: ' . $element['username'], LogLevel::Error);
-
+                        $func = '\Craft\MigrationManagerHelper::getUserByHandle';
                         break;
                     default:
-
                         break;
+                }
 
+                if ($func){
+                    $item = $func( $element );
+                    if ($item)
+                    {
+                        $ids[] = $item->id;
+                    }
                 }
             } else {
                 $isElementField = false;
                 $this->getSourceIds($element);
-
             }
-
-            //$value[] = $item;
         }
-        //}
 
         if ($isElementField){
-            Craft::log('replace values with ids', LogLevel::Error);
-            Craft::log(JsonHelper::encode($ids), LogLevel::Error);
-
             $value = $ids;
         }
 
         return true;
     }
+
+
 
 
 

@@ -233,11 +233,20 @@ class MigrationManagerController extends BaseController
 
 
 
-    public function actionEntry()
+    public function actionTest()
     {
-        HeaderHelper::setHeader(['Content-Type: text/json']);
+        $element = [
+            "elementType" =>"Tag",
+            "slug" => "tag-3",
+            "group" => "tags",
+            "value" => [
+                "plaintext"=>"tag 3"
+            ]
+        ];
 
-        $content = craft()->migrationManager_entries->export([35]);
+
+        $content = MigrationManagerHelper::getTagByHandle($element);
+
 
         echo JsonHelper::encode($content);
 

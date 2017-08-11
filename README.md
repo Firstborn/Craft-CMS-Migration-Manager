@@ -189,7 +189,10 @@ In addition to generated migrations you can use the MigrationManger to create em
 
 View the [examples](migrationmanager/EXAMPLES.md).
 
+## Content migrations
+With migrations you also have the ability to create content migrations directly from element index pages (ie the entry, category and user list pages). Check the entries you wish to export and then click the 'create migration' option in the action list. Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site.
 
+ ![Pending Migration](screenshots/content-migration.png)
 
 ##### Icon Credit
 Flying Duck by Agne Alesiute from the Noun Project
