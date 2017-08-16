@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'userGroup';
-    protected $destination = 'userGroups';
+    protected $source = 'userGroup:settings';
+    protected $destination = 'userGroups:settings';
 
     public function exportItem($id, $fullExport)
     {
@@ -61,7 +61,7 @@ class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationS
         if ($result)
         {
             if (array_key_exists('permissions', $data)) {
-                $permissions = $this->getGroupPermissionIds($data['permissions']);
+                $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
                 if (craft()->userPermissions->saveGroupPermissions($userGroup->id, $permissions)){
 
                 } else {
@@ -151,7 +151,7 @@ class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationS
         $newSource['id'] = $source->id;
     }
 
-    private function getGroupPermissionIds($permissions)
+    /*private function getGroupPermissionIds($permissions)
     {
          foreach($permissions as &$permission)
         {
@@ -177,35 +177,12 @@ class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationS
         }
 
         return $permissions;
-    }
+    }*/
 
     private function getGroupPermissionHandles($id)
     {
         $permissions = craft()->userPermissions->getPermissionsByGroupId($id);
-
-        foreach($permissions as &$permission)
-        {
-            //determine if permission references element, get handle if it does
-            if (preg_match('/(:\d)/', $permission))
-            {
-                $permissionParts = explode(":", $permission);
-                $element = null;
-
-                if (preg_match('/entries|entrydrafts/', $permissionParts[0]))
-                {
-                    $element = craft()->sections->getSectionById($permissionParts[1]);
-                } elseif (preg_match('/assetsource/', $permissionParts[0])) {
-                    $element = craft()->assetSources->getSourceById($permissionParts[1]);
-                } elseif (preg_match('/categories/', $permissionParts[0])) {
-                    $element = craft()->categories->getGroupById($permissionParts[1]);
-                }
-
-                if ($element != null) {
-                    $permission = $permissionParts[0] . ':' . $element->handle;
-                }
-            }
-        }
-
+        $permissions = MigrationManagerHelper::getPermissionHandles($permissions);
         return $permissions;
     }
 

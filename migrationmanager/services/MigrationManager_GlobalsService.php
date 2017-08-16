@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'global';
-    protected $destination = 'globals';
+    protected $source = 'global:settings';
+    protected $destination = 'globals:settings';
 
     public function exportItem($id, $fullExport)
     {

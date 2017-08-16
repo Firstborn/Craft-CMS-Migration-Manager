@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_RoutesService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'settingsRoutes';
-    protected $destination = 'routes';
+    protected $source = 'settingsRoutes:settings';
+    protected $destination = 'routes:settings';
 
     public function export(Array $ids, $fullExport = true)
     {

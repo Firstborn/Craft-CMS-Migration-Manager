@@ -11,7 +11,7 @@ namespace Craft;
  * @package   craft.app.elementactions
  * @since     2.3
  */
-class MigrationManager_MigrateElementAction extends BaseElementAction
+class MigrationManager_MigrateEntryElementAction extends BaseElementAction
 {
 	// Public Methods
 	// =========================================================================
@@ -37,8 +37,8 @@ class MigrationManager_MigrateElementAction extends BaseElementAction
 	{
 
 	    $params['entry'] = $criteria->ids();
+
         if (craft()->migrationManager_migrations->create($params)) {
-            //craft()->migrationManager_entries->export($criteria->ids());
             $this->setMessage(Craft::t('Migration created.'));
             return true;
 

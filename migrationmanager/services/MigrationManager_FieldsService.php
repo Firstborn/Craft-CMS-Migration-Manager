@@ -3,8 +3,8 @@
 namespace Craft;
 class MigrationManager_FieldsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'field';
-    protected $destination = 'fields';
+    protected $source = 'field:settings';
+    protected $destination = 'fields:settings';
 
     public function exportItem($id, $fullExport){
         $includeID = false;

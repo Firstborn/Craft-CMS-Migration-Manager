@@ -1,122 +1,17 @@
 <?php
+
 namespace Craft;
 
-class MigrationManager_EntriesService extends MigrationManager_BaseMigrationService
+abstract class MigrationManager_BaseContentMigrationService extends MigrationManager_BaseMigrationService
 {
 
-    protected $source = 'entry';
-    protected $destination = 'entries';
-
-    public function exportItem($id, $fullExport)
-    {
-        $primaryEntry = craft()->entries->getEntryById($id);
-        $locales = $primaryEntry->getSection()->getLocales();
-        $content = array(
-            'slug' => $primaryEntry->slug,
-            'section' => $primaryEntry->getSection()->handle,
-            'locales' => array()
-        );
-
-        foreach($locales as $locale){
-            $entry = craft()->entries->getEntryById($id, $locale->locale);
-            $entries[] = $entry;
-            $entryContent = array(
-                'slug' => $entry->slug,
-                'section' => $entry->getSection()->handle,
-                'enabled' => $entry->enabled,
-                'locale' => $entry->locale,
-                'localeEnabled' => $entry->localeEnabled,
-                'postDate' => $entry->postDate,
-                'expiryDate' => $entry->expiryDate,
-                'title' => $entry->title,
-                'entryType' => $entry->type->handle
-            );
-
-            $this->getContent($entryContent, $entry);
-
-
-            $content['locales'][$locale->locale] = $entryContent;
-        }
-
-        return $content;
-    }
-
-    public function importItem(Array $data)
-    {
-        $criteria = craft()->elements->getCriteria(ElementType::Entry);
-        $criteria->section = $data['section'];
-        $criteria->slug = $data['slug'];
-        $primaryEntry = $criteria->first();
-        //$entry = false;
-
-        foreach($data['locales'] as $value) {
-
-            if ($primaryEntry) {
-
-                //$entry = craft()->entries->getEntryById($primaryEntry->id, $key);
-                //if (!$entry) {
-                $value['id'] = $primaryEntry->id;
-                //}
-            }
-
-            $entry = $this->createModel($value);
-
-            $this->getSourceIds($value);
-            $entry->setContentFromPost($value);
-
-            // save entry
-            if (!$success = craft()->entries->saveEntry($entry)) {
-                throw new Exception(print_r($entry->getErrors(), true));
-            }
-
-            if (!$primaryEntry) {
-                $primaryEntry = $entry;
-            }
-        }
-
-        return true;
-
-    }
-
-
-
-    public function createModel(Array $data)
-    {
-
-        $entry = new EntryModel();
-
-        if (array_key_exists('id', $data)){
-            $entry->id = $data['id'];
-        }
-
-        $section = craft()->sections->getSectionByHandle($data['section']);
-        $entry->sectionId = $section->id;
-
-
-
-        $entryType = $this->getEntryType($data['entryType'], $entry->sectionId);
-        if ($entryType) {
-            $entry->typeId = $entryType->id;
-        }
-
-        $entry->locale = $data['locale'];
-        $entry->slug = $data['slug'];
-        $entry->postDate = $data['postDate'];
-        $entry->expiryDate = $data['expiryDate'];
-        $entry->enabled = $data['enabled'];
-        $entry->localeEnabled = $data['localeEnabled'];
-        $entry->getContent()->title = $data['title'];
-
-        return $entry;
-    }
-
-    private function getContent(&$content, $element){
+    protected function getContent(&$content, $element){
         foreach ($element->getFieldLayout()->getFields() as $fieldModel) {
             $this->getFieldContent($content, $fieldModel, $element);
         }
     }
 
-    private function getFieldContent(&$content, $fieldModel, $parent)
+    protected function getFieldContent(&$content, $fieldModel, $parent)
     {
         $field = $fieldModel->getField();
         $value = $parent->getFieldValue($field->handle);
@@ -176,7 +71,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         $content[$field->handle] = $value;
     }
 
-    private function getIteratorValues($element, $settingsFunc)
+    protected function getIteratorValues($element, $settingsFunc)
     {
         $items = $element->getIterator();
         $value = [];
@@ -202,7 +97,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         return $value;
     }
 
-    private function getEntryType($handle, $sectionId)
+    protected function getEntryType($handle, $sectionId)
     {
         $entryTypes = craft()->sections->getEntryTypesBySectionId($sectionId);
         foreach($entryTypes as $entryType)
@@ -216,7 +111,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         return false;
     }
 
-    private function getSourceHandles(&$value)
+    protected function getSourceHandles(&$value)
     {
         $elements = $value->elements();
         $value = [];
@@ -279,7 +174,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         return $value;
     }
 
-    private function getSourceIds(&$value)
+    protected function getSourceIds(&$value)
     {
         if (is_array($value))
         {
@@ -292,7 +187,7 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         return;
     }
 
-    private function populateIds(&$value)
+    protected function populateIds(&$value)
     {
         $isElementField = true;
         $ids = [];
@@ -339,11 +234,6 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
         return true;
     }
 
-
-
-
-
-
     /**
      * Fires an 'onExportField' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
      *
@@ -356,9 +246,8 @@ class MigrationManager_EntriesService extends MigrationManager_BaseMigrationServ
      */
     public function onExportField(Event $event)
     {
-         $this->raiseEvent('onExportField', $event);
+        $this->raiseEvent('onExportField', $event);
     }
-
 
 
 }

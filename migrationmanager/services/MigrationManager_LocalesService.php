@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_LocalesService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'locale';
-    protected $destination = 'locales';
+    protected $source = 'locale:settings';
+    protected $destination = 'locales:settings';
 
     public function exportItem($id, $fullExport)
     {

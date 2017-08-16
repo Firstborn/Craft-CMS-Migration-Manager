@@ -30,7 +30,9 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     );
 
     private $_contentMigrationTypes = array(
-        'entry' => 'migrationManager_entries'
+        'entry' => 'migrationManager_entriesContent',
+        'category' => 'migrationManager_categoriesContent',
+        'user' => 'migrationManager_usersContent'
     );
 
 
@@ -47,6 +49,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      */
     public function create($data)
     {
+
         $migration = array(
             'settings' => array(
                 'dependencies' => array(),
@@ -54,6 +57,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             ),
             'content' => array()
         );
+
+        Craft::log('create migrations ' . json_encode($data), LogLevel::Error);
 
         $empty = true;
 

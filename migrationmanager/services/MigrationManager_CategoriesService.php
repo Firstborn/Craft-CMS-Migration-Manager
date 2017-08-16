@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'category';
-    protected $destination = 'categories';
+    protected $source = 'category:settings';
+    protected $destination = 'categories:settings';
 
     public function exportItem($id, $fullExport)
     {

@@ -35,7 +35,23 @@ class MigrationManagerPlugin extends BasePlugin
     {
         return array(
             'Migrate',
-            new MigrationManager_MigrateElementAction()
+            new MigrationManager_MigrateEntryElementAction()
+        );
+    }
+
+    public function addCategoryActions($source)
+    {
+        return array(
+            'Migrate',
+            new MigrationManager_MigrateCategoryElementAction()
+        );
+    }
+
+    public function addUserActions($source)
+    {
+        return array(
+            'Migrate',
+            new MigrationManager_MigrateUserElementAction()
         );
     }
 
@@ -53,7 +69,9 @@ class MigrationManagerPlugin extends BasePlugin
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/helpers/MigrationManagerHelper.php');
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_IMigrationService.php');
         require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_BaseMigrationService.php');
-        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateElementAction.php');
+        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateCategoryElementAction.php');
+        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateEntryElementAction.php');
+        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateUserElementAction.php');
 
 
     }
