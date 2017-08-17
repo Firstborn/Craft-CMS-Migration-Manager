@@ -10,7 +10,8 @@ class MigrationManagerController extends BaseController
         // Prevent GET Requests
         $this->requirePostRequest();
         $post = craft()->request->getPost();
-        if (craft()->migrationManager_migrations->create($post))
+
+        if (craft()->migrationManager_migrations->createSettingMigration($post))
         {
             craft()->userSession->setNotice(Craft::t('Migration created.'));
         } else {
@@ -18,6 +19,52 @@ class MigrationManagerController extends BaseController
         }
 
         $this->renderTemplate('migrationmanager/index');
+    }
+
+    public function actionCreateGlobalsContentMigration()
+    {
+        $this->requirePostRequest();
+        craft()->userSession->requireAdmin();
+
+        $globalSet = new GlobalSetModel();
+
+        // Set the simple stuff
+        $globalSet->id     = craft()->request->getPost('setId');
+        $globalSet->name   = craft()->request->getPost('name');
+        $globalSet->handle = craft()->request->getPost('handle');
+
+        // Set the field layout
+
+        $fieldLayout = craft()->fields->assembleLayoutFromPost();
+        $fieldLayout->type = ElementType::GlobalSet;
+        $globalSet->setFieldLayout($fieldLayout);
+
+        $post = craft()->request->getPost();
+
+        $params['global'] = array(craft()->request->getPost('setId'));
+
+        if (craft()->migrationManager_migrations->createContentMigration($params))
+        {
+            craft()->userSession->setNotice(Craft::t('Migration created.'));
+        } else {
+            craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
+        }
+
+        $this->redirectToPostedUrl($globalSet);
+
+        /*
+        // Prevent GET Requests
+        $this->requirePostRequest();
+        $post = craft()->request->getPost();
+
+        if (craft()->migrationManager_migrations->createSettingMigration($post))
+        {
+            craft()->userSession->setNotice(Craft::t('Migration created.'));
+        } else {
+            craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
+        }
+
+        $this->renderTemplate('migrationmanager/index');*/
     }
 
     public function actionMigrations(){

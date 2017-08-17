@@ -38,7 +38,7 @@ class MigrationManager_MigrateEntryElementAction extends BaseElementAction
 
 	    $params['entry'] = $criteria->ids();
 
-        if (craft()->migrationManager_migrations->create($params)) {
+        if (craft()->migrationManager_migrations->createContentMigration($params)) {
             $this->setMessage(Craft::t('Migration created.'));
             return true;
 

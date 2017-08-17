@@ -64,15 +64,25 @@ In addition it also supports:
  
 To support additional field types you can use event handlers for customized import/export functions.
 
-The following events are available to 
-- migrationManager_entries.exportField
-- migrationManager_entries.importField
+To import/export field settings for custom field types use:
 - migrationManager_fields.exportField
 - migrationManager_fields.importField
 
+For export field values for custom field types use:
+- migrationManager_entriesContent.exportField
+- migrationManager_categoriesContent.exportField
+- migrationManager_globalsContent.exportField
+- migrationManager_usersContent.exportField
+
+Any values in the field data that contains id's should be converted to handles/slug or some string based value that can be looked up on the destination site without depending on matching id values as id values can differ between website database instances.
+
+For importing custom fields the exported value should match the fields required input structure. Check the field type's fieldtypes/[type] `prepValueFromPost` and `prepValue` methods for help on determining the correct structure.
+
+When using events to modify the import/export of a field be sure to set `$event->performAction = false;` to prevent the default field action from happening. The value you want to be exported/imported must be assigned to the `$event->params['value']` variable.
+
 ```
 craft()->on('migrationManager_entries.exportField', function(Event $event){
-    $event->params['value'] = 'oh yeah';
+    $event->params['value'] = 'my value';
     $event->performAction = false;
 });
 ```

@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_AssetTransformsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'assetTransform:settings';
-    protected $destination = 'assetTransforms:settings';
+    protected $source = 'assetTransform';
+    protected $destination = 'assetTransforms';
 
     public function exportItem($id, $fullExport)
     {

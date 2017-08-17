@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'userGroup:settings';
-    protected $destination = 'userGroups:settings';
+    protected $source = 'userGroup';
+    protected $destination = 'userGroups';
 
     public function exportItem($id, $fullExport)
     {

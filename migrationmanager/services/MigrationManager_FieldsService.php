@@ -3,8 +3,8 @@
 namespace Craft;
 class MigrationManager_FieldsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'field:settings';
-    protected $destination = 'fields:settings';
+    protected $source = 'field';
+    protected $destination = 'fields';
 
     public function exportItem($id, $fullExport){
         $includeID = false;
@@ -81,9 +81,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
         if ($event->performAction) {
             $field = $this->createModel($event->params['value']);
-
-            Craft::log(JsonHelper::encode($field->settings), LogLevel::Error);
-
 
             $result = craft()->fields->saveField($field);
             if ($result) {

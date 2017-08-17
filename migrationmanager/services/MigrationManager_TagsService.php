@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'tag:settings';
-    protected $destination = 'tags:settings';
+    protected $source = 'tag';
+    protected $destination = 'tags';
 
     public function exportItem($id, $fullExport)
     {

@@ -5,8 +5,8 @@ namespace Craft;
 
 class MigrationManager_SectionsService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'section:settings';
-    protected $destination = 'sections:settings';
+    protected $source = 'section';
+    protected $destination = 'sections';
 
     public function exportItem($id, $fullExport)
     {

@@ -4,8 +4,8 @@ namespace Craft;
 
 class MigrationManager_EmailMessagesService extends MigrationManager_BaseMigrationService
 {
-    protected $source = 'settingsEmailMessages:settings';
-    protected $destination = 'emailMessages:settings';
+    protected $source = 'settingsEmailMessages';
+    protected $destination = 'emailMessages';
 
     public function export(Array $ids, $fullExport = true)
     {

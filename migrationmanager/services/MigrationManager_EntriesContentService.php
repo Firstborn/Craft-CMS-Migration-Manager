@@ -113,7 +113,7 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
             $criteria = craft()->elements->getCriteria(ElementType::Entry);
             $criteria->slug = $data['parent'];
             $criteria->section = $section;
-            $parent = $criteria->first();// craft()->entries->get MigrationManagerHelper::getCategoryByHandle(array('slug' => $data['parent'], 'category' => $data['category']));
+            $parent = $criteria->first();
             if ($parent) {
                 $entry->parentId = $parent->id;
             }

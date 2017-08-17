@@ -40,7 +40,7 @@ class MigrationManager_MigrateUserElementAction extends BaseElementAction
 
 
 
-        if (craft()->migrationManager_migrations->create($params)) {
+        if (craft()->migrationManager_migrations->createContentMigration($params)) {
             Craft::log('migration users', LogLevel::Error);
             $this->setMessage(Craft::t('Migration created.'));
             return true;
