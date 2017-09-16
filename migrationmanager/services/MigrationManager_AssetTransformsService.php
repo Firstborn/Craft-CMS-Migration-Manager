@@ -15,6 +15,8 @@ class MigrationManager_AssetTransformsService extends MigrationManager_BaseMigra
             return false;
         }
 
+        $this->addManifest($transform->handle);
+
         $newTransform = [
             'name' => $transform->name,
             'handle' => $transform->handle,

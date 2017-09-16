@@ -15,6 +15,7 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
             return false;
         }
 
+        $this->addManifest($source->handle);
 
         $newSource = [
             'name' => $source->name,

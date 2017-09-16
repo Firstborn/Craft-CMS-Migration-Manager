@@ -20,6 +20,8 @@ class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
             'handle' => $tag->handle
         ];
 
+        $this->addManifest($tag->handle);
+
         if ($fullExport)
         {
             $newTag['fieldLayout'] = array();

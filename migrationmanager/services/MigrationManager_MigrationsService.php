@@ -51,6 +51,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     public function createSettingMigration($data)
     {
 
+        $manifest = [];
+
         $migration = array(
             'settings' => array(
                 'dependencies' => array(),
@@ -90,7 +92,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
             if (array_key_exists($service->getSource(), $data))
             {
-
                 $migration['settings']['elements'][$service->getDestination()] = $service->export($data[$service->getSource()]);
                 $empty = false;
 
@@ -102,6 +103,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     }
                     return false;
                 }
+
+                $manifest = array_merge($manifest, $service->getManifest());
             }
         }
 
@@ -109,7 +112,9 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $migration = null;
         }
 
-        $this->createMigration($migration);
+        $description = implode('_', $manifest);
+
+        $this->createMigration($migration, $description);
         return true;
     }
 
@@ -120,6 +125,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      */
     public function createContentMigration($data)
     {
+        $manifest = [];
+
         $migration = array(
             'content' => array()
         );
@@ -132,8 +139,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
             if (array_key_exists($service->getSource(), $data))
             {
-
-
                 $migration['content'][$service->getDestination()] = $service->export($data[$service->getSource()]);
                 $empty = false;
 
@@ -145,6 +150,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     }
                     return false;
                 }
+
+                $manifest = array_merge($manifest, $service->getManifest());
             }
         }
 
@@ -153,8 +160,8 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $migration = null;
         }
 
-        $this->createMigration($migration);
-
+        $description = implode('_', $manifest);
+        $this->createMigration($migration, $description);
 
         return true;
     }
@@ -163,13 +170,22 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      * @param $migration - data to write in migration file
      */
 
-    private function createMigration($migration)
+    private function createMigration($migration, $description = '')
     {
         $empty = is_null($migration);
 
         // route
         $date = new DateTime();
-        $filename = sprintf('m%s_migrationmanager_import', $date->format('ymd_His'));
+
+        $name = 'm%s_migration';
+        if ($description != ''){
+            $name .= '_' . $description;
+        }
+
+        $filename = sprintf($name, $date->format('ymd_His'));
+        $filename = substr($filename, 0, 250);
+        $filename = str_replace('-', '_', $filename);
+
         $plugin = craft()->plugins->getPlugin('migrationmanager', false);
         $migrationPath = craft()->migrations->getMigrationPath($plugin);
         $path = sprintf($migrationPath . 'generated/%s.php', $filename);

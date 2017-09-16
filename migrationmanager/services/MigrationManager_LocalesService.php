@@ -11,6 +11,8 @@ class MigrationManager_LocalesService extends MigrationManager_BaseMigrationServ
     {
         $locale = ['id' => $id];
 
+        $this->addManifest($id);
+
         return $locale;
     }
 

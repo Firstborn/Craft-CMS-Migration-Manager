@@ -15,6 +15,8 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
             return false;
         }
 
+        $this->addManifest($category->handle);
+
         $newCategory = [
             'name' => $category->name,
             'handle' => $category->handle,

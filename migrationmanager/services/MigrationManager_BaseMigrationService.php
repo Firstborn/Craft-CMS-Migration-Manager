@@ -8,6 +8,7 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
 
     protected $source;
     protected $destination;
+    protected $manifest;
 
     public function __construct()
     {
@@ -41,12 +42,26 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
         $this->errors = array();
     }
 
+    public function resetManifest(){
+        $this->manifest = array($this->destination);
+    }
+
+    public function addManifest($value)
+    {
+        $this->manifest[] = $value;
+    }
+
+    public function getManifest(){
+        return $this->manifest;
+    }
+
     /**
      * @param $ids array of fields ids to export
      * @param $fullExport flag to export all element data including extending settings and field tabs
      */
     public function export(Array $ids, $fullExport = true)
     {
+        $this->resetManifest();
         $items = array();
         foreach ($ids as $id) {
             $obj = $this->exportItem($id, $fullExport);

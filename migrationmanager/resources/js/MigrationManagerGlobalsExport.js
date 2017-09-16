@@ -5,7 +5,7 @@
             $('input.checkbox.checkbox-toggle').on('click', this.toggleSelections);
             $('input.checkbox.checkbox-all').on('click', this.toggleAllSelections);
 
-            console.log('div.body form global stuff');
+
 
             $('div.body form div.buttons').append('&nbsp;<a href="#" class="btn submit create-migration">Create Migration</a>');
 

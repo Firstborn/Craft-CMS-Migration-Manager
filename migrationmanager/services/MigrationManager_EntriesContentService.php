@@ -16,6 +16,8 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
             'locales' => array()
         );
 
+        $this->addManifest($content['slug']);
+
         if ($primaryEntry->getParent())
         {
             $content['parent'] = $this->exportItem($primaryEntry->getParent()->id, true);

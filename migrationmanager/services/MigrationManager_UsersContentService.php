@@ -10,6 +10,8 @@ class MigrationManager_UsersContentService extends MigrationManager_BaseContentM
     {
         $user = craft()->users->getUserById($id);
 
+        $this->addManifest($id);
+
         if ($user)
         {
             $attributes = $user->getAttributes();

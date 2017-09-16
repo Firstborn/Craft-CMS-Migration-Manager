@@ -18,6 +18,8 @@ class MigrationManager_EmailMessagesService extends MigrationManager_BaseMigrati
             $localeMessages = craft()->emailMessages->getAllMessages($locale);
             foreach ($localeMessages as $message)
             {
+                $this->addManifest($message->key);
+
                 $m = craft()->emailMessages->getMessage($message->key, $locale);
                 $messages[] = $this->exportItem($m);
             }

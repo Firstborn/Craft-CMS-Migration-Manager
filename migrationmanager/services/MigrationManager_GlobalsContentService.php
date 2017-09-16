@@ -17,6 +17,8 @@ class MigrationManager_GlobalsContentService extends MigrationManager_BaseConten
             'locales' => array()
         );
 
+        $this->addManifest($globalSet->handle);
+
 
         foreach($locales as $locale){
             $set = craft()->globals->getSetById($id, $locale);

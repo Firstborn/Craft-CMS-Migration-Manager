@@ -12,12 +12,13 @@ The Migration Manager can create migrations for the following tasks:
 - adding and updating sections
 - adding and updating section entry types
 - updating entry type field layouts (ie adding or removing fields from field tabs)
+- content (entries, categories, globals, users)
 
 To create a migration select the fields and/or sections you wish to migrate and then click the 'Create Migration' button at the bottom of the page.
 
 ![Migration Manager](screenshots/create-migration.png)
 
-A migration file will be created in the `craft/plugins/migrationmanager/migrations/generated` folder. Move the new migration file to your destination environment, ideally with version control.
+A migration file will be created in the `craft/plugins/migrationmanager/migrations/generated` folder. The migration filename will contain the slugs/handles of the migrated items. Move the new migration file to your destination environment, ideally with version control.
 
 - In your development environment:   
 ```
@@ -34,7 +35,7 @@ Once the migration(s) are in your destination environment, go to the Migration M
  
  ![Pending Migration](screenshots/pending-migrations.png)
  
-Before executing the migration(s) the Craft database will be backed up and stored in the backups directory. To disable backups from being created each time a migration is run you can use the `backupDbOnUpdate` config setting (https://craftcms.com/docs/config-settings#backupDbOnUpdate). **This is not recommended**.
+Before executing the migration(s) the Craft database will be backed up and stored in the backups directory. To disable backups from being created each time a migration is run you can set the `backupDbOnUpdate` config setting to false (https://craftcms.com/docs/config-settings#backupDbOnUpdate). **This is not recommended**.
 
 If a migration fails to execute the migration will be rolled back and the database will be restored to state before the migration started. You can check the Log tab to review previous migrations and see any error messages.
 
@@ -200,7 +201,7 @@ In addition to generated migrations you can use the MigrationManger to create em
 View the [examples](migrationmanager/EXAMPLES.md).
 
 ## Content migrations
-With migrations you also have the ability to create content migrations directly from element index pages (ie the entry, category and user list pages). Check the entries you wish to export and then click the 'create migration' option in the action list. Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site.
+With migrations you also have the ability to create content migrations directly from element index pages (ie the entry, category and user list pages). Check the entries you wish to export and then click the 'create migration' option in the action list. Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site. For Global values, use the 'Create Migration' button on the global screen.
 
  ![Pending Migration](screenshots/content-migration.png)
 

@@ -13,6 +13,8 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             return false;
         }
 
+        $this->addManifest($field->handle);
+
         $newField = [
             'group' => $field->group->name,
             'name' => $field->name,
@@ -357,11 +359,14 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
 
         if ($field['type'] == 'Tags') {
+
             if (array_key_exists('source', $field['typesettings'])) {
-                if (substr($field['typesettings']['source'], 0, 9) == 'taggroup:') {
-                    $tag = craft()->tags->getTagGroupById(intval(substr($field['typesettings']['source'], 9)));
-                    if ($tag) {
-                        $field['typesettings']['source'] = $tag->handle;
+                 foreach ($field['typesettings']['source'] as $key => $value) {
+                    if (substr($value, 0, 9) == 'taggroup:') {
+                        $tag = craft()->tags->getTagGroupById(intval(substr($value, 9)));
+                        if ($tag) {
+                            $field['typesettings']['source'] = $tag->handle;
+                        }
                     }
                 }
             }

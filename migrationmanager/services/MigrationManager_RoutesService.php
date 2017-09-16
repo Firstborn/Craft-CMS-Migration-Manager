@@ -25,9 +25,12 @@ class MigrationManager_RoutesService extends MigrationManager_BaseMigrationServi
     {
         $route = $this->getRouteById($id);
 
+        $this->addManifest($id);
+
         if (!$route) {
             return false;
         }
+
 
         $newRoute = [
             'urlParts' => urlencode($route['urlParts']),

@@ -22,6 +22,8 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
             'requiredFields' => array()
         ];
 
+        $this->addManifest($source->handle);
+
         $fieldLayout = $source->getFieldLayout();
 
         foreach ($fieldLayout->getTabs() as $tab) {
@@ -43,6 +45,8 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
     public function importItem(Array $data)
     {
 
+        Craft::log(json_encode($data), LogLevel::Error);
+
         $existing = craft()->globals->getSetByHandle($data['handle']);
 
         if ($existing) {
@@ -50,20 +54,23 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
         }
 
         $set = $this->createModel($data);
+
+
         $result = craft()->globals->saveSet($set);
+
 
         return $result;
     }
 
     public function createModel(Array $data)
     {
-        $source = new GlobalSetModel();
+        $globalSet = new GlobalSetModel();
         if (array_key_exists('id', $data)){
-            $source->id = $data['id'];
+            $globalSet->id = $data['id'];
         }
 
-        $source->name = $data['name'];
-        $source->handle = $data['handle'];
+        $globalSet->name = $data['name'];
+        $globalSet->handle = $data['handle'];
 
         $requiredFields = array();
         if (array_key_exists('requiredFields', $data)) {
@@ -79,24 +86,33 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
         foreach($data['fieldLayout'] as $key => $fields)
         {
             $fieldIds = array();
+
             foreach($fields as $field) {
                 $existingField = craft()->fields->getFieldByHandle($field);
+
+                Craft::log('get field by handle: ' . $field, LogLevel::Error);
                 if ($existingField) {
+                    Craft::log('found field: ' . $existingField->id, LogLevel::Error);
                     $fieldIds[] = $existingField->id;
                 } else {
+                    Craft::log('no field found', LogLevel::Error);
                     $this->addError('Missing field: ' . $field . ' can not add to field layout for Global: ' . $source->handle);
                 }
             }
+            Craft::log($key . ' = ' . json_encode($fieldIds), LogLevel::Error);
             $layout[$key] = $fieldIds;
+
+
         }
 
-
         $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
-        $source->fieldLayout = $fieldLayout;
+        $fieldLayout->type = ElementType::GlobalSet;
+        $globalSet->setFieldLayout($fieldLayout);
 
 
 
-        return $source;
+
+        return $globalSet;
 
     }
 

@@ -20,6 +20,8 @@ class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationS
             'handle' => $group->handle
         ];
 
+        $this->addManifest($group->handle);
+
         if ($fullExport)
         {
             $newGroup['fieldLayout'] = array();

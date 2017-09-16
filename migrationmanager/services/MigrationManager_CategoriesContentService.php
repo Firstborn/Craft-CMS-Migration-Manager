@@ -16,6 +16,8 @@ class MigrationManager_CategoriesContentService extends MigrationManager_BaseCon
             'locales' => array()
         );
 
+        $this->addManifest($content['slug']);
+
         if ($primaryCategory->getParent())
         {
             $content['parent'] = $this->exportItem($primaryCategory->getParent()->id, true);

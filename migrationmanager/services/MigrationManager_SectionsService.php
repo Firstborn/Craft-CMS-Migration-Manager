@@ -26,6 +26,8 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             'maxLevels' => $section->attributes['maxLevels']
         ];
 
+        $this->addManifest($section->attributes['handle']);
+
         $locales = $section->getLocales();
 
         if ((bool) $section->attributes['hasUrls'] === false ) {
