@@ -176,10 +176,6 @@ class MigrationManagerController extends BaseController
         //give a little on screen pause
         sleep(2);
 
-        Craft::log(JsonHelper::encode($data), LogLevel::Error);
-
-
-
         if (craft()->migrationManager_migrations->runToTop($data['migrations']))
         {
             $this->returnJson(array('alive' => true, 'finished' => true, 'returnUrl' => 'migrationManager/migrations'));

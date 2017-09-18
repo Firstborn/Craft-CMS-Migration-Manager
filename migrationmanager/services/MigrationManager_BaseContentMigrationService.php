@@ -23,7 +23,7 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
             'value' => $value
         ));
 
-        $this->onExportField($event);
+        $this->onExportFieldContent($event);
 
         if ($event->performAction == false) {
             $value = $event->params['value'];
@@ -142,7 +142,6 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                         ];
                         break;
                     case 'Tag':
-                        Craft::log('get tag', LogLevel::Error);
                         $tagValue = [];
                         $this->getContent($tagValue, $element);
                         $item = [
@@ -235,7 +234,7 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
     }
 
     /**
-     * Fires an 'onExportField' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
+     * Fires an 'onExportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
      *
      * @param Event $event
      *          $event->params['field'] - field
@@ -244,10 +243,13 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
      *
      * @return null
      */
-    public function onExportField(Event $event)
+    public function onExportFieldContent(Event $event)
     {
-        $this->raiseEvent('onExportField', $event);
+        //route this through fields service for simplified event listening
+        craft()->migrationManager_fields->onExportFieldContent($event);
     }
+
+
 
 
 }

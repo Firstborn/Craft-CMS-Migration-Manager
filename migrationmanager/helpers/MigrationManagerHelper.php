@@ -42,15 +42,13 @@ class MigrationManagerHelper
     public static function getAssetByHandle($element)
     {
         $source = $newSource = MigrationManagerHelper::getAssetSourceByHandle($element['source']);
-        Craft::log('find asset: ' . JsonHelper::encode($element), LogLevel::Error);
-
 
         if ($source) {
             $folderCriteria = new FolderCriteriaModel();
             $folderCriteria->name = $element['folder'];
             $folderCriteria->sourceId = $source->id;
             $folder = craft()->assets->findFolder($folderCriteria);
-            //$folder = $folderCriteria->find();
+
             if ($folder) {
                 $criteria = craft()->elements->getCriteria(ElementType::Asset);
                 $criteria->sourceId = $source->id;
@@ -59,21 +57,11 @@ class MigrationManagerHelper
 
                 $asset = $criteria->first();
                 if ($asset) {
-
                     return $asset;
-                    //Craft::log('found asset: ' . serialize($asset), LogLevel::Error);
-                } else {
-                    Craft::log('no asset: ' . $element['filename'], LogLevel::Error);
                 }
-            } else {
-                Craft::log('no folder: ' . $element['folder'], LogLevel::Error);
             }
-        } else {
-            Craft::log('no source:' . $element['source'], LogLevel::Error);
         }
-
         return false;
-
     }
 
     public static function getCategoryByHandle($element)
@@ -88,8 +76,6 @@ class MigrationManagerHelper
             {
                 return $category;
             }
-        } else {
-            Craft::log('no category group: ' . $element['category'], LogLevel::Error);
         }
 
         return false;
@@ -106,11 +92,7 @@ class MigrationManagerHelper
             $entry = $criteria->first();
             if ($entry){
                 return $entry;
-            } else {
-                Craft::log('entry not found: ' . $element['slug'], LogLevel::Error);
             }
-        } else {
-            Craft::log('section not found ' . $element['section'], LogLevel::Error);
         }
 
         return false;
@@ -144,8 +126,6 @@ class MigrationManagerHelper
             {
                 return $tag;
             }
-        } else {
-            Craft::log('group not found');
         }
     }
 

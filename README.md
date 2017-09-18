@@ -69,15 +69,13 @@ To import/export field settings for custom field types use:
 - migrationManager_fields.exportField
 - migrationManager_fields.importField
 
-For export field values for custom field types use:
-- migrationManager_entriesContent.exportField
-- migrationManager_categoriesContent.exportField
-- migrationManager_globalsContent.exportField
-- migrationManager_usersContent.exportField
+To export content field values for custom field types use (ideal for complex fieldtype data structures).
+- migrationManager_fields.exportFieldContent
+
 
 Any values in the field data that contains id's should be converted to handles/slug or some string based value that can be looked up on the destination site without depending on matching id values as id values can differ between website database instances.
 
-For importing custom fields the exported value should match the fields required input structure. Check the field type's fieldtypes/[type] `prepValueFromPost` and `prepValue` methods for help on determining the correct structure.
+For importing custom fields the imported value should match the fields required input structure. Check the field type's fieldtypes/[type] `prepValueFromPost` and `prepValue` methods for help on determining the correct structure.
 
 When using events to modify the import/export of a field be sure to set `$event->performAction = false;` to prevent the default field action from happening. The value you want to be exported/imported must be assigned to the `$event->params['value']` variable.
 
@@ -88,19 +86,10 @@ craft()->on('migrationManager_entries.exportField', function(Event $event){
 });
 ```
 
-This is an example of a custom plugin that listens for the 'migrationManager_fields.exportField' and 'migrationManager.importField' events and then modifies the settings source values for a FruitLinkIt field.
+This is an example of a custom plugin that listens for the 'migrationManager_fields.exportField' and 'migrationManager_fields.importField' and 'migrationManager_fields.exportFieldContent' events and then modifies the settings source values for a FruitLinkIt field.
 ```
 public function init()
 {
-
-    craft()->on('migrationManager_entries.exportField', function(Event $event){
-        echo 'on entries export field event';
-        Craft::log('export field', LogLevel::Error);
-        $event->params['value'] = 'oh yeah';
-        $event->performAction = false;
-
-
-    });
 
     craft()->on('migrationManager_fields.exportField', function(Event $event){
         if ($event->params['field']['type'] == 'FruitLinkIt')
@@ -126,7 +115,6 @@ public function init()
                 }
             }
 
-
             foreach ($event->params['value']['typesettings']['assetSources'] as $key => $value) {
                 if (substr($value, 0, 7) == 'folder:') {
                     $source = craft()->assetSources->getSourceById(intval(substr($value, 7)));
@@ -135,60 +123,70 @@ public function init()
                     }
                 }
             }
-
-            //$event->performAction = false;
-            //$event->params['error'] = 'something screwed up';
         }
     });
 
     craft()->on('migrationManager_fields.importField', function(Event $event){
-        Craft::log('import field: '. $event->params['field']['type'] , LogLevel::Error);
-        if ($event->params['field']['type'] == 'FruitLinkIt')
+        if ($event->params['value']['type'] == 'FruitLinkIt')
         {
-            Craft::log(JsonHelper::encode($event->params['value']), LogLevel::Error);
             //replace source handles with ids
-            $entrySources = [];
-            foreach ($event->params['value']['typesettings']['entrySources'] as $value) {
-                $source = craft()->sections->getSectionByHandle($value);
-                if ($source)
-                {
-                    $entrySources[] = 'section:' . $source->id;
+            if (is_array($event->params['value']['typesettings']['entrySources'])) {
+                $entrySources = [];
+                foreach ($event->params['value']['typesettings']['entrySources'] as $value) {
+                    $source = craft()->sections->getSectionByHandle($value);
+                    if ($source) {
+                        $entrySources[] = 'section:' . $source->id;
+                    } elseif ($value == 'singles') {
+                        $entrySources[] = $value;
+                    }
                 }
-                elseif ($value == 'singles')
-                {
-                    $entrySources[] = $value;
-                }
+                $event->params['value']['typesettings']['entrySources'] = $entrySources;
             }
-            $event->params['value']['typesettings']['entrySources'] = $entrySources;
 
-            $categorySources = [];
-            foreach ($event->params['value']['typesettings']['categorySources'] as $value) {
+            if (is_array($event->params['value']['typesettings']['categorySources'])) {
+                $categorySources = [];
+                foreach ($event->params['value']['typesettings']['categorySources'] as $value) {
 
-                $source = craft()->categories->getGroupByHandle($value);
-                if ($source) {
-                    $categorySources[] = 'group:' . $source->id;
+                    $source = craft()->categories->getGroupByHandle($value);
+                    if ($source) {
+                        $categorySources[] = 'group:' . $source->id;
+                    }
                 }
+                $event->params['value']['typesettings']['categorySources'] = $categorySources;
             }
-            $event->params['value']['typesettings']['categorySources'] = $categorySources;
 
-            $assetSources = [];
-            foreach ($event->params['value']['typesettings']['assetSources'] as $value) {
-                $source = MigrationManagerHelper::getAssetSourceByHandle($value);
-                if ($source) {
-                    $assetSources[] = 'folder:' . $source->id;
+            if(is_array($event->params['value']['typesettings']['assetSources'])) {
+                $assetSources = [];
+                foreach ($event->params['value']['typesettings']['assetSources'] as $value) {
+                    $source = MigrationManagerHelper::getAssetSourceByHandle($value);
+                    if ($source) {
+                        $assetSources[] = 'folder:' . $source->id;
+                    }
                 }
+                $event->params['value']['typesettings']['assetSources'] = $assetSources;
             }
-            $event->params['value']['typesettings']['assetSources'] = $assetSources;
-
-            //$event->performAction = false;
-            //$event->params['error'] = 'test';
-
-
-
-
 
         }
     });
+    
+    craft()->on('migrationManager_fields.exportFieldContent', function(Event $event){
+        if ($event->params['field']['type'] == 'FruitLinkIt') {
+            //format value to expected LinkIt structure 
+            if ($event->params['value'] != '') {
+                $value = array(
+                    'type' => $event->params['value']['type'],
+                    'value' => $event->params['value']['value'],
+                    'defaultText' => $event->params['value']['defaultText'],
+                    'customText' => $event->params['value']['customText'],
+                    'target' => $event->params['value']['target'],
+                    $event->params['value']['type'] => $event->params['value']['value']
+                );
+                $event->params['value'] = $value;
+            }
+            $event->performAction = false;
+    
+        }
+     });
 }
 
 ```

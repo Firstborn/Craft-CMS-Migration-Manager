@@ -45,20 +45,12 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
     public function importItem(Array $data)
     {
 
-        Craft::log(json_encode($data), LogLevel::Error);
-
         $existing = craft()->globals->getSetByHandle($data['handle']);
-
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
-
         $set = $this->createModel($data);
-
-
         $result = craft()->globals->saveSet($set);
-
-
         return $result;
     }
 
@@ -90,27 +82,18 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
             foreach($fields as $field) {
                 $existingField = craft()->fields->getFieldByHandle($field);
 
-                Craft::log('get field by handle: ' . $field, LogLevel::Error);
                 if ($existingField) {
-                    Craft::log('found field: ' . $existingField->id, LogLevel::Error);
                     $fieldIds[] = $existingField->id;
                 } else {
-                    Craft::log('no field found', LogLevel::Error);
                     $this->addError('Missing field: ' . $field . ' can not add to field layout for Global: ' . $source->handle);
                 }
             }
-            Craft::log($key . ' = ' . json_encode($fieldIds), LogLevel::Error);
             $layout[$key] = $fieldIds;
-
-
         }
 
         $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
         $fieldLayout->type = ElementType::GlobalSet;
         $globalSet->setFieldLayout($fieldLayout);
-
-
-
 
         return $globalSet;
 

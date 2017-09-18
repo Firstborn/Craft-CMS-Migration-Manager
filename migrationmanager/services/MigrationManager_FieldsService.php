@@ -114,6 +114,21 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
     }
 
     /**
+     * Fires an 'onExportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
+     *
+     * @param Event $event
+     *          $event->params['field'] - field
+     *          $event->params['parent'] - field parent
+     *          $event->params['value'] - current field value, change this value in the event handler to output a different value
+     *
+     * @return null
+     */
+    public function onExportFieldContent(Event $event)
+    {
+        $this->raiseEvent('onExportFieldContent', $event);
+    }
+
+    /**
      * Fires an 'onImportField' event. To prevent execution of the import set $event->performAction to false and set a reason in $event->params['error'] to be logged. When checking the field type use the $event->params['value'] object as the ['field'] could be empty (ie field doesn't exist yet)
      *
      * @param Event $event

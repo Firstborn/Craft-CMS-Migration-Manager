@@ -43,7 +43,7 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
     }
 
     public function resetManifest(){
-        $this->manifest = array($this->destination);
+        $this->manifest = array();
     }
 
     public function addManifest($value)

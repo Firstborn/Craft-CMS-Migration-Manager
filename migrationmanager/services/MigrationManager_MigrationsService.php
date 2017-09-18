@@ -103,8 +103,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     }
                     return false;
                 }
-
-                $manifest = array_merge($manifest, $service->getManifest());
+                $manifest = array_merge($manifest, [$key => $service->getManifest()]);
             }
         }
 
@@ -112,9 +111,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $migration = null;
         }
 
-        $description = implode('_', $manifest);
-
-        $this->createMigration($migration, $description);
+        $this->createMigration($migration, $manifest);
         return true;
     }
 
@@ -150,8 +147,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                     }
                     return false;
                 }
-
-                $manifest = array_merge($manifest, $service->getManifest());
+                $manifest = array_merge($manifest, [$key => $service->getManifest()]);
             }
         }
 
@@ -160,8 +156,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $migration = null;
         }
 
-        $description = implode('_', $manifest);
-        $this->createMigration($migration, $description);
+        $this->createMigration($migration, $manifest);
 
         return true;
     }
@@ -170,7 +165,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      * @param $migration - data to write in migration file
      */
 
-    private function createMigration($migration, $description = '')
+    private function createMigration($migration, $manifest = array())
     {
         $empty = is_null($migration);
 
@@ -178,9 +173,19 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $date = new DateTime();
 
         $name = 'm%s_migration';
-        if ($description != ''){
-            $name .= '_' . $description;
+
+        $description = [];
+        foreach($manifest as $key => $value){
+            $description[] = $key;
+            foreach($value as $item){
+                $description[] = $item;
+            }
+
         }
+
+        $description = implode('_', $description);
+        $name .= '_' . $description;
+
 
         $filename = sprintf($name, $date->format('ymd_His'));
         $filename = substr($filename, 0, 250);
@@ -190,7 +195,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $migrationPath = craft()->migrations->getMigrationPath($plugin);
         $path = sprintf($migrationPath . 'generated/%s.php', $filename);
         $migration = json_encode($migration);
-        $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, true));
+        $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
         IOHelper::writeToFile($path, $content);
     }
 

@@ -6,6 +6,17 @@ namespace Craft;
  */
 class {{ className }} extends BaseMigration
 {
+    /**
+    Migration manifest:
+    {% for key, value in manifest %}
+
+    {{ key|upper }}
+    {% for item in value %}
+    - {{ item }}
+    {% endfor %}
+    {% endfor %}
+
+    */
 	/**
 	 * Any migration code in here is wrapped inside of a transaction.
 	 * Returning false will rollback the migration
