@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d7c62cd-047d-4618-b402-6c1c5ccdb323" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/controllers/MigrationManagerController.php" afterPath="$PROJECT_DIR$/migrationmanager/controllers/MigrationManagerController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/helpers/MigrationManagerHelper.php" afterPath="$PROJECT_DIR$/migrationmanager/helpers/MigrationManagerHelper.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseContentMigrationService.php" afterPath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseContentMigrationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseMigrationService.php" afterPath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseMigrationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php" afterPath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsContentService.php" afterPath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsContentService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsService.php" afterPath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_MigrationsService.php" afterPath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_MigrationsService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/templates/_migration.twig" afterPath="$PROJECT_DIR$/migrationmanager/templates/_migration.twig" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/migrationmanager/services/MigrationManager_ContentService.php" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -147,6 +137,7 @@
         <option value="$PROJECT_DIR$/migrationmanager/helpers/MigrationManagerHelper.php" />
         <option value="$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsService.php" />
         <option value="$PROJECT_DIR$/migrationmanager/services/MigrationManager_MigrationsService.php" />
+        <option value="$PROJECT_DIR$/migrationmanager/services/MigrationManager_ContentService.php" />
       </list>
     </option>
   </component>
@@ -317,18 +308,17 @@
       <workItem from="1505394938095" duration="599000" />
       <workItem from="1505520254742" duration="683000" />
       <workItem from="1505743861841" duration="747000" />
-      <workItem from="1505755132818" duration="2301000" />
+      <workItem from="1505755132818" duration="2347000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19113000" />
+    <option name="totallyTimeSpent" value="19159000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="129" y="105" width="2217" height="1250" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1759134" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1759134" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -358,17 +348,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="1836">
-            <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_MigrationsService.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1458">
@@ -1129,6 +1108,14 @@
             <marker date="1505757245000" expanded="true" signature="1731:1749" ph="{...}" />
             <marker date="1505757245000" expanded="true" signature="6361:6424" ph="{...}" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_ContentService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
