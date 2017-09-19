@@ -196,12 +196,15 @@ public function init()
 ## Custom migrations
 In addition to generated migrations you can use the MigrationManger to create empty migrations that can be used for tasks like deleting fields and creating content. To create an empty migration simply click the 'Create Migration' on the Migration Manager/Create Migrations tab. A new empty migration will be added to the `craft/plugins/migrationmanager/migrations/generated` folder.
 
-View the [examples](migrationmanager/EXAMPLES.md).
+View the [examples](EXAMPLES.md).
 
 ## Content migrations
 With migrations you also have the ability to create content migrations directly from element index pages (ie the entry, category and user list pages). Check the entries you wish to export and then click the 'create migration' option in the action list. Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site. For Global values, use the 'Create Migration' button on the global screen.
 
  ![Pending Migration](screenshots/content-migration.png)
 
-##### Icon Credit
-Flying Duck by Agne Alesiute from the Noun Project
+##### Credits
+The entire dev team at [Firstborn](https://www.firstborn.com/)
+
+
+Flying Duck icon by Agne Alesiute from the [Noun Project](https://thenounproject.com/)

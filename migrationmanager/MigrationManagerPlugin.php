@@ -21,7 +21,7 @@ class MigrationManagerPlugin extends BasePlugin
 
     function getDeveloperUrl()
     {
-        return 'http://dgrigg.com';
+        return 'https://firstborn.com';
     }
 
     public function hasCpSection()

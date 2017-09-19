@@ -2,8 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d7c62cd-047d-4618-b402-6c1c5ccdb323" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/LICENSE.md" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/migrationmanager/DEV.md" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/migrationmanager/EXAMPLES.md" afterPath="$PROJECT_DIR$/EXAMPLES.md" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/migrationmanager/MigrationManagerPlugin.php" afterPath="$PROJECT_DIR$/migrationmanager/MigrationManagerPlugin.php" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,89 +18,8 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MigrationManagerController.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/controllers/MigrationManagerController.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2754">
-              <caret line="153" column="14" lean-forward="false" selection-start-line="153" selection-start-column="14" selection-end-line="153" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MigrationManager_BaseContentMigrationService.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseContentMigrationService.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2592">
-              <caret line="144" column="0" lean-forward="false" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MigrationManagerHelper.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/helpers/MigrationManagerHelper.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2574">
-              <caret line="143" column="63" lean-forward="false" selection-start-line="143" selection-start-column="63" selection-end-line="143" selection-end-column="63" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EXAMPLES.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="1836">
-                <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
-                <folding />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MigrationManager_MigrationsService.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_MigrationsService.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="398">
-              <caret line="167" column="69" lean-forward="true" selection-start-line="167" selection-start-column="69" selection-end-line="167" selection-end-column="69" />
-              <folding>
-                <marker date="1505757245000" expanded="true" signature="1170:1215" ph="..." />
-                <marker date="1505757245000" expanded="true" signature="1170:1334" ph="..." />
-                <marker date="1505757245000" expanded="true" signature="1731:1749" ph="{...}" />
-                <marker date="1505757245000" expanded="true" signature="6361:6424" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
-              <caret line="2" column="5" lean-forward="true" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DEV.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/DEV.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="0">
-                <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-                <folding />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MigrationManager_SectionsService.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_SectionsService.php">
+      <file leaf-file-name="MigrationManager_AssetTransformsService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_AssetTransformsService.php">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -105,21 +28,94 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MigrationManagerVariable.php" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/variables/MigrationManagerVariable.php">
+      <file leaf-file-name="MigrationManager_FieldsService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding>
+                <marker date="1505753636000" expanded="true" signature="231:381" ph="..." />
+                <marker date="1505753636000" expanded="true" signature="3397:4514" ph=" Fires an 'onImportField' event. To prevent execution of the import set $event-&gt;performAction to false and set a reason in $event-&gt;params['error'] to be logged. When checking the field type use the $event-&gt;params['value'] object as the ['field'] could be empty (ie field doesn't exist yet) ..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationManager_GlobalsContentService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsContentService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="432">
+              <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.twig" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/migrationmanager/templates/index.twig">
+      <file leaf-file-name="LICENSE.md" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/LICENSE.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1710">
-              <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
+            <state relative-caret-position="36">
+              <caret line="2" column="38" lean-forward="false" selection-start-line="2" selection-start-column="38" selection-end-line="2" selection-end-column="38" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationManager_BaseContentMigrationService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseContentMigrationService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationManager_BaseMigrationService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseMigrationService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="378">
+              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationManager_CategoriesContentService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_CategoriesContentService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationManager_CategoriesService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_CategoriesService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationManager_EmailMessagesService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EmailMessagesService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MigrationManager_EntriesContentService.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EntriesContentService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -142,7 +138,6 @@
         <option value="$PROJECT_DIR$/migrationmanager/variables/MigrationManagerVariable.php" />
         <option value="$PROJECT_DIR$/migrationmanager/templates/index.twig" />
         <option value="$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/migrationmanager/controllers/MigrationManagerController.php" />
         <option value="$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseContentMigrationService.php" />
         <option value="$PROJECT_DIR$/migrationmanager/helpers/MigrationManagerHelper.php" />
@@ -150,6 +145,9 @@
         <option value="$PROJECT_DIR$/migrationmanager/services/MigrationManager_MigrationsService.php" />
         <option value="$PROJECT_DIR$/migrationmanager/services/MigrationManager_ContentService.php" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/migrationmanager/MigrationManagerPlugin.php" />
+        <option value="$PROJECT_DIR$/LICENSE.md" />
       </list>
     </option>
   </component>
@@ -161,8 +159,8 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds">
-    <option name="x" value="129" />
-    <option name="y" value="105" />
+    <option name="x" value="130" />
+    <option name="y" value="165" />
     <option name="width" value="2217" />
     <option name="height" value="1250" />
   </component>
@@ -193,6 +191,42 @@
               <item name="craft-cms-migration-plugin" type="2a2b976b:PhpTreeStructureProvider$1" />
               <item name="migrationmanager" type="2a2b976b:PhpTreeStructureProvider$1" />
             </path>
+            <path>
+              <item name="craft-cms-migration-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="craft-cms-migration-plugin" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="migrationmanager" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="actions" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="craft-cms-migration-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="craft-cms-migration-plugin" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="migrationmanager" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="controllers" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="craft-cms-migration-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="craft-cms-migration-plugin" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="migrationmanager" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="helpers" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="craft-cms-migration-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="craft-cms-migration-plugin" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="migrationmanager" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="migrations" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="craft-cms-migration-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="craft-cms-migration-plugin" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="migrationmanager" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="resources" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
+            <path>
+              <item name="craft-cms-migration-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="craft-cms-migration-plugin" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="migrationmanager" type="2a2b976b:PhpTreeStructureProvider$1" />
+              <item name="services" type="2a2b976b:PhpTreeStructureProvider$1" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -206,6 +240,9 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
     </key>
@@ -314,15 +351,15 @@
       <workItem from="1505520254742" duration="683000" />
       <workItem from="1505743861841" duration="747000" />
       <workItem from="1505755132818" duration="2366000" />
-      <workItem from="1505840524006" duration="185000" />
+      <workItem from="1505840524006" duration="698000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19363000" />
+    <option name="totallyTimeSpent" value="19876000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="129" y="105" width="2217" height="1250" extended-state="0" />
+    <frame x="130" y="165" width="2217" height="1250" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1759134" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -355,279 +392,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/migrationmanager/DEV.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_SectionsService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/variables/MigrationManagerVariable.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/templates/index.twig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1710">
-          <caret line="95" column="0" lean-forward="false" selection-start-line="95" selection-start-column="0" selection-end-line="95" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_AssetSourcesService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EntriesService.php" />
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2016">
-          <caret line="112" column="5" lean-forward="false" selection-start-line="112" selection-start-column="5" selection-end-line="112" selection-end-column="5" />
-          <folding>
-            <marker date="1505753636000" expanded="true" signature="231:381" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="3397:4514" ph=" Fires an 'onImportField' event. To prevent execution of the import set $event-&gt;performAction to false and set a reason in $event-&gt;params['error'] to be logged. When checking the field type use the $event-&gt;params['value'] object as the ['field'] could be empty (ie field doesn't exist yet) ..." />
-            <marker date="1505753636000" expanded="true" signature="4564:4628" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4711:6681" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4859:6675" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4897:4968" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4975:5034" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="5102:5239" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="5326:6638" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="5372:5456" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="5463:5531" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="5623:5974" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6035:6381" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="6163:6233" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6439:6591" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6764:8583" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="6918:8523" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6948:7004" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7012:7059" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7118:8513" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7152:7212" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7220:7287" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7457:7894" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7953:8275" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8058:8128" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8324:8467" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8592:8619" ph=" @param $field ..." />
-            <marker date="1505753636000" expanded="true" signature="8670:9360" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="8803:9055" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="8889:9044" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8954:9030" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9100:9353" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="9186:9342" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9251:9328" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9408:15460" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="9458:10861" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9576:10021" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9656:10007" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9717:9989" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9855:9967" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10029:10103" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10196:10478" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10354:10464" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10570:10850" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10727:10836" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10907:12440" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11053:11586" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11189:11572" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11287:11554" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11406:11532" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11594:11682" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11775:12058" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11933:12043" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12150:12430" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12307:12416" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12488:13511" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12606:13501" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12721:13487" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12915:13292" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="13062:13169" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13177:13269" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13299:13469" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13556:14207" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13674:14120" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13754:14106" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13816:14088" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13953:14066" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14128:14197" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14249:14755" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14320:14745" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14400:14731" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14463:14713" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14589:14691" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14798:15453" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14916:15366" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14996:15352" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15056:15334" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15197:15312" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15374:15443" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15511:16085" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="15561:16078" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15703:16068" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15795:16054" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15917:16036" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16093:16391" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16442:16769" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="16607:16740" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16686:16730" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16815:17524" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="16975:17224" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="17061:17213" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17126:17199" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17269:17518" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="17355:17506" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17420:17492" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17571:18225" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="17621:18218" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17763:18208" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17889:18114" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18016:18096" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18269:23674" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="18317:19786" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18422:18757" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18542:18623" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18631:18743" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18918:19303" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19078:19184" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19192:19289" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19394:19776" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19553:19658" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19666:19762" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19832:21322" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19950:20285" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20070:20151" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20159:20271" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20454:20839" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20614:20720" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20728:20825" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20930:21312" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21089:21194" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21202:21298" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21370:21808" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21533:21605" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21613:21738" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21854:22502" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21958:22424" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22067:22168" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="22214:22295" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="22302:22410" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22544:22977" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22704:22779" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22787:22907" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23020:23667" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23124:23589" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23233:23332" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="23377:23458" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="23465:23575" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23720:24581" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="23903:24047" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="24389:24462" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="24637:25014" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="24729:25008" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="24781:24864" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="24911:24998" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="25072:25837" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="25397:25620" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="25627:25685" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="25920:26639" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26129:26587" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26276:26508" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26344:26430" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="26515:26576" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="26706:26884" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26747:26856" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26801:26845" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="26938:27708" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="27017:27701" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27170:27537" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27304:27451" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27459:27523" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27767:28417" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="28092:28367" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="28221:28291" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="28299:28356" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="28521:28630" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="28575:28619" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="1836">
-            <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_MigrationsService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1314">
-          <caret line="73" column="9" lean-forward="false" selection-start-line="73" selection-start-column="9" selection-end-line="73" selection-end-column="9" />
-          <folding>
-            <marker date="1505757245000" expanded="true" signature="1170:1215" ph="..." />
-            <marker date="1505757245000" expanded="true" signature="1170:1334" ph="..." />
-            <marker date="1505757245000" expanded="true" signature="1731:1749" ph="{...}" />
-            <marker date="1505757245000" expanded="true" signature="6361:6424" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/DEV.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_SectionsService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/migrationmanager/variables/MigrationManagerVariable.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
@@ -710,7 +474,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
+    <entry file="file://$PROJECT_DIR$/EXAMPLES.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="1836">
@@ -732,7 +496,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
+    <entry file="file://$PROJECT_DIR$/EXAMPLES.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="1836">
@@ -798,7 +562,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
+    <entry file="file://$PROJECT_DIR$/EXAMPLES.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="1836">
@@ -820,222 +584,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EntriesService.php" />
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="110">
-            <caret line="33" column="16" lean-forward="false" selection-start-line="33" selection-start-column="16" selection-end-line="33" selection-end-column="16" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_AssetSourcesService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2034">
-          <caret line="113" column="5" lean-forward="false" selection-start-line="113" selection-start-column="5" selection-end-line="113" selection-end-column="5" />
-          <folding>
-            <marker date="1505753636000" expanded="true" signature="231:381" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="3397:4514" ph=" Fires an 'onImportField' event. To prevent execution of the import set $event-&gt;performAction to false and set a reason in $event-&gt;params['error'] to be logged. When checking the field type use the $event-&gt;params['value'] object as the ['field'] could be empty (ie field doesn't exist yet) ..." />
-            <marker date="1505753636000" expanded="true" signature="4564:4628" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4711:6681" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4859:6675" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4897:4968" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="4975:5034" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="5102:5239" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="5326:6638" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="5372:5456" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="5463:5531" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="5623:5974" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6035:6381" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="6163:6233" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6439:6591" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6764:8583" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="6918:8523" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="6948:7004" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7012:7059" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7118:8513" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7152:7212" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7220:7287" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7457:7894" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="7953:8275" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8058:8128" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8324:8467" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8592:8619" ph=" @param $field ..." />
-            <marker date="1505753636000" expanded="true" signature="8670:9360" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="8803:9055" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="8889:9044" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="8954:9030" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9100:9353" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="9186:9342" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9251:9328" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9408:15460" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="9458:10861" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9576:10021" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9656:10007" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9717:9989" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="9855:9967" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10029:10103" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10196:10478" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10354:10464" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10570:10850" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10727:10836" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="10907:12440" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11053:11586" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11189:11572" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11287:11554" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11406:11532" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11594:11682" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11775:12058" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="11933:12043" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12150:12430" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12307:12416" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12488:13511" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12606:13501" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12721:13487" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="12915:13292" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="13062:13169" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13177:13269" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13299:13469" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13556:14207" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13674:14120" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13754:14106" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13816:14088" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="13953:14066" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14128:14197" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14249:14755" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14320:14745" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14400:14731" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14463:14713" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14589:14691" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14798:15453" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14916:15366" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="14996:15352" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15056:15334" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15197:15312" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15374:15443" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15511:16085" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="15561:16078" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15703:16068" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15795:16054" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="15917:16036" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16093:16391" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16442:16769" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="16607:16740" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16686:16730" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="16815:17524" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="16975:17224" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="17061:17213" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17126:17199" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17269:17518" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="17355:17506" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17420:17492" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17571:18225" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="17621:18218" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17763:18208" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="17889:18114" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18016:18096" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18269:23674" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="18317:19786" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18422:18757" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18542:18623" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18631:18743" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="18918:19303" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19078:19184" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19192:19289" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19394:19776" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19553:19658" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19666:19762" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19832:21322" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="19950:20285" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20070:20151" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20159:20271" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20454:20839" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20614:20720" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20728:20825" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="20930:21312" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21089:21194" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21202:21298" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21370:21808" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21533:21605" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21613:21738" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21854:22502" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="21958:22424" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22067:22168" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="22214:22295" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="22302:22410" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22544:22977" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22704:22779" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="22787:22907" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23020:23667" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23124:23589" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23233:23332" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="23377:23458" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="23465:23575" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="23720:24581" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="23903:24047" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="24389:24462" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="24637:25014" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="24729:25008" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="24781:24864" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="24911:24998" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="25072:25837" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="25397:25620" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="25627:25685" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="25920:26639" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26129:26587" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26276:26508" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26344:26430" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="26515:26576" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="26706:26884" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26747:26856" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="26801:26845" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="26938:27708" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="27017:27701" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27170:27537" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27304:27451" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27459:27523" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="27767:28417" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="28092:28367" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="28221:28291" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="28299:28356" ph="..." />
-            <marker date="1505753636000" expanded="true" signature="28521:28630" ph="{...}" />
-            <marker date="1505753636000" expanded="true" signature="28575:28619" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/EXAMPLES.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="1836">
-            <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/DEV.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_SectionsService.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1060,34 +608,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/controllers/MigrationManagerController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2754">
-          <caret line="153" column="14" lean-forward="false" selection-start-line="153" selection-start-column="14" selection-end-line="153" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseContentMigrationService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2592">
-          <caret line="144" column="0" lean-forward="false" selection-start-line="144" selection-start-column="0" selection-end-line="144" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsService.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="430">
           <caret line="50" column="9" lean-forward="true" selection-start-line="50" selection-start-column="9" selection-end-line="50" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/migrationmanager/helpers/MigrationManagerHelper.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2574">
-          <caret line="143" column="63" lean-forward="false" selection-start-line="143" selection-start-column="63" selection-end-line="143" selection-end-column="63" />
           <folding />
         </state>
       </provider>
@@ -1110,6 +634,178 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="36">
           <caret line="2" column="5" lean-forward="true" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/MigrationManagerPlugin.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="23" column="21" lean-forward="false" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/DEV.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="0">
+            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="762">
+            <caret line="196" column="36" lean-forward="true" selection-start-line="196" selection-start-column="36" selection-end-line="196" selection-end-column="36" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/EXAMPLES.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="1068">
+            <caret line="102" column="0" lean-forward="false" selection-start-line="102" selection-start-column="0" selection-end-line="102" selection-end-column="0" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/actions/MigrationManager_MigrateCategoryElementAction.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/actions/MigrationManager_MigrateEntryElementAction.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/actions/MigrationManager_MigrateUserElementAction.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/controllers/MigrationManagerController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/helpers/MigrationManagerHelper.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_AssetSourcesService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_AssetTransformsService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseContentMigrationService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_BaseMigrationService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_CategoriesContentService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_CategoriesService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EmailMessagesService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_EntriesContentService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_FieldsService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1505753636000" expanded="true" signature="231:381" ph="..." />
+            <marker date="1505753636000" expanded="true" signature="3397:4514" ph=" Fires an 'onImportField' event. To prevent execution of the import set $event-&gt;performAction to false and set a reason in $event-&gt;params['error'] to be logged. When checking the field type use the $event-&gt;params['value'] object as the ['field'] could be empty (ie field doesn't exist yet) ..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/migrationmanager/services/MigrationManager_GlobalsContentService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LICENSE.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="36">
+          <caret line="2" column="38" lean-forward="false" selection-start-line="2" selection-start-column="38" selection-end-line="2" selection-end-column="38" />
           <folding />
         </state>
       </provider>
