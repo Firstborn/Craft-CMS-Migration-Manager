@@ -202,6 +202,12 @@ View the [examples](EXAMPLES.md).
 With migrations you also have the ability to create content migrations directly from element index pages (ie the entry, category and user list pages). Check the entries you wish to export and then click the 'create migration' option in the action list. Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site. For Global values, use the 'Create Migration' button on the global screen.
 
  ![Pending Migration](screenshots/content-migration.png)
+ 
+ ## Handling Errors
+ The MigrationManager will do a full database rollback if an error occurs during a migration. You can check both the migrationmanager.log and craft.log to see details on why the migration failed. In many instances it's simply a case of a migration having dependencies (ie required fields) that have not been setup on the destination site or a missing plugin.
+ 
+ If after running a migration you attempt to edit an element (entry/category) and see an illegal offset error you need to edit the settings for the element that was updated via a migration (ie field). Simply find the field in the Settings/Fields section, open it and then click save.
+ ![Error](screenshots/illegal-offset-error.png)
 
 ##### Credits
 The entire dev team at [Firstborn](https://www.firstborn.com/)

@@ -231,6 +231,7 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
 
 
         $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+        $fieldLayout->type = ElementType::Entry;
         $entryType->fieldLayout = $fieldLayout;
 
         return $entryType;

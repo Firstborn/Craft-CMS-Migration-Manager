@@ -38,18 +38,21 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
 
         if ($fullExport)
         {
-            $newCategory['fieldLayout'] = array();
-            $newCategory['requiredFields'] = array();
-
             $fieldLayout = $category->getFieldLayout();
 
-            foreach ($fieldLayout->getTabs() as $tab) {
-                $newCategory['fieldLayout'][$tab->name] = array();
-                foreach ($tab->getFields() as $tabField) {
+            if ($fieldLayout) {
 
-                    $newCategory['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
-                    if ($tabField->required) {
-                        $newCategory['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                $newCategory['fieldLayout'] = array();
+                $newCategory['requiredFields'] = array();
+
+                foreach ($fieldLayout->getTabs() as $tab) {
+                    $newCategory['fieldLayout'][$tab->name] = array();
+                    foreach ($tab->getFields() as $tabField) {
+
+                        $newCategory['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        if ($tabField->required) {
+                            $newCategory['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        }
                     }
                 }
             }
@@ -107,6 +110,7 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
         }
 
         if (array_key_exists('fieldLayout', $data)) {
+
             $requiredFields = array();
             if (array_key_exists('requiredFields', $data)) {
                 foreach ($data['requiredFields'] as $handle) {
@@ -133,6 +137,7 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
 
 
             $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+            $fieldLayout->type = ElementType::Category;
             $category->fieldLayout = $fieldLayout;
 
         }

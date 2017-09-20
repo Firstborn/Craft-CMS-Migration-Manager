@@ -101,6 +101,7 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
 
 
             $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+            $fieldLayout->type = ElementType::Asset;
             $source->fieldLayout = $fieldLayout;
         }
 
