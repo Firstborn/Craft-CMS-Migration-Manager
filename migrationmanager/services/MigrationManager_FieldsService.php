@@ -83,7 +83,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
         if ($event->performAction) {
             $field = $this->createModel($event->params['value']);
-
             $result = craft()->fields->saveField($field);
             if ($result) {
 
@@ -277,7 +276,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
     private function getSourceHandles(&$field)
     {
-          if ($field['type'] == 'Assets') {
+        if ($field['type'] == 'Assets') {
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 7) == 'folder:') {
@@ -340,7 +339,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         if ($field['type'] == 'Categories') {
              if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
                 $value = $field['typesettings']['source'];
-                if (substr($value, 0, 6) == 'group:') {
+                 if (substr($value, 0, 6) == 'group:') {
                     $categories = craft()->categories->getAllGroupIds();
                     $categoryId = intval(substr($value, 6));
                     if (in_array($categoryId, $categories))
@@ -355,7 +354,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                         $this->addError('Can not export field: ' . $field['handle'] . ' category id: ' . $categoryId . ' does not exist in system');
                     }
                 }
-            }
+             }
         }
 
         if ($field['type'] == 'Entries') {
@@ -417,19 +416,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             }
         }
     }
-
-    /*private function getAssetSourceByHandle($handle){
-        $sources = craft()->assetSources->getAllSources();
-        foreach($sources as $source)
-        {
-            if ($source->handle == $handle)
-            {
-                return $source;
-            }
-        }
-
-        return false;
-    }*/
 
     private function getFieldGroupByName($name)
     {
@@ -555,14 +541,13 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
 
         if ($field['type'] == 'Categories') {
-            $newSources = array();
             $newSource = craft()->categories->getGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
-                $newSources[] = 'group:' . $newSource->id;
+                $newSource = 'group:' . $newSource->id;
             } else {
                 $this->addError('Category: ' . $field['typesettings']['source'] . ' is not defined in system');
             }
-            $field['typesettings']['source'] = $newSources;
+            $field['typesettings']['source'] = $newSource;
         }
 
 
