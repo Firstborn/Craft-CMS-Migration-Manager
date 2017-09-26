@@ -194,7 +194,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $plugin = craft()->plugins->getPlugin('migrationmanager', false);
         $migrationPath = craft()->migrations->getMigrationPath($plugin);
         $path = sprintf($migrationPath . 'generated/%s.php', $filename);
-        $migration = json_encode($migration);
+        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
         $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
         IOHelper::writeToFile($path, $content);
     }
