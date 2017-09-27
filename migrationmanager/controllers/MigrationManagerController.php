@@ -52,19 +52,7 @@ class MigrationManagerController extends BaseController
 
         $this->redirectToPostedUrl($globalSet);
 
-        /*
-        // Prevent GET Requests
-        $this->requirePostRequest();
-        $post = craft()->request->getPost();
 
-        if (craft()->migrationManager_migrations->createSettingMigration($post))
-        {
-            craft()->userSession->setNotice(Craft::t('Migration created.'));
-        } else {
-            craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
-        }
-
-        $this->renderTemplate('migrationmanager/index');*/
     }
 
     public function actionMigrations(){
@@ -81,13 +69,34 @@ class MigrationManagerController extends BaseController
             'data' => array(
                 'handle' => craft()->security->hashData($plugin->getClassHandle()),
                 'uid' => craft()->security->hashData(StringHelper::UUID()),
-                'migrations' => craft()->request->getPost('migration')
-
+                'migrations' => craft()->request->getPost('migration'),
+                'applied' => craft()->request->getPost('applied')
             )
         );
 
+        MigrationManagerPlugin::log('runMigration', LogLevel::Error);
+        MigrationManagerPlugin::log(json_encode($data['data']['migrations']), LogLevel::Error);
+
         $this->renderTemplate('migrationmanager/run', $data);
 
+    }
+
+    public function actionRunAppliedMigration()
+    {
+        $this->requirePostRequest();
+
+
+        $migrations = craft()->request->getPost('migration');
+
+        if ($migrations == false){
+            craft()->userSession->setError(Craft::t('You must select a migration to re run'));
+            $this->renderTemplate('migrationmanager/migrations-applied');
+        } else {
+
+            //unset the selected migrations
+            craft()->migrationManager_migrations->setMigrationsAsNotApplied($migrations);
+            $this->actionRunMigration();
+        }
     }
 
     public function actionPrepare()
@@ -158,6 +167,11 @@ class MigrationManagerController extends BaseController
             $return = craft()->updates->rollbackUpdate($uid, $handle);
         }
 
+        //reset the status of the migrations if they were reruns
+        if ($data['applied'] == 1){
+            craft()->migrationManager_migrations->setMigrationsAsApplied($data['migrations']);
+        }
+
         if (!$return['success'])
         {
             // Let the JS handle the exception response.
@@ -180,11 +194,9 @@ class MigrationManagerController extends BaseController
         {
             $this->returnJson(array('alive' => true, 'finished' => true, 'returnUrl' => 'migrationManager/migrations'));
         } else {
-            $this->returnJson(array('alive' => true, 'errorDetails' => 'Check to migration <a href="log">log</a> for details. ', 'nextStatus' => Craft::t('An error was encountered. Rolling back…'), 'nextAction' => 'update/rollback', 'data' => $data));
+            $this->returnJson(array('alive' => true, 'errorDetails' => 'Check to migration <a href="log">log</a> for details. ', 'nextStatus' => Craft::t('An error was encountered. Rolling back…'), 'nextAction' => 'migrationManager/rollback', 'data' => $data));
         }
     }
-
-
 
     public function actionLog(){
 
@@ -225,78 +237,5 @@ class MigrationManagerController extends BaseController
             'logEntries' => $logEntries
         ));
     }
-
-    public function actionManualImport()
-    {
-        HeaderHelper::setHeader(['Content-Type: text/json']);
-
-        $migrations = craft()->migrationManager_migrations->getNewMigrations();
-        $migration = array_pop($migrations);
-
-        $plugin = craft()->plugins->getPlugin('migrationmanager', false);
-
-        echo 'RUN MIGRATION: '. $migration . PHP_EOL;
-
-        if (craft()->migrations->migrateUp($migration, $plugin) === false)
-        {
-
-            echo 'Migration ' . $migration . ' failed . All later migrations are canceled.' . PHP_EOL;
-
-            // Refresh the DB cache
-            craft()->db->getSchema()->refresh();
-
-
-        } else {
-
-            echo 'Migration ' . $migration . ' successfully ran'. PHP_EOL;
-        }
-
-        $this->returnJson(true);
-
-    }
-
-    public function actionManualExport()
-    {
-        HeaderHelper::setHeader(['Content-Type: text/json']);
-
-        $get = craft()->request->getQuery();
-
-
-        if (craft()->migrationManager_migrations->create($get))
-        {
-            craft()->userSession->setNotice(Craft::t('Migration created.'));
-        } else {
-            craft()->user->setError(Craft::t('Could not create migration.'));
-        }
-
-
-
-        $this->returnJson(true);
-    }
-
-
-
-    public function actionTest()
-    {
-        $element = [
-            "elementType" =>"Tag",
-            "slug" => "tag-3",
-            "group" => "tags",
-            "value" => [
-                "plaintext"=>"tag 3"
-            ]
-        ];
-
-
-        $content = MigrationManagerHelper::getTagByHandle($element);
-
-
-        echo JsonHelper::encode($content);
-
-        $this->returnJson(true);
-    }
-
-
-
 
 }

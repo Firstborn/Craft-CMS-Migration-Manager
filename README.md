@@ -1,6 +1,6 @@
 # Migration Manager for [Craft CMS](https://craftcms.com/)
 
-CraftCMS Plugin to migrate Section, Entry Type and Field updates between Craft environments.
+Create migrations to easily move settings and content between CraftCMS website installations. You can select which elements to migrate and create a migration file that can be committed to your version control system. The migration(s) can then be applied on different CraftCMS installations to instantly create and update settings and content, without needing to enter data multiple times. By using migrations you can ensure your various website environments (local, staging, production, etc.) stay in sync and up to date.
 
 ## Installation
 1. Move the `migrationmanager` directory into your `craft/plugins` directory.
@@ -8,13 +8,23 @@ CraftCMS Plugin to migrate Section, Entry Type and Field updates between Craft e
 
 ## Use
 The Migration Manager can create migrations for the following tasks:
-- adding and updating fields
-- adding and updating sections
-- adding and updating section entry types
-- updating entry type field layouts (ie adding or removing fields from field tabs)
-- content (entries, categories, globals, users)
+- adding and updating:
+    - fields
+    - sections and entry types
+    - categories
+    - asset sources and transformations
+    - user groups
+    - locales
+    - tags
+    - routes
+    - email settings
+- adding and updating content:
+    - entries
+    - categories
+    - globals
+    - users
 
-To create a migration select the fields and/or sections you wish to migrate and then click the 'Create Migration' button at the bottom of the page.
+To create a migration select the elements you wish to migrate and then click the 'Create Migration' button at the bottom of the page.
 
 ![Migration Manager](screenshots/create-migration.png)
 

@@ -7,3 +7,8 @@ button.btn.submit {
     font-weight:600;
     font-family: HelveticaNeue, sans-serif;
 }
+
+a.link-muted {
+    color:#8f98a3;
+    text-decoration:underline;
+}

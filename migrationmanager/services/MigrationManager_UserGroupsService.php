@@ -153,33 +153,7 @@ class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationS
         $newSource['id'] = $source->id;
     }
 
-    /*private function getGroupPermissionIds($permissions)
-    {
-         foreach($permissions as &$permission)
-        {
-            //determine if permission references element, get id if it does
-            if (preg_match('/(:)/', $permission))
-            {
-                $permissionParts = explode(":", $permission);
-                $element = null;
 
-                if (preg_match('/entries|entrydrafts/', $permissionParts[0]))
-                {
-                    $element = craft()->sections->getSectionByHandle($permissionParts[1]);
-                } elseif (preg_match('/assetsource/', $permissionParts[0])) {
-                    $element = MigrationManagerHelper::getAssetSourceByHandle($permissionParts[1]);
-                } elseif (preg_match('/categories/', $permissionParts[0])) {
-                    $element = craft()->categories->getGroupByHandle($permissionParts[1]);
-                }
-
-                if ($element != null) {
-                    $permission = $permissionParts[0] . ':' . $element->id;
-                }
-            }
-        }
-
-        return $permissions;
-    }*/
 
     private function getGroupPermissionHandles($id)
     {

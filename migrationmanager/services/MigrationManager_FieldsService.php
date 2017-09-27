@@ -141,10 +141,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         $this->raiseEvent('onImportField', $event);
     }
 
-
-
-
-
     private function getMatrixField(&$newField, $fieldId, $includeID = false)
     {
         $blockTypes = craft()->matrix->getBlockTypesByFieldId($fieldId);

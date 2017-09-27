@@ -15,6 +15,12 @@ class MigrationManagerVariable
         return craft()->migrationManager_migrations->getNewMigrations();
     }
 
+    public function getAppliedMigrations()
+    {
+        return craft()->migrationManager_migrations->getAppliedMigrations();
+    }
+
+
     public function getAssetSources()
     {
         return craft()->assetSources->getAllSources();

@@ -1,6 +1,18 @@
 <?php
-namespace Craft;
 
+/**
+ * Migration Manager plugin for Craft CMS
+ *
+ * Create Craft migrations to easily migrate settings and content between website environments.
+ *
+ * @author    Derrick Grigg
+ * @copyright Copyright (c) 2017 FirstBorn
+ * @link      https://firstborn.com
+ * @package   MigrationManager
+ * @since     1.0.0
+ */
+
+namespace Craft;
 
 class MigrationManagerPlugin extends BasePlugin
 {
@@ -61,18 +73,18 @@ class MigrationManagerPlugin extends BasePlugin
             'migrationmanager/run-migration' => array('action' => 'migrationManager/runMigration'),
             'migrationmanager/migrations' => array('action' => 'migrationManager/migrations'),
             'migrationmanager/log' => array('action' => 'migrationManager/log')
-
         );
     }
 
     function init(){
-        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/helpers/MigrationManagerHelper.php');
-        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_IMigrationService.php');
-        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/services/MigrationManager_BaseMigrationService.php');
-        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateCategoryElementAction.php');
-        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateEntryElementAction.php');
-        require_once(CRAFT_PLUGINS_PATH . '/migrationmanager/actions/MigrationManager_MigrateUserElementAction.php');
+        Craft::import('plugins.migrationmanager.helpers.MigrationManagerHelper');
+        Craft::import('plugins.migrationmanager.services.MigrationManager_IMigrationService');
+        Craft::import('plugins.migrationmanager.service.MigrationManager_BaseMigrationService');
+        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateCategoryElementAction');
+        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateEntryElementAction');
+        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateUserElementAction');
 
+        // add a Create Migration button to the globals screen
         // check we have a cp request as we don't want to this js to run anywhere but the cp
         // and while we're at it check for a logged in user as well
         if ( craft()->request->isCpRequest() && craft()->userSession->isLoggedIn() && craft()->request->getSegment(1) == 'globals' ) {

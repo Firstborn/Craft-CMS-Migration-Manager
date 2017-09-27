@@ -168,24 +168,20 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
     private function createMigration($migration, $manifest = array())
     {
         $empty = is_null($migration);
-
-        // route
         $date = new DateTime();
-
         $name = 'm%s_migration';
-
         $description = [];
         foreach($manifest as $key => $value){
             $description[] = $key;
             foreach($value as $item){
                 $description[] = $item;
             }
-
         }
 
-        $description = implode('_', $description);
-        $name .= '_' . $description;
-
+        if (!$empty) {
+            $description = implode('_', $description);
+            $name .= '_' . $description;
+        }
 
         $filename = sprintf($name, $date->format('ymd_His'));
         $filename = substr($filename, 0, 250);
@@ -197,13 +193,23 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
         $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
         IOHelper::writeToFile($path, $content);
+
+        //mark the migration as completed if it's not a blank one
+        if (!$empty) {
+            $plugin = craft()->plugins->getPlugin('migrationmanager');
+            $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+
+            craft()->db->createCommand()->insert($this->_migrationTable, array(
+                'version' => $filename,
+                'applyTime' => DateTimeHelper::currentTimeForDb(),
+                'pluginId' => $pluginInfo['id']
+            ));
+        }
     }
 
     public function import($data)
     {
-
         $data = json_decode($data, true);
-
         try
         {
             if (array_key_exists('settings', $data)) {
@@ -269,11 +275,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         return true;
     }
 
-    /**
-     *
-     *
-     * @return mixed
-     */
     public function runToTop($migrationsToRun)
     {
         // This might take a while
@@ -288,7 +289,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                 if ($migration){
                     $migrations[] = $migration;
                 }
-
             }
         } else {
             $migrations = $this->getNewMigrations();
@@ -335,6 +335,107 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         craft()->db->getSchema()->refresh();
 
         return true;
+    }
+
+    /**
+     * remove applied migrations from the migration table so they can be run again
+     * @param $migrations
+     */
+    public function setMigrationsAsNotApplied($migrations)
+    {
+        $plugin = craft()->plugins->getPlugin('migrationmanager');
+        $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+
+        foreach($migrations as $migration)
+        {
+            craft()->db->createCommand()->delete($this->_migrationTable, array(
+                'version' => $migration,
+                'pluginId' => $pluginInfo['id']
+            ));
+
+        }
+
+    }
+
+    /**
+     * add applied migrations to the migration table
+     * @param $migrations
+     */
+    public function setMigrationsAsApplied($migrations)
+    {
+        $plugin = craft()->plugins->getPlugin('migrationmanager');
+        $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+
+        foreach($migrations as $migration)
+        {
+            MigrationManagerPlugin::log('set: ' . $migration, LogLevel::Error);
+            $plugin = craft()->plugins->getPlugin('migrationmanager');
+            $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+
+            craft()->db->createCommand()->insert($this->_migrationTable, array(
+                'version' => $migration,
+                'applyTime' => DateTimeHelper::currentTimeForDb(),
+                'pluginId' => $pluginInfo['id']
+            ));
+
+
+
+            MigrationManagerPlugin::log('set result: ' . $result, LogLevel::Error);
+        }
+
+    }
+
+    /**
+     * Gets migrations that have no been applied yet
+     *
+     * @param $plugin
+     *
+     * @return array
+     */
+    public function getAppliedMigrations($plugin = null)
+    {
+        $migrations = array();
+        if ($plugin == null){
+            $plugin = craft()->plugins->getPlugin('migrationmanager', false);
+        }
+        $migrationPath = craft()->migrations->getMigrationPath($plugin) . 'generated/';
+
+        if (IOHelper::folderExists($migrationPath) && IOHelper::isReadable($migrationPath))
+        {
+            $applied = array();
+
+            foreach (craft()->migrations->getMigrationHistory($plugin) as $migration)
+            {
+                $applied[] = $migration['version'];
+            }
+
+            $handle = opendir($migrationPath);
+
+            while (($file = readdir($handle)) !== false)
+            {
+                if ($file[0] === '.')
+                {
+                    continue;
+                }
+
+                $migration = $this->getMigration($file, $plugin);
+                if ($migration){
+
+                    // Have we already run this migration?
+                    if (in_array($migration, $applied))
+                    {
+                        $migrations[] = $migration;
+                    }
+
+                }
+
+            }
+
+            closedir($handle);
+            sort($migrations);
+        }
+
+        return $migrations;
     }
 
     /**
@@ -482,8 +583,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         }
         else
         {
-            //$time = microtime(true) - $start;
-            //MigrationManagerPlugin::log('Failed to apply migration: '.$class.' (time: '.sprintf("%.3f", $time).'s)', LogLevel::Error);
             return false;
         }
     }

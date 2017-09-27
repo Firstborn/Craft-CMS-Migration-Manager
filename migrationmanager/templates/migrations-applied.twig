@@ -15,16 +15,16 @@
 
 {% set content %}
 <div class="migration-manager">
-    {% set migrations = craft.migrationManager.getNewMigrations() %}
+    {% set migrations = craft.migrationManager.getAppliedMigrations() %}
     {%  if migrations | length %}
-        <h1>New migration{{ migrations|length > 1 ? 's' : '' }}</h1>
+        <h1>Applied migration{{ migrations|length > 1 ? 's' : '' }}</h1>
     {%  else %}
-        <h1>No pending migrations</h1>
+        <h1>No applied migrations</h1>
     {%  endif %}
 
     <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-        <input type="hidden" name="action" value="migrationManager/runMigration">
-        <input type="hidden" name="applied" value="0">
+        <input type="hidden" name="action" value="migrationManager/runAppliedMigration">
+        <input type="hidden" name="applied" value="1">
         {{ getCsrfInput() }}
 
         {% for migration in migrations %}
@@ -33,9 +33,10 @@
         {% endfor %}
 
         {% if migrations|length %}
-            <p>You can select specific migrations to run, otherwise all migrations will be run. You can also run previously <a class="link-muted" href="migrations-applied">applied migrations</a></p>
-            <input type="submit" class="btn submit export-btn" value="Run Migration{{ migrations|length > 1 ? 's' : '' }}">
-        {% endif %}
+            <p>You must select specific migrations to run. Return to the <a class="link-muted" href="migrations">new migrations</a></p>
+            <input type="submit" class="btn submit export-btn" value="Rerun Migration{{ migrations|length > 1 ? 's' : '' }}">
+         {% endif %}
+
     </form>
 
 
