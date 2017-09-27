@@ -49,6 +49,7 @@ Before executing the migration(s) the Craft database will be backed up and store
 
 If a migration fails to execute the migration will be rolled back and the database will be restored to state before the migration started. You can check the Log tab to review previous migrations and see any error messages.
 
+You can also view previously applied migrations by clicking the 'applied migrations' link at the bottom of the migration list. This will show you migrations that have already been applied and migrations that were created locally (and don't need to be run locally). Note that if you create [blank migrations](#custom-migrations) (by clicking the Create Migration button without selecting elements) they will show up in the New Migrations list, so that you have a chance to test and run them locally with your custom migration code.
 ## Field type support
 Migration manager currently supports all core CraftCMS fields types:
 - Assets
