@@ -202,8 +202,6 @@ public function init()
 
 ```
 
-
-
 <a name="custom-migrations"/>
 
 ## Custom migrations
@@ -216,7 +214,7 @@ With migrations you also have the ability to create content migrations directly 
 
  ![Pending Migration](screenshots/content-migration.png)
  
- ## Handling Errors
+## Handling Errors
  The MigrationManager will do a full database rollback if an error occurs during a migration. You can check both the migrationmanager.log and craft.log to see details on why the migration failed. In many instances it's simply a case of a migration having dependencies (ie required fields) that have not been setup on the destination site or a missing plugin.
  
  If after running a migration you attempt to edit an element (entry/category) and see an illegal offset error you need to edit the settings for the element that was updated via a migration (ie field). Simply find the field in the Settings/Fields section, open it and then click save. This is most often caused by a missing reference to a category/entry type for a category or entry selector field. Also make sure the reference element type exists.
