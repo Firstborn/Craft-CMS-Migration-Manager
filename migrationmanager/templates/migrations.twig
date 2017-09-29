@@ -33,8 +33,10 @@
         {% endfor %}
 
         {% if migrations|length %}
-            <p>You can select specific migrations to run, otherwise all migrations will be run. You can also run previously <a class="link-muted" href="migrations-applied">applied migrations</a></p>
+            <p>You can select specific migrations to run, otherwise all migrations will be run. You can also run previously <a class="link-muted" href="migrations-applied">applied migrations</a>.</p>
             <input type="submit" class="btn submit export-btn" value="Run Migration{{ migrations|length > 1 ? 's' : '' }}">
+        {% else %}
+            <p>There are no pending migrations. You can run previously <a class="link-muted" href="migrations-applied">applied migrations</a>.</p>
         {% endif %}
     </form>
 

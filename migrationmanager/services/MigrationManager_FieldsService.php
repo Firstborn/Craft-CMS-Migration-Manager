@@ -276,9 +276,11 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 7) == 'folder:') {
-                        $source = craft()->assetSources->getSourceById(intval(substr($value, 7)));
+                        $source = MigrationManagerHelper::getAssetSourceByFolderId(intval(substr($value, 7)));
                         if ($source) {
                             $field['typesettings']['sources'][$key] = $source->handle;
+                        } else {
+
                         }
                     }
                 }

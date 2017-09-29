@@ -33,9 +33,11 @@
         {% endfor %}
 
         {% if migrations|length %}
-            <p>You must select specific migrations to run. Return to the <a class="link-muted" href="migrations">new migrations</a></p>
+            <p>You must select specific migrations to run. Return to the <a class="link-muted" href="migrations">new migrations</a>.</p>
             <input type="submit" class="btn submit export-btn" value="Rerun Migration{{ migrations|length > 1 ? 's' : '' }}">
-         {% endif %}
+        {% else %}
+            <p>There are no applied migrations. Return to the <a class="link-muted" href="migrations">new migrations</a>.</p>
+        {% endif %}
 
     </form>
 

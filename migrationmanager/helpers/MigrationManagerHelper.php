@@ -16,6 +16,21 @@ class MigrationManagerHelper
         return false;
     }
 
+    /**
+     * @param $id folder id
+     */
+    public static function getAssetSourceByFolderId($id)
+    {
+        $folder = craft()->assets->getFolderById($id);
+        if ($folder){
+            $source = craft()->assetSources->getSourceById($folder->sourceId);
+            if ($source){
+                return $source;
+            }
+        }
+        return false;
+    }
+
     public static function getAssetSourceByHandle($handle)
     {
         $sources = craft()->assetSources->getAllSources();
