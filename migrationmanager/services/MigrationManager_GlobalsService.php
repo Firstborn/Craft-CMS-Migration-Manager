@@ -85,7 +85,7 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
                 if ($existingField) {
                     $fieldIds[] = $existingField->id;
                 } else {
-                    $this->addError('Missing field: ' . $field . ' can not add to field layout for Global: ' . $source->handle);
+                    $this->addError('Missing field: ' . $field . ' can not add to field layout for Global: ' . $globalSet->handle);
                 }
             }
             $layout[$key] = $fieldIds;
