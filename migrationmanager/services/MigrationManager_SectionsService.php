@@ -168,12 +168,18 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             foreach($data['locales'] as $key => $locale){
                 //determine if locale exists
                 if (in_array($key, craft()->i18n->getSiteLocaleIds())) {
-                    $locales[$key] = new SectionLocaleModel(array(
-                        'locale' => $key,
-                        'enabledByDefault' => $locale['enabledByDefault'],
-                        'urlFormat' => $locale['urlFormat'],
-                        'nestedUrlFormat' => $locale['nestedUrlFormat'],
-                    ));
+                    if ($section->hasUrls) {
+                        $locales[$key] = new SectionLocaleModel(array(
+                            'locale' => $key,
+                            'enabledByDefault' => array_key_exists('enabledByDefault', $locale) ? $locale['enabledByDefault'] : true,
+                            'urlFormat' => $locale['urlFormat'],
+                            'nestedUrlFormat' => $locale['nestedUrlFormat'],
+                        ));
+                    } else {
+                        $locales[$key] = new SectionLocaleModel(array(
+                            'locale' => $key
+                        ));
+                    }
                 } else {
                     $this->addError('missing locale: ' . $key . ' in section: ' . $section->handle . ', locale not defined in system');
                 }
