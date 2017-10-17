@@ -33,7 +33,7 @@ class MigrationManagerPlugin extends BasePlugin
 
     function getDeveloperUrl()
     {
-        return 'https://firstborn.com';
+        return 'https://www.firstborn.com';
     }
 
     public function hasCpSection()
