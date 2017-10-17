@@ -198,6 +198,15 @@ public function init()
     
         }
      });
+     
+    
+    craft()->on('migrationManager_fields.importFieldContent', function(Event $event){
+        if ( $event->params['field']->type == 'RichText'){
+            //convert the value to uppercase before import
+            $event->params['value'] = strtoupper($event->params['value']);
+            $event->performAction = false;
+        }
+    });
 }
 
 ```
