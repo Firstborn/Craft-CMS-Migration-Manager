@@ -54,6 +54,16 @@ class MigrationManagerHelper
         return false;
     }
 
+    public static function getMatrixBlockType($handle, $fieldId){
+        $blockTypes = craft()->matrix->getBlockTypesByFieldId($fieldId);
+        foreach($blockTypes as $block){
+            if ($block->handle == $handle){
+                return $block;
+            }
+        }
+        return false;
+    }
+
     public static function getAssetByHandle($element)
     {
         $source = $newSource = MigrationManagerHelper::getAssetSourceByHandle($element['source']);

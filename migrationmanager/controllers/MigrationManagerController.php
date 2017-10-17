@@ -74,9 +74,6 @@ class MigrationManagerController extends BaseController
             )
         );
 
-        MigrationManagerPlugin::log('runMigration', LogLevel::Error);
-        MigrationManagerPlugin::log(json_encode($data['data']['migrations']), LogLevel::Error);
-
         $this->renderTemplate('migrationmanager/run', $data);
 
     }

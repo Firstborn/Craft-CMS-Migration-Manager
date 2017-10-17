@@ -1,6 +1,8 @@
 <?php
 
 namespace Craft;
+use function GuzzleHttp\Psr7\str;
+
 class MigrationManager_MigrationsService extends BaseApplicationComponent
 {
 
@@ -188,11 +190,21 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $filename = str_replace('-', '_', $filename);
 
         $plugin = craft()->plugins->getPlugin('migrationmanager', false);
-        $migrationPath = craft()->migrations->getMigrationPath($plugin);
-        $path = sprintf($migrationPath . 'generated/%s.php', $filename);
+        $migrationPath = craft()->migrations->getMigrationPath($plugin) . '/generated';
+        $path = sprintf($migrationPath . '/%s.php', $filename);
+
+        $pathLen = strlen($path);
+        if ($pathLen > 255) {
+            $migrationPathLen = strlen($migrationPath);
+            $filename = substr($filename, 0, 250 - $migrationPathLen);
+            $path = sprintf($migrationPath . '/%s.php', $filename);
+        }
+
         $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
         $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
+
         IOHelper::writeToFile($path, $content);
+
 
         //mark the migration as completed if it's not a blank one
         if (!$empty) {
@@ -368,7 +380,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
         foreach($migrations as $migration)
         {
-            MigrationManagerPlugin::log('set: ' . $migration, LogLevel::Error);
             $plugin = craft()->plugins->getPlugin('migrationmanager');
             $pluginInfo = craft()->plugins->getPluginInfo($plugin);
 
@@ -377,10 +388,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
                 'applyTime' => DateTimeHelper::currentTimeForDb(),
                 'pluginId' => $pluginInfo['id']
             ));
-
-
-
-            MigrationManagerPlugin::log('set result: ' . $result, LogLevel::Error);
         }
 
     }

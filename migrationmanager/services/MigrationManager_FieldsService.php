@@ -141,6 +141,21 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         $this->raiseEvent('onImportField', $event);
     }
 
+    /**
+     * Fires an 'onImportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
+     *
+     * @param Event $event
+     *          $event->params['field'] - field
+     *          $event->params['parent'] - field parent
+     *          $event->params['value'] - current field value, change this value in the event handler to output a different value
+     *
+     * @return null
+     */
+    public function onImportFieldContent(Event $event)
+    {
+        $this->raiseEvent('onImportFieldContent', $event);
+    }
+
     private function getMatrixField(&$newField, $fieldId, $includeID = false)
     {
         $blockTypes = craft()->matrix->getBlockTypesByFieldId($fieldId);
@@ -372,15 +387,17 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
         if ($field['type'] == 'Tags') {
 
-            if (array_key_exists('source', $field['typesettings'])) {
-                 foreach ($field['typesettings']['source'] as $key => $value) {
+            if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
+                MigrationManagerPlugin::log(json_encode($field), LogLevel::Error);
+                $value = $field['typesettings']['source'];
+                //foreach ($field['typesettings']['source'] as $key => $value) {
                     if (substr($value, 0, 9) == 'taggroup:') {
                         $tag = craft()->tags->getTagGroupById(intval(substr($value, 9)));
                         if ($tag) {
                             $field['typesettings']['source'] = $tag->handle;
                         }
                     }
-                }
+                //}
             }
         }
 
@@ -569,14 +586,13 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
 
         if ($field['type'] == 'Tags') {
-            $newSources = array();
             $newSource = craft()->tags->getTagGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
-                $newSources[] = 'taggroup:' . $newSource->id;
+                $newSource = 'taggroup:' . $newSource->id;
             } else {
                 $this->addError('Tag: ' . $field['typesettings']['source'] . ' is not defined in system');
             }
-            $field['typesettings']['source'] = $newSources;
+            $field['typesettings']['source'] = $newSource;
         }
 
         if ($field['type'] == 'Users') {

@@ -62,6 +62,7 @@ class MigrationManager_UsersContentService extends MigrationManager_BaseContentM
 
         $user->setAttributes($data);
         $this->getSourceIds($data);
+        $this->validateImportValues($data);
         $user->setContentFromPost($data);
         return $user;
     }

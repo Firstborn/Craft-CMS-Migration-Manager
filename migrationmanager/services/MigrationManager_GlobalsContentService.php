@@ -43,7 +43,7 @@ class MigrationManager_GlobalsContentService extends MigrationManager_BaseConten
             $set = craft()->globals->getSetById($globalSet->id, $key);
 
             $this->getSourceIds($value);
-
+            $this->validateImportValues($value);
             $set->setContentFromPost($value);
 
             // save set

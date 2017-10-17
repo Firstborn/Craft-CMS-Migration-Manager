@@ -61,6 +61,9 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                         return $value;
                     });
                     break;
+                case 'Dropdown':
+                    $value = $value->value;
+                    break;
                 default:
                     if ($field->getFieldType() instanceof BaseElementFieldType) {
                         $this->getSourceHandles($value);
@@ -68,7 +71,64 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                     break;
             }
         }
+
         $content[$field->handle] = $value;
+    }
+
+    protected function validateImportValues(&$values)
+    {
+        foreach ($values as $key => &$value) {
+            $this->validateFieldValue($values, $key, $value);
+        }
+    }
+
+    protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
+    {
+        $field = craft()->fields->getFieldByHandle($fieldHandle);
+
+        if ($field) {
+            // Fire an 'onImportFieldContent' event
+            $event = new Event($this, array(
+                'field' => $field,
+                'parent' => $parent,
+                'value' => &$fieldValue
+            ));
+
+            $this->onImportFieldContent($event);
+
+            if ($event->performAction == false) {
+                $fieldValue = $event->params['value'];
+
+            } else {
+                switch ($field->type) {
+                    case 'Matrix':
+                        foreach($fieldValue as $key => &$matrixBlock){
+                            $blockType = MigrationManagerHelper::getMatrixBlockType($matrixBlock['type'], $field->id);
+                            if ($blockType) {
+                                $blockFields = craft()->fields->getAllFields(null, 'matrixBlockType:' . $blockType->id);
+                                foreach($blockFields as &$blockField){
+                                    if ($blockField->type == 'SuperTable') {
+                                        $matrixBlockFieldValue = &$matrixBlock['fields'][$blockField->handle];
+                                        $this->updateSupertableFieldValue($matrixBlockFieldValue, $blockField);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case 'SuperTable':
+                        $this->updateSupertableFieldValue($fieldValue, $field);
+                        break;
+                }
+            }
+        }
+
+    }
+
+    protected function updateSupertableFieldValue(&$fieldValue, $field){
+        $blockType = craft()->superTable->getBlockTypesByFieldId($field->id)[0];
+        foreach ($fieldValue as $key => &$value) {
+            $value['type'] = $blockType->id;
+        }
     }
 
     protected function getIteratorValues($element, $settingsFunc)
@@ -247,6 +307,22 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
     {
         //route this through fields service for simplified event listening
         craft()->migrationManager_fields->onExportFieldContent($event);
+    }
+
+    /**
+     * Fires an 'onImportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
+     *
+     * @param Event $event
+     *          $event->params['field'] - field
+     *          $event->params['parent'] - field parent
+     *          $event->params['value'] - current field value, change this value in the event handler to import a different value
+     *
+     * @return null
+     */
+    public function onImportFieldContent(Event $event)
+    {
+        //route this through fields service for simplified event listening
+        craft()->migrationManager_fields->onImportFieldContent($event);
     }
 
 

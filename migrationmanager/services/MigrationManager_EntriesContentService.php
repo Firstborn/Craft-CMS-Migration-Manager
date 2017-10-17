@@ -58,7 +58,6 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
         $criteria->section = $data['section'];
         $criteria->slug = $data['slug'];
         $primaryEntry = $criteria->first();
-        //$entry = false;
 
         if (array_key_exists('parent', $data))
         {
@@ -71,12 +70,13 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
             }
 
             $entry = $this->createModel($value);
-
             $this->getSourceIds($value);
+            $this->validateImportValues($value);
             $entry->setContentFromPost($value);
 
-            // save entry
+           // save entry
             if (!$success = craft()->entries->saveEntry($entry)) {
+
                 throw new Exception(print_r($entry->getErrors(), true));
             }
 
@@ -125,6 +125,8 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
 
         return $entry;
     }
+
+
 
 
 

@@ -108,6 +108,7 @@ class MigrationManager_CategoriesContentService extends MigrationManager_BaseCon
         }
 
         $this->getSourceIds($data);
+        $this->validateImportValues($data);
         $category->setContentFromPost($data);
         return $category;
     }
