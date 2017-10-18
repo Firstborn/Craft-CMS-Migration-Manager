@@ -1,7 +1,6 @@
 <?php
 
 namespace Craft;
-use function GuzzleHttp\Psr7\str;
 
 class MigrationManager_MigrationsService extends BaseApplicationComponent
 {

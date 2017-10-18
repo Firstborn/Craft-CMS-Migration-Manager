@@ -265,7 +265,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         $this->getSourceHandles($field);
         $this->getTransformHandles($field);
 
-        if ($field['type'] == 'Matrix')
+        if ($field['type'] == 'Matrix' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
@@ -274,7 +274,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             }
         }
 
-        if ($field['type'] == 'SuperTable')
+        if ($field['type'] == 'SuperTable' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
@@ -454,7 +454,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         $this->getSourceIds($field);
         $this->getTransformIds($field);
         //get ids for children items
-        if ($field['type'] == 'Matrix')
+        if ($field['type'] == 'Matrix' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
@@ -463,7 +463,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             }
         }
 
-        if ($field['type'] == 'SuperTable')
+        if ($field['type'] == 'SuperTable' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
