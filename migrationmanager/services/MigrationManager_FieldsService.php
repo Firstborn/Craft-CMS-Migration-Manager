@@ -98,6 +98,58 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
     }
 
+    public function createModel(Array $data)
+    {
+        $field = new FieldModel();
+        //find group id
+        $field->id = $data['id'];
+
+        $group = $this->getFieldGroupByName($data['group']);
+        if (!$group){
+            $group = new FieldGroupModel();
+            $group->name = $data['group'];
+            craft()->fields->saveGroup($group);
+        }
+
+        //go get any extra settings that need to be set based on handles
+        $this->getSettingIds($data);
+
+        $field->groupId = $group->id;
+        $field->name = $data['name'];
+        $field->handle = $data['handle'];
+        $field->instructions = $data['instructions'];
+
+        if (array_key_exists('translatable', $data)) {
+            $field->translatable = (bool)$data['translatable'];
+        }
+        $field->type = $data['type'];
+        $field->settings = $data['typesettings'];
+
+        return $field;
+    }
+
+    private function getFieldGroupByName($name)
+    {
+
+        $results = craft()->db->createCommand()->select('id, name')->from('fieldgroups')->order('name')->queryAll();
+        $groups = array();
+
+        foreach ($results as $result)
+        {
+            $group = new FieldGroupModel($result);
+            $groups[$group->id] = $group;
+        }
+
+        // Loop through field groups
+        foreach ($groups as $group) {
+            // Return matching group
+            if ($group->name == $name) {
+                return $group;
+            }
+        }
+        return false;
+    }
+
     /**
      * Fires an 'onExportField' event. To prevent execution of the export set $event->performAction to false and set a reason in $event->params['error'] to be logged.
      *
@@ -181,7 +233,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                 {
                     $fieldId = $blockField->id;
                 } else {
-                     $fieldId = 'new'.$fieldCount;
+                    $fieldId = 'new'.$fieldCount;
                 }
 
                 $newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId] = [
@@ -278,7 +330,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
-                     $this->getSettingHandles($childField);
+                    $this->getSettingHandles($childField);
                 }
             }
         }
@@ -350,9 +402,9 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
 
         if ($field['type'] == 'Categories') {
-             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
+            if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
                 $value = $field['typesettings']['source'];
-                 if (substr($value, 0, 6) == 'group:') {
+                if (substr($value, 0, 6) == 'group:') {
                     $categories = craft()->categories->getAllGroupIds();
                     $categoryId = intval(substr($value, 6));
                     if (in_array($categoryId, $categories))
@@ -367,7 +419,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                         $this->addError('Can not export field: ' . $field['handle'] . ' category id: ' . $categoryId . ' does not exist in system');
                     }
                 }
-             }
+            }
         }
 
         if ($field['type'] == 'Entries') {
@@ -391,12 +443,12 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                 MigrationManagerPlugin::log(json_encode($field), LogLevel::Error);
                 $value = $field['typesettings']['source'];
                 //foreach ($field['typesettings']['source'] as $key => $value) {
-                    if (substr($value, 0, 9) == 'taggroup:') {
-                        $tag = craft()->tags->getTagGroupById(intval(substr($value, 9)));
-                        if ($tag) {
-                            $field['typesettings']['source'] = $tag->handle;
-                        }
+                if (substr($value, 0, 9) == 'taggroup:') {
+                    $tag = craft()->tags->getTagGroupById(intval(substr($value, 9)));
+                    if ($tag) {
+                        $field['typesettings']['source'] = $tag->handle;
                     }
+                }
                 //}
             }
         }
@@ -432,23 +484,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         }
     }
 
-    private function getFieldGroupByName($name)
-    {
-        // Get all field groups
-        $groups = craft()->fields->getAllGroups();
-
-        // Loop through field groups
-        foreach ($groups as $group) {
-
-            // Return matching group
-            if ($group->name == $name) {
-                return $group;
-            }
-        }
-        return false;
-    }
-
-
     private function getSettingIds(&$field)
     {
         $this->getSourceIds($field);
@@ -458,7 +493,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
-                     $this->getSettingIds($childField);
+                    $this->getSettingIds($childField);
                 }
             }
         }
@@ -613,37 +648,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
             $field['typesettings']['sources'] = join($newSources);
         }
-    }
-
-    public function createModel(Array $data)
-    {
-        $field = new FieldModel();
-        //find group id
-        $field->id = $data['id'];
-
-        $group = $this->getFieldGroupByName($data['group']);
-        if (!$group){
-            $group = new FieldGroupModel();
-            $group->name = $data['group'];
-            craft()->fields->saveGroup($group);
-        }
-
-        //go get any extra settings that need to be set based on handles
-        $this->getSettingIds($data);
-
-        $field->groupId = $group->id;
-
-        $field->name = $data['name'];
-        $field->handle = $data['handle'];
-        $field->instructions = $data['instructions'];
-
-        if (array_key_exists('translatable', $data)) {
-            $field->translatable = (bool)$data['translatable'];
-        }
-        $field->type = $data['type'];
-        $field->settings = $data['typesettings'];
-
-        return $field;
     }
 
 

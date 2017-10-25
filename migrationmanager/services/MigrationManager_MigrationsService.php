@@ -69,6 +69,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
 
         foreach($this->_settingsDependencyTypes as $key => $value)
         {
+            Craft::log('getComponent: ' .$value, LogLevel::Error);
             $service = craft()->getComponent($value);
             if (array_key_exists($service->getSource(), $data))
             {

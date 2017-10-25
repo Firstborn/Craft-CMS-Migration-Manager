@@ -67,6 +67,8 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                 default:
                     if ($field->getFieldType() instanceof BaseElementFieldType) {
                         $this->getSourceHandles($value);
+                    } elseif ($field->getFieldType() instanceof BaseOptionsFieldType){
+                        $this->getSelectedOptions($value);
                     }
                     break;
             }
@@ -244,6 +246,19 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
             }
         }
         return;
+    }
+
+    protected function getSelectedOptions(&$value){
+        $options = $value->getOptions();
+        $value = [];
+        foreach($options as $option){
+            if ($option->selected)
+            {
+                $value[] = $option->value;
+            }
+        }
+        return $value;
+
     }
 
     protected function populateIds(&$value)
