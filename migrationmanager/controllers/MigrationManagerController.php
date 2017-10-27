@@ -113,20 +113,15 @@ class MigrationManagerController extends BaseController
 
         if (craft()->config->get('backupDbOnUpdate'))
         {
-            $plugin = craft()->plugins->getPlugin('migrationmanager');
+            $return = craft()->updates->backupDatabase();
 
-            // make sure there are new migrations before backing up the database.
-            if ($plugin && craft()->migrations->getNewMigrations($plugin) )
+            MigrationManagerPlugin::log('running database backup', LogLevel::Info);
+
+            if (!$return['success'])
             {
-                $return = craft()->updates->backupDatabase();
-
-                MigrationManagerPlugin::log('running database backup', LogLevel::Info);
-
-                if (!$return['success'])
-                {
-                    $this->returnJson(array('alive' => true, 'errorDetails' => $return['message'], 'nextStatus' => Craft::t('An error was encountered. Rolling back…'), 'nextAction' => 'migrationManager/rollback', 'data' => $data));
-                }
+                $this->returnJson(array('alive' => true, 'errorDetails' => $return['message'], 'nextStatus' => Craft::t('An error was encountered. Rolling back…'), 'nextAction' => 'migrationManager/rollback', 'data' => $data));
             }
+
         }
 
         $this->returnJson(array('alive' => true, 'nextStatus' => Craft::t('Running migrations ...'), 'nextAction' => 'migrationManager/runMigrations', 'data' => $data));
