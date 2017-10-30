@@ -1,6 +1,7 @@
 {
   "name": "firstborn/craft-cms-migration-manager",
   "description": "Craft CMS Migration Manager",
+  "type": "craft-plugin",
   "authors": [
     {
       "name": "Derrick Grigg",
