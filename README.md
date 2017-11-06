@@ -232,5 +232,4 @@ With migrations you also have the ability to create content migrations directly 
 ##### Credits
 The entire dev team at [Firstborn](https://www.firstborn.com/)
 
-
 Flying Duck icon by Agne Alesiute from the [Noun Project](https://thenounproject.com/)
