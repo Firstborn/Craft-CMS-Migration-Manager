@@ -112,7 +112,7 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
                         craft()->sections->deleteEntryTypeById($defaultEntryType[0]->id);
                     }
                 }
-                
+
                 //add entry types
                 foreach ($data['entrytypes'] as $key => $newEntryType) {
                     $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
