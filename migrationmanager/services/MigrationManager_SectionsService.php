@@ -105,6 +105,14 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
 
         if ($section) {
             if (craft()->sections->saveSection($section)) {
+                if (!$existing){
+                    //wipe out the default entry type
+                    $defaultEntryType = craft()->sections->getEntryTypesBySectionId($section->id);
+                    if ($defaultEntryType) {
+                        craft()->sections->deleteEntryTypeById($defaultEntryType[0]->id);
+                    }
+                }
+                
                 //add entry types
                 foreach ($data['entrytypes'] as $key => $newEntryType) {
                     $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
