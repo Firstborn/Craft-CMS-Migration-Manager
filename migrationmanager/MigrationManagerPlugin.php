@@ -6,7 +6,7 @@
  * Create Craft migrations to easily migrate settings and content between website environments.
  *
  * @author    Derrick Grigg
- * @copyright Copyright (c) 2017 FirstBorn
+ * @copyright Copyright (c) 2017 Firstborn
  * @link      https://firstborn.com
  * @package   MigrationManager
  * @since     1.0.0
