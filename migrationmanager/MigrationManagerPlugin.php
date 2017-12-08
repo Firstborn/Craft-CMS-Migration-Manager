@@ -84,15 +84,23 @@ class MigrationManagerPlugin extends BasePlugin
         Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateEntryElementAction');
         Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateUserElementAction');
 
-        // add a Create Migration button to the globals screen
-        // check we have a cp request as we don't want to this js to run anywhere but the cp
-        // and while we're at it check for a logged in user as well
-        if ( craft()->request->isCpRequest() && craft()->userSession->isLoggedIn() && craft()->request->getSegment(1) == 'globals' ) {
-            // the includeJsResource method will add a js file to the bottom of the page
-            craft()->templates->includeJsResource('migrationmanager/js/MigrationManagerGlobalsExport.js');
-            craft()->templates->includeJs("new Craft.MigrationManagerGlobalsExport();");
-        }
+        if ( craft()->request->isCpRequest() && craft()->userSession->isLoggedIn()) {
 
+            // add a Create Migration button to the globals screen
+            if (craft()->request->getSegment(1) == 'globals' ) {
+                // the includeJsResource method will add a js file to the bottom of the page
+                craft()->templates->includeJsResource('migrationmanager/js/MigrationManagerGlobalsExport.js');
+                craft()->templates->includeJs("new Craft.MigrationManagerGlobalsExport();");
+            }
+
+            //show alert on sidebar if migrations are pending
+            $pendingMigrations = count(craft()->migrationManager_migrations->getNewMigrations());
+            if ($pendingMigrations > 0) {
+                craft()->templates->includeCssResource('migrationmanager/css/styles.css');
+                craft()->templates->includeJsResource('migrationmanager/js/MigrationManagerSideBar.js');
+                craft()->templates->includeJs("new Craft.MigrationManagerSideBar({$pendingMigrations});");
+            }
+        }
 
     }
 
