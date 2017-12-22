@@ -51,15 +51,25 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                     });
                     break;
                 case 'SuperTable':
-
                     $model = $parent[$field->handle];
-                    $value = $this->getIteratorValues($model, function () {
+
+                    if ($field->settings['staticField'] == 1){
                         $value = [
-                            'type' => 1,
-                            'fields' => []
+                            'new1' => [
+                                'type' => 1,
+                                'fields' => []
+                            ]
                         ];
-                        return $value;
-                    });
+                        $this->getContent($value['new1']['fields'], $model);
+                    } else {
+                        $value = $this->getIteratorValues($model, function () {
+                            $value = [
+                                'type' => 1,
+                                'fields' => []
+                            ];
+                            return $value;
+                        });
+                    }
                     break;
                 case 'Dropdown':
                     $value = $value->value;
@@ -137,8 +147,8 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
     {
         $items = $element->getIterator();
         $value = [];
-
         $i = 1;
+
         foreach ($items as $item) {
             $itemType = $item->getType();
             $itemFields = $itemType->getFieldLayout()->getFields();
@@ -154,8 +164,6 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
             $value['new' . $i] = $itemValue;
             $i++;
         }
-
-
         return $value;
     }
 
