@@ -72,6 +72,7 @@ Migration manager currently supports all core CraftCMS fields types:
 - Users
 
 In addition it also supports:
+- [Neo](https://github.com/benjamminf/craft-neo)
 - [SuperTable](https://github.com/engram-design/SuperTable)
  
 To support additional field types you can use event handlers for customized import/export functions.

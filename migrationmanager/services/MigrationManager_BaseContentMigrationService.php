@@ -50,6 +50,22 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                         return $value;
                     });
                     break;
+                case 'Neo':
+                    $model = $parent[$field->handle];
+                    $value = $this->getIteratorValues($model, function ($item) {
+                        $itemType = $item->getType();
+                        $value = [
+                            'type' => $itemType->handle,
+                            'enabled' => $item->enabled,
+                            'modified' => $item->enabled,
+                            'collapsed' => $item->collapsed,
+                            'level' => $item->level,
+                            'fields' => []
+                        ];
+
+                        return $value;
+                    });
+                    break;
                 case 'SuperTable':
                     $model = $parent[$field->handle];
 
