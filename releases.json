@@ -1,7 +1,7 @@
 [
   {
     "version": "1.0.8",
-    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/1.0.8.zip",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.zip",
     "date": "2018-01-12T16:00:00-00:00",
     "notes": [
       "[Added] Neo plugin is not supported for field and content migrations.",
