@@ -1,12 +1,18 @@
 {
   "name": "firstborn/craft-cms-migration-manager",
   "description": "Craft CMS Migration Manager",
-
+  "type": "craft-plugin",
+  "extra": {
+    "installer-name": "migrationmanager"
+  },
   "authors": [
     {
       "name": "Derrick Grigg",
       "email": "derrick.grigg@firstborn.com"
     }
-  ]
+  ],
+  "require": {
+    "composer/installers": "~1.0"
+  }
 }
 
