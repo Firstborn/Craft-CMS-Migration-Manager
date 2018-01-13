@@ -2,12 +2,25 @@
 
 namespace Craft;
 
+/**
+ * Class MigrationManager_TagsService
+ */
 class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
 {
+    /**
+     * @var string
+     */
     protected $source = 'tag';
+
+    /**
+     * @var string
+     */
     protected $destination = 'tags';
 
-    public function exportItem($id, $fullExport)
+    /**
+     * {@inheritdoc}
+     */
+    public function exportItem($id, $fullExport = false)
     {
         $tag = craft()->tags->getTagGroupById($id);
 
@@ -17,15 +30,15 @@ class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
 
         $newTag = [
             'name' => $tag->name,
-            'handle' => $tag->handle
+            'handle' => $tag->handle,
         ];
 
         $this->addManifest($tag->handle);
 
-        if ($fullExport)
-        {
+        if ($fullExport) {
+
             $newTag['fieldLayout'] = array();
-            $newTag['requiredFields'] =  array();
+            $newTag['requiredFields'] = array();
 
             $fieldLayout = $tag->getFieldLayout();
 
@@ -44,10 +57,11 @@ class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
         return $newTag;
     }
 
-
+    /**
+     * {@inheritdoc}
+     */
     public function importItem(Array $data)
     {
-
         $existing = craft()->tags->getTagGroupByHandle($data['handle']);
 
         if ($existing) {
@@ -60,23 +74,31 @@ class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
         return $result;
     }
 
+    /**
+     * @param array $newSource
+     * @param TagGroupModel $source
+     */
     private function mergeUpdates(&$newSource, $source)
     {
         $newSource['id'] = $source->id;
     }
 
-    public function createModel(Array $data)
+    /**
+     * @param array $data
+     *
+     * @return TagGroupModel
+     */
+    public function createModel(array $data)
     {
         $tag = new TagGroupModel();
-        if (array_key_exists('id', $data)){
+        if (array_key_exists('id', $data)) {
             $tag->id = $data['id'];
         }
 
         $tag->name = $data['name'];
         $tag->handle = $data['handle'];
 
-        if (array_key_exists('fieldLayout', $data))
-        {
+        if (array_key_exists('fieldLayout', $data)) {
             $requiredFields = array();
             if (array_key_exists('requiredFields', $data)) {
                 foreach ($data['requiredFields'] as $handle) {
@@ -107,7 +129,5 @@ class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
         }
 
         return $tag;
-
     }
-
 }

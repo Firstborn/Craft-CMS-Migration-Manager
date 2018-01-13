@@ -2,15 +2,30 @@
 
 namespace Craft;
 
+/**
+ * Class MigrationManager_AssetSourcesService
+ */
 class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigrationService
 {
+    /**
+     * @var string
+     */
     protected $source = 'assetSource';
+
+    /**
+     * @var string
+     */
     protected $destination = 'assetSources';
 
-    public function exportItem($id, $fullExport)
+    /**
+     * @param int  $id
+     * @param bool $fullExport
+     *
+     * @return array|bool
+     */
+    public function exportItem($id, $fullExport = false)
     {
         $source = craft()->assetSources->getSourceById($id);
-
         if (!$source) {
             return false;
         }
@@ -26,11 +41,12 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
         ];
 
         if ($fullExport) {
+
             $newSource['fieldLayout'] = array();
 
             $fieldLayout = $source->getFieldLayout();
-
             foreach ($fieldLayout->getTabs() as $tab) {
+
                 $newSource['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
@@ -45,12 +61,15 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
         return $newSource;
     }
 
-
+    /**
+     * @param array $data
+     *
+     * @return bool
+     * @throws \Exception
+     */
     public function importItem(Array $data)
     {
-
         $existing = MigrationManagerHelper::getAssetSourceByHandle($data['handle']);
-
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
@@ -61,10 +80,15 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
         return $result;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return AssetSourceModel
+     */
     public function createModel(Array $data)
     {
         $source = new AssetSourceModel();
-        if (array_key_exists('id', $data)){
+        if (array_key_exists('id', $data)) {
             $source->id = $data['id'];
         }
 
@@ -93,30 +117,26 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
                     if ($existingField) {
                         $fieldIds[] = $existingField->id;
                     } else {
-                        $this->addError('Missing field: ' . $field . ' can not add to field layout for Asset Source: ' . $source->handle);
+                        $this->addError('Missing field: '.$field.' can not add to field layout for Asset Source: '.$source->handle);
                     }
                 }
                 $layout[$key] = $fieldIds;
             }
-
 
             $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
             $fieldLayout->type = ElementType::Asset;
             $source->fieldLayout = $fieldLayout;
         }
 
-
-
         return $source;
-
     }
 
+    /**
+     * @param array               $newSource
+     * @param AssetTransformModel $source
+     */
     private function mergeUpdates(&$newSource, $source)
     {
         $newSource['id'] = $source->id;
     }
-
-
-
-
 }

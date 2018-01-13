@@ -2,12 +2,25 @@
 
 namespace Craft;
 
+/**
+ * Class MigrationManager_LocalesService
+ */
 class MigrationManager_LocalesService extends MigrationManager_BaseMigrationService
 {
+    /**
+     * @var string
+     */
     protected $source = 'locale';
+
+    /**
+     * @var string
+     */
     protected $destination = 'locales';
 
-    public function exportItem($id, $fullExport)
+    /**
+     * {@inheritdoc}
+     */
+    public function exportItem($id, $fullExport = false)
     {
         $locale = ['id' => $id];
 
@@ -16,12 +29,14 @@ class MigrationManager_LocalesService extends MigrationManager_BaseMigrationServ
         return $locale;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function importItem(Array $data)
     {
         $locales = craft()->i18n->getSiteLocaleIds();
 
-        if (in_array($data['id'], $locales) === false)
-        {
+        if (in_array($data['id'], $locales) === false) {
             $result = craft()->i18n->addSiteLocale($data['id']);
         } else {
             $result = true;
@@ -29,16 +44,4 @@ class MigrationManager_LocalesService extends MigrationManager_BaseMigrationServ
 
         return $result;
     }
-
-    public function createModel(Array $data)
-    {
-        return null;
-
-    }
-
-
-
-
-
-
 }

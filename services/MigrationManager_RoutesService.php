@@ -2,26 +2,45 @@
 
 namespace Craft;
 
+/**
+ * Class MigrationManager_RoutesService
+ */
 class MigrationManager_RoutesService extends MigrationManager_BaseMigrationService
 {
+    /**
+     * @var string
+     */
     protected $source = 'settingsRoutes';
+
+    /**
+     * @var string
+     */
     protected $destination = 'routes';
 
-    public function export(Array $ids, $fullExport = true)
+    /**
+     * {@inheritdoc}
+     */
+    public function export(array $ids, $fullExport = true)
     {
-        //ignore incoming ids are grab all routes ids
+        // ignore incoming ids are grab all routes ids
         $ids = $this->getAllRouteIds();
+
         $items = array();
         foreach ($ids as $id) {
-            $obj = $this->exportItem($id, $fullExport);
+
+            $obj = $this->exportItem($id, $fullExport = false);
             if ($obj) {
                 $items[] = $obj;
             }
         }
+
         return $items;
     }
 
-    public function exportItem($id, $fullExport)
+    /**
+     * {@inheritdoc}
+     */
+    public function exportItem($id, $fullExport = false)
     {
         $route = $this->getRouteById($id);
 
@@ -31,33 +50,37 @@ class MigrationManager_RoutesService extends MigrationManager_BaseMigrationServi
             return false;
         }
 
-
         $newRoute = [
             'urlParts' => urlencode($route['urlParts']),
             'urlPattern' => '',
             'template' => $route['template'],
-            'locale' => $route['locale'] !== null ? $route['locale'] : ''
+            'locale' => $route['locale'] !== null ? $route['locale'] : '',
         ];
+
         return $newRoute;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function import(Array $data)
     {
-        //we delete all routes first since there is no way to identify routes without the id column
-        //import data is all routes from source
+        // we delete all routes first since there is no way to identify routes without the id column
+        // import data is all routes from source
         $this->deleteAllRoutes();
-        return parent::import($data);
 
+        return parent::import($data);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function importItem(Array $data)
     {
-
         $data['urlParts'] = urldecode($data['urlParts']);
         $urlParts = json_decode($data['urlParts'], true);
 
-        if ($data['locale'] === '')
-        {
+        if ($data['locale'] === '') {
             $locale = null;
         } else {
             $locale = $data['locale'];
@@ -68,19 +91,20 @@ class MigrationManager_RoutesService extends MigrationManager_BaseMigrationServi
         return $result;
     }
 
-    public function createModel(Array $data)
+    /**
+     * Deletes all routes
+     */
+    private function deleteAllRoutes()
     {
-
-    }
-
-    private function deleteAllRoutes(){
         $ids = $this->getAllRouteIds();
-        foreach($ids as $id)
-        {
+        foreach ($ids as $id) {
             craft()->routes->deleteRouteById($id);
         }
     }
 
+    /**
+     * @return array
+     */
     private function getAllRouteIds()
     {
         $routes = craft()->db->createCommand()
@@ -90,25 +114,26 @@ class MigrationManager_RoutesService extends MigrationManager_BaseMigrationServi
             ->queryAll();
 
         $ids = array();
-        foreach($routes as $route) {
+        foreach ($routes as $route) {
             $ids[] = $route['id'];
         }
 
         return $ids;
-
     }
 
+    /**
+     * @param int $id
+     *
+     * @return \CDbDataReader|mixed
+     */
     private function getRouteById($id)
     {
         $route = craft()->db->createCommand()
             ->select('id, locale, urlParts, urlPattern, template')
             ->from('routes')
-            ->where('id=:id', array(':id'=>$id))
+            ->where('id = :id', array(':id' => $id))
             ->queryRow();
 
         return $route;
     }
-
-
-
 }
