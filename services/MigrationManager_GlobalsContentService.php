@@ -6,7 +6,7 @@ class MigrationManager_GlobalsContentService extends MigrationManager_BaseConten
     protected $source = 'global';
     protected $destination = 'globals';
 
-    public function exportItem($id, $fullExport)
+    public function exportItem($id, $fullExport = false)
     {
 
         $globalSet = craft()->globals->getSetById($id);

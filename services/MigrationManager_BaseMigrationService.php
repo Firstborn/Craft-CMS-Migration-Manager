@@ -100,11 +100,21 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
     }
 
     /**
+     * @param array $data
+     *
+     * @return BaseModel|null
+     */
+    public function createModel(array $data)
+    {
+        return null;
+    }
+
+    /**
      * @param array $ids        array of fields ids to export
      * @param bool  $fullExport flag to export all element data including extending settings and field tabs
      * @return array
      */
-    public function export(Array $ids, $fullExport = true)
+    public function export(array $ids, $fullExport = false)
     {
         $this->resetManifest();
         $items = array();
@@ -144,7 +154,7 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
      *
      * @return mixed
      */
-    abstract public function exportItem($id, $fullExport);
+    abstract public function exportItem($id, $fullExport = false);
 
     /**
      * @param array $data
