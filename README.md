@@ -4,8 +4,23 @@ Create migrations to easily move settings and content between CraftCMS website i
 
 ## Installation
 
-1. Move the `migrationmanager` directory into your `craft/plugins` directory.
+### Manually
+
+1. Download a copy of this repository into your `craft/plugins` directory.
+1. Rename the plugin directory to `migrationmanager`.
 1. Go to Settings &gt; Plugins from your Craft control panel and enable the `Migration Manager` plugin
+
+### Via composer
+
+Run composer require from your project root
+
+```terminal
+composer require firstborn/craft-cms-migration-manager
+```
+
+__Note:__ If you can run composer on your production server, you can add the `vendor/` and 
+the `craft/plugins/migrationmanager/` folders to your gitignore. Thowse will be installed again 
+if you run `composer install` again.
 
 ## Use
 
