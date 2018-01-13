@@ -36,6 +36,11 @@ class MigrationManagerPlugin extends BasePlugin
         return 'https://www.firstborn.com';
     }
 
+    public function getReleaseFeedUrl()
+    {
+        return 'https://raw.githubusercontent.com/Firstborn/Craft-CMS-Migration-Manager/master/releases.json';
+    }
+
     public function hasCpSection()
     {
         if (craft()->userSession->isAdmin()) {
