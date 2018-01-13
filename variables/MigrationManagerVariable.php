@@ -8,35 +8,42 @@ namespace Craft;
 class MigrationManagerVariable
 {
     /**
-     * @return string
+     * @return array
      */
     public function getNewMigrations()
     {
         return craft()->migrationManager_migrations->getNewMigrations();
     }
 
+    /**
+     * @return array
+     */
     public function getAppliedMigrations()
     {
         return craft()->migrationManager_migrations->getAppliedMigrations();
     }
 
-
+    /**
+     * @return array
+     */
     public function getAssetSources()
     {
         return craft()->assetSources->getAllSources();
     }
 
+    /**
+     * @return array
+     */
     public function getAssetTransforms()
     {
         return craft()->assetTransforms->getAllTransforms();
     }
 
+    /**
+     * @return array
+     */
     public function getAllTagGroups()
     {
         return craft()->tags->getAllTagGroups();
     }
-
-
-
-
 }
