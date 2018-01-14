@@ -104,6 +104,7 @@ class MigrationManagerPlugin extends BasePlugin
             'migrationmanager' => array('action' => 'migrationManager/index'),
             'migrationmanager/create' => array('action' => 'migrationManager/create'),
             'migrationmanager/pending' => array('action' => 'migrationManager/pending'),
+            'migrationmanager/applied' => array('action' => 'migrationManager/applied'),
             'migrationmanager/logs' => array('action' => 'migrationManager/logs'),
 
             'migrationmanager/run-migration' => array('action' => 'migrationManager/runMigration'),
