@@ -90,9 +90,7 @@ class MigrationManagerPlugin extends BasePlugin
      */
     public function hasCpSection()
     {
-        if (craft()->userSession->isAdmin()) {
-            return true;
-        }
+        return true;
     }
 
     /**
@@ -106,10 +104,6 @@ class MigrationManagerPlugin extends BasePlugin
             'migrationmanager/pending' => array('action' => 'migrationManager/pending'),
             'migrationmanager/applied' => array('action' => 'migrationManager/applied'),
             'migrationmanager/logs' => array('action' => 'migrationManager/logs'),
-
-            'migrationmanager/run-migration' => array('action' => 'migrationManager/runMigration'),
-            'migrationmanager/migrations' => array('action' => 'migrationManager/migrations'),
-            'migrationmanager/log' => array('action' => 'migrationManager/log'),
         );
     }
 
