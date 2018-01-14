@@ -93,6 +93,11 @@ class MigrationManagerPlugin extends BasePlugin
     public function registerCpRoutes()
     {
         return array(
+            'migrationmanager' => array('action' => 'migrationManager/index'),
+            'migrationmanager/create' => array('action' => 'migrationManager/create'),
+            'migrationmanager/pending' => array('action' => 'migrationManager/pending'),
+            'migrationmanager/logs' => array('action' => 'migrationManager/logs'),
+
             'migrationmanager/run-migration' => array('action' => 'migrationManager/runMigration'),
             'migrationmanager/migrations' => array('action' => 'migrationManager/migrations'),
             'migrationmanager/log' => array('action' => 'migrationManager/log'),

@@ -8,6 +8,14 @@ namespace Craft;
 class MigrationManagerVariable
 {
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return craft()->plugins->getPlugin('migrationManager')->getName();
+    }
+
+    /**
      * @return array
      */
     public function getNewMigrations()

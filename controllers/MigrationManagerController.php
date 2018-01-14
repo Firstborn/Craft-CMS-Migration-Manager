@@ -8,6 +8,24 @@ namespace Craft;
 class MigrationManagerController extends BaseController
 {
     /**
+     * Index redirects to creation page
+     */
+    public function actionIndex()
+    {
+        $this->redirect('migrationmanager/create');
+    }
+
+    /**
+     * The export creation page controller
+     *
+     * @throws HttpException
+     */
+    public function actionCreate()
+    {
+        $this->renderTemplate('migrationManager/create');
+    }
+
+    /**
      * @throws HttpException
      */
     public function actionCreateMigration()
@@ -22,7 +40,7 @@ class MigrationManagerController extends BaseController
             craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
         }
 
-        $this->renderTemplate('migrationmanager/index');
+        $this->redirectToPostedUrl();
     }
 
     /**
