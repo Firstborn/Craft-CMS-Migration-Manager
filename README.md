@@ -66,6 +66,12 @@ Once the migration(s) are in your destination environment, go to the Migration M
 
 ![Pending Migration](resources/screenshots/pending-migrations.png)
 
+You can also use the CLI command to run new/pending migrations.
+
+```terminal
+php craft/app/etc/console/yiic migrationmanager run
+```
+
 Before executing the migration(s) the Craft database will be backed up and stored in the backups directory. To disable backups from being created each time a migration is run you can set the `backupDbOnUpdate` config setting to false (https://craftcms.com/docs/config-settings#backupDbOnUpdate). **This is not recommended**.
 
 If a migration fails to execute the migration will be rolled back and the database will be restored to state before the migration started. You can check the Log tab to review previous migrations and see any error messages.

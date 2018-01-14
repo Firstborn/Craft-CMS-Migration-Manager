@@ -296,7 +296,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      * @return bool
      * @throws \CDbException
      */
-    public function runToTop($migrationsToRun)
+    public function runToTop($migrationsToRun = null)
     {
         // This might take a while
         craft()->config->maxPowerCaptain();
