@@ -8,6 +8,24 @@ namespace Craft;
 class MigrationManagerController extends BaseController
 {
     /**
+     * Index redirects to creation page
+     */
+    public function actionIndex()
+    {
+        $this->redirect('migrationmanager/create');
+    }
+
+    /**
+     * The export creation page controller
+     *
+     * @throws HttpException
+     */
+    public function actionCreate()
+    {
+        $this->renderTemplate('migrationManager/create');
+    }
+
+    /**
      * @throws HttpException
      */
     public function actionCreateMigration()
@@ -22,219 +40,33 @@ class MigrationManagerController extends BaseController
             craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
         }
 
-        $this->renderTemplate('migrationmanager/index');
+        $this->redirectToPostedUrl();
     }
 
     /**
+     * Shows pending migrations
+     *
      * @throws HttpException
      */
-    public function actionCreateGlobalsContentMigration()
+    public function actionPending()
     {
-        $this->requirePostRequest();
-        craft()->userSession->requireAdmin();
-
-        $globalSet = new GlobalSetModel();
-
-        // Set the simple stuff
-        $globalSet->id = craft()->request->getPost('setId');
-        $globalSet->name = craft()->request->getPost('name');
-        $globalSet->handle = craft()->request->getPost('handle');
-
-        // Set the field layout
-        $fieldLayout = craft()->fields->assembleLayoutFromPost();
-        $fieldLayout->type = ElementType::GlobalSet;
-        $globalSet->setFieldLayout($fieldLayout);
-
-        $params['global'] = array(craft()->request->getPost('setId'));
-
-        if (craft()->migrationManager_migrations->createContentMigration($params)) {
-            craft()->userSession->setNotice(Craft::t('Migration created.'));
-        } else {
-            craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
-        }
-
-        $this->redirectToPostedUrl($globalSet);
+        $this->renderTemplate('migrationManager/pending');
     }
 
     /**
+     * Shows applied migrations
+     *
      * @throws HttpException
      */
-    public function actionMigrations()
+    public function actionApplied()
     {
-        $this->renderTemplate('migrationmanager/migrations');
+        $this->renderTemplate('migrationManager/applied');
     }
 
     /**
      * @throws HttpException
      */
-    public function actionRunMigration()
-    {
-        $this->requirePostRequest();
-
-        $plugin = craft()->plugins->getPlugin('migrationmanager');
-
-        $data = array(
-            'data' => array(
-                'handle' => craft()->security->hashData($plugin->getClassHandle()),
-                'uid' => craft()->security->hashData(StringHelper::UUID()),
-                'migrations' => craft()->request->getPost('migration'),
-                'applied' => craft()->request->getPost('applied'),
-            ),
-        );
-
-        $this->renderTemplate('migrationmanager/run', $data);
-    }
-
-    /**
-     * @throws HttpException
-     */
-    public function actionRunAppliedMigration()
-    {
-        $this->requirePostRequest();
-
-        $migrations = craft()->request->getPost('migration');
-
-        if ($migrations == false) {
-
-            craft()->userSession->setError(Craft::t('You must select a migration to re run'));
-            $this->renderTemplate('migrationmanager/migrations-applied');
-        } else {
-
-            //unset the selected migrations
-            craft()->migrationManager_migrations->setMigrationsAsNotApplied($migrations);
-            $this->actionRunMigration();
-        }
-    }
-
-    /**
-     * @throws HttpException
-     */
-    public function actionPrepare()
-    {
-        $this->requirePostRequest();
-        $this->requireAjaxRequest();
-
-        $data = craft()->request->getRequiredPost('data');
-
-        $this->returnJson(array(
-            'alive' => true,
-            'nextStatus' => Craft::t('Backing-up database ...'),
-            'nextAction' => 'migrationManager/backupDatabase',
-            'data' => $data,
-        ));
-    }
-
-    /**
-     * @throws HttpException
-     */
-    public function actionBackupDatabase()
-    {
-
-        $this->requirePostRequest();
-        $this->requireAjaxRequest();
-        $data = craft()->request->getRequiredPost('data');
-
-        if (craft()->config->get('backupDbOnUpdate')) {
-            $return = craft()->updates->backupDatabase();
-
-            MigrationManagerPlugin::log('running database backup', LogLevel::Info);
-
-            if (!$return['success']) {
-                $this->returnJson(array(
-                    'alive' => true,
-                    'errorDetails' => $return['message'],
-                    'nextStatus' => Craft::t('An error was encountered. Rolling back…'),
-                    'nextAction' => 'migrationManager/rollback',
-                    'data' => $data,
-                ));
-            }
-        }
-
-        $this->returnJson(array(
-            'alive' => true,
-            'nextStatus' => Craft::t('Running migrations ...'),
-            'nextAction' => 'migrationManager/runMigrations',
-            'data' => $data,
-        ));
-    }
-
-    /**
-     * @throws Exception
-     * @throws HttpException
-     */
-    public function actionRollback()
-    {
-        $this->requirePostRequest();
-        $this->requireAjaxRequest();
-
-        MigrationManagerPlugin::log('rolling back database', LogLevel::Error);
-
-        $data = craft()->request->getRequiredPost('data');
-        $handle = craft()->security->validateData($data['uid']);
-        $uid = craft()->security->validateData($data['uid']);
-
-        if (!$uid) {
-            throw new Exception(('Could not validate UID'));
-        }
-
-        if (isset($data['dbBackupPath'])) {
-            $dbBackupPath = craft()->security->validateData($data['dbBackupPath']);
-
-            if (!$dbBackupPath) {
-                throw new Exception('Could not validate database backup path.');
-            }
-
-            $return = craft()->updates->rollbackUpdate($uid, $handle, $dbBackupPath);
-        } else {
-            $return = craft()->updates->rollbackUpdate($uid, $handle);
-        }
-
-        //reset the status of the migrations if they were reruns
-        if ($data['applied'] == 1) {
-            craft()->migrationManager_migrations->setMigrationsAsApplied($data['migrations']);
-        }
-
-        if (!$return['success']) {
-            // Let the JS handle the exception response.
-            throw new Exception($return['message']);
-        }
-
-        $this->returnJson(array('alive' => true, 'finished' => true, 'rollBack' => true));
-    }
-
-    /**
-     * @throws HttpException
-     */
-    public function actionRunMigrations()
-    {
-        $this->requirePostRequest();
-        $this->requireAjaxRequest();
-        $data = craft()->request->getRequiredPost('data');
-
-        //give a little on screen pause
-        sleep(2);
-
-        if (craft()->migrationManager_migrations->runToTop($data['migrations'])) {
-            $this->returnJson(array(
-                'alive' => true,
-                'finished' => true,
-                'returnUrl' => 'migrationManager/migrations',
-            ));
-        } else {
-            $this->returnJson(array(
-                'alive' => true,
-                'errorDetails' => 'Check to migration <a href="log">log</a> for details. ',
-                'nextStatus' => Craft::t('An error was encountered. Rolling back…'),
-                'nextAction' => 'migrationManager/rollback',
-                'data' => $data,
-            ));
-        }
-    }
-
-    /**
-     * @throws HttpException
-     */
-    public function actionLog()
+    public function actionLogs()
     {
         $path = craft()->path->getLogPath().'migrationmanager.log';
         $contents = IOHelper::getFileContents($path);
@@ -269,5 +101,36 @@ class MigrationManagerController extends BaseController
         $this->renderTemplate('migrationmanager/log', array(
             'logEntries' => $logEntries,
         ));
+    }
+
+    /**
+     * @throws HttpException
+     */
+    public function actionCreateGlobalsContentMigration()
+    {
+        $this->requirePostRequest();
+        craft()->userSession->requireAdmin();
+
+        $globalSet = new GlobalSetModel();
+
+        // Set the simple stuff
+        $globalSet->id = craft()->request->getPost('setId');
+        $globalSet->name = craft()->request->getPost('name');
+        $globalSet->handle = craft()->request->getPost('handle');
+
+        // Set the field layout
+        $fieldLayout = craft()->fields->assembleLayoutFromPost();
+        $fieldLayout->type = ElementType::GlobalSet;
+        $globalSet->setFieldLayout($fieldLayout);
+
+        $params['global'] = array(craft()->request->getPost('setId'));
+
+        if (craft()->migrationManager_migrations->createContentMigration($params)) {
+            craft()->userSession->setNotice(Craft::t('Migration created.'));
+        } else {
+            craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
+        }
+
+        $this->redirectToPostedUrl($globalSet);
     }
 }

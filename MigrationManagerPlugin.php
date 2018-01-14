@@ -52,7 +52,15 @@ class MigrationManagerPlugin extends BasePlugin
      */
     public function getReleaseFeedUrl()
     {
-        return 'https://github.com/Firstborn/Craft-CMS-Migration-Manager/tree/master/migrationmanager/releases.json';
+        return 'https://github.com/Firstborn/Craft-CMS-Migration-Manager/tree/master/releases.json';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDocumentationUrl()
+    {
+        return 'https://github.com/Firstborn/Craft-CMS-Migration-Manager/tree/master/README.md';
     }
 
     /**
@@ -82,9 +90,7 @@ class MigrationManagerPlugin extends BasePlugin
      */
     public function hasCpSection()
     {
-        if (craft()->userSession->isAdmin()) {
-            return true;
-        }
+        return true;
     }
 
     /**
@@ -93,9 +99,11 @@ class MigrationManagerPlugin extends BasePlugin
     public function registerCpRoutes()
     {
         return array(
-            'migrationmanager/run-migration' => array('action' => 'migrationManager/runMigration'),
-            'migrationmanager/migrations' => array('action' => 'migrationManager/migrations'),
-            'migrationmanager/log' => array('action' => 'migrationManager/log'),
+            'migrationmanager' => array('action' => 'migrationManager/index'),
+            'migrationmanager/create' => array('action' => 'migrationManager/create'),
+            'migrationmanager/pending' => array('action' => 'migrationManager/pending'),
+            'migrationmanager/applied' => array('action' => 'migrationManager/applied'),
+            'migrationmanager/logs' => array('action' => 'migrationManager/logs'),
         );
     }
 

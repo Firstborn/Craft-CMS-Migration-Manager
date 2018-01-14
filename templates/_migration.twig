@@ -1,4 +1,5 @@
 <?php
+
 namespace Craft;
 
 /**
@@ -34,7 +35,5 @@ class {{ className }} extends BaseMigration
         return craft()->migrationManager_migrations->import($json);
         {% endif %}
         {% endspaceless %}
-
     }
-
 }

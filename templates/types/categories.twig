@@ -1,0 +1,25 @@
+<table class="data fullwidth collapsible">
+    <thead>
+    <tr>
+        <th>
+            <div class="field checkboxfield">
+                <input type="checkbox" id="allCategories" class="checkbox checkbox-toggle" name="allCategories" value="all" data-selector="category"> <label for="allCategories">Name</label>
+            </div>
+        </th>
+        <th>Handle</th>
+    </tr>
+    </thead>
+    <tbody class="categories">
+    {% for category in categories %}
+
+        <tr class="category">
+            <th scope="row" class="name">
+                <input type="checkbox" id="category{{ category.id }}" class="checkbox" name="category[]" value="{{ category.id }}"> <label for="category{{ category.id }}">{{ category }}</label>
+            </th>
+            <td>
+                <code>{{ category.handle }}</code>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,24 @@
+<table class="data fullwidth collapsible">
+    <thead>
+    <tr>
+        <th>
+            <div class="field checkboxfield">
+                <input type="checkbox" id="allGlobals" class="checkbox checkbox-toggle" name="allGlobals" value="all" data-selector="global"> <label for="allGlobals">Name</label>
+            </div>
+        </th>
+        <th>Handle</th>
+    </tr>
+    </thead>
+    <tbody class="globals">
+    {% for global in globals %}
+        <tr class="global">
+            <th scope="row" class="name">
+                <input type="checkbox" id="global{{ global.id }}" class="checkbox" name="global[]" value="{{ global.id }}"> <label for="global{{ global.id }}">{{ global }}</label>
+            </th>
+            <td>
+                <code>{{ global.handle }}</code>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
