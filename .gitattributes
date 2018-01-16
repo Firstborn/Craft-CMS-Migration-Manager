@@ -1,0 +1,7 @@
+/resources/screenshots export-ignore
+/screenshots export-ignore
+/vendor export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.editorconfig export-ignore
+composer.lock export-ignore

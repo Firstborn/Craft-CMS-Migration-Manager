@@ -1,0 +1,18 @@
+{% requirePermission 'performUpdates' %}
+{% extends "_layouts/cp" %}
+
+{% set title = "Migrations"|t %}
+
+{% includecssresource "css/updates.css" %}
+{% includeJsResource "migrationmanager/js/MigrationManagerRunner.js" %}
+
+{% block pageHeader %}{% endblock %}
+
+{% block main %}
+    <div id="graphic" class="spinner big"></div>
+    <div id="status">{{ "Preparing migrations ..."|t }}</div>
+{% endblock %}
+
+{% includejs %}
+    new Craft.MigrationManagerRunner({{ data|json_encode|raw }});
+{% endincludejs %}

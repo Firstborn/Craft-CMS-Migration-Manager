@@ -6,7 +6,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
     protected $source = 'field';
     protected $destination = 'fields';
 
-    public function exportItem($id, $fullExport){
+    public function exportItem($id, $fullExport = false){
         $includeID = false;
         $field = craft()->fields->getFieldById($id);
         if (!$field){
@@ -87,6 +87,8 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
         if ($event->performAction) {
             $field = $this->createModel($event->params['value']);
+
+            MigrationManagerPlugin::log('import field: '. $field->handle, LogLevel::Error);
             $result = craft()->fields->saveField($field);
             if ($result) {
 

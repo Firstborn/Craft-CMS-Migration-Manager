@@ -7,7 +7,7 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
     protected $source = 'category';
     protected $destination = 'categories';
 
-    public function exportItem($id, $fullExport)
+    public function exportItem($id, $fullExport = false)
     {
         $category = craft()->categories->getGroupById($id);
 

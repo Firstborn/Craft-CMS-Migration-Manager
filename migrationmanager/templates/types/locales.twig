@@ -1,0 +1,24 @@
+<table class="data fullwidth collapsible">
+    <thead>
+    <tr>
+        <th>
+            <div class="field checkboxfield">
+                <input type="checkbox" id="allLocales" class="checkbox checkbox-toggle" name="allLocales" value="all" data-selector="locale"> <label for="allLocales">Name</label>
+            </div>
+        </th>
+        <th>Code</th>
+    </tr>
+    </thead>
+    <tbody class="routes">
+    {% for locale in locales %}
+        <tr class="route" data-id="{{ locale.id }}">
+            <th scope="row" class="name">
+                <input type="checkbox" id="locale{{ locale.id }}" class="checkbox" name="locale[]" value="{{ locale.id }}"> <label for="locale{{ locale.id }}">{{ locale.getName() }}</label>
+            </th>
+            <td>
+                <code>{{ locale }}</code>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,24 @@
+<table class="data fullwidth collapsible">
+    <thead>
+    <tr>
+        <th>
+            <div class="field checkboxfield">
+                <input type="checkbox" id="allUserGroups" class="checkbox checkbox-toggle" name="allUserGroups" value="all" data-selector="userGroup"> <label for="allUserGroups">Name</label>
+            </div>
+        </th>
+        <th>Handle</th>
+    </tr>
+    </thead>
+    <tbody class="userGroups">
+    {% for group in userGroups %}
+        <tr class="userGroup" data-id="{{ group.id }}">
+            <th scope="row" class="name">
+                <input type="checkbox" id="userGroup{{ group.id }}" class="checkbox" name="userGroup[]" value="{{ group.id }}"> <label for="userGroup{{ group.id }}">{{ group }}</label>
+            </th>
+            <td>
+                <code>{{ group.handle }}</code>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

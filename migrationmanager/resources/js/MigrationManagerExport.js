@@ -1,7 +1,7 @@
 (function($) {
 
     Craft.MigrationManagerExport = Garnish.Base.extend({
-        init: function () {
+        init: function() {
             $('input.checkbox.checkbox-toggle').on('click', this.toggleSelections);
             $('input.checkbox.checkbox-all').on('click', this.toggleAllSelections);
         },
@@ -9,9 +9,9 @@
         toggleSelections: function(evt) {
             var selector = $(this).attr('data-selector');
             if ($(this).is(':checked')) {
-                $('input[name^="' + selector +'"]').prop('checked', true);
+                $('input[name^="' + selector + '"]').prop('checked', true);
             } else {
-                $('input[name^="' + selector +'"]').prop('checked', false);
+                $('input[name^="' + selector + '"]').prop('checked', false);
             }
         },
 
@@ -19,13 +19,11 @@
             //var selector = $(this).attr('data-selector');
             if ($(this).is(':checked')) {
 
-                $('input[data-selector="' + $(this).attr('data-selector') +'"]').prop('checked', true);
+                $('input[data-selector="' + $(this).attr('data-selector') + '"]').prop('checked', true);
             } else {
-                $('input[data-selector="' + $(this).attr('data-selector') +'"]').prop('checked', false);
+                $('input[data-selector="' + $(this).attr('data-selector') + '"]').prop('checked', false);
             }
         }
-
-
     });
 
 })(jQuery);
