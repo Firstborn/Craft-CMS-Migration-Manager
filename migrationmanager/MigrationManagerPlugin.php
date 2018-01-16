@@ -31,7 +31,7 @@ class MigrationManagerPlugin extends BasePlugin
      */
     public function getVersion()
     {
-        return '1.0.8';
+        return '1.0.8.2';
     }
 
     /**
@@ -69,24 +69,6 @@ class MigrationManagerPlugin extends BasePlugin
     /**
      * {@inheritdoc}
      */
-    /*public function init()
-    {
-        Craft::import('plugins.migrationmanager.helpers.MigrationManagerHelper');
-        Craft::import('plugins.migrationmanager.services.MigrationManager_IMigrationService');
-        Craft::import('plugins.migrationmanager.service.MigrationManager_BaseMigrationService');
-        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateCategoryElementAction');
-        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateEntryElementAction');
-        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateUserElementAction');
-
-        // add a Create Migration button to the globals screen
-        // check we have a cp request as we don't want to this js to run anywhere but the cp
-        // and while we're at it check for a logged in user as well
-        if (craft()->request->isCpRequest() && craft()->userSession->isLoggedIn() && craft()->request->getSegment(1) == 'globals') {
-            // the includeJsResource method will add a js file to the bottom of the page
-            craft()->templates->includeJsResource('migrationmanager/js/MigrationManagerGlobalsExport.js');
-            craft()->templates->includeJs("new Craft.MigrationManagerGlobalsExport();");
-        }
-    }*/
     function init(){
         Craft::import('plugins.migrationmanager.helpers.MigrationManagerHelper');
         Craft::import('plugins.migrationmanager.services.MigrationManager_IMigrationService');
