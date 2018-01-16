@@ -25,28 +25,26 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
 
         foreach($locales as $locale){
             $entry = craft()->entries->getEntryById($id, $locale->locale);
+            if ($entry) {
+                $entryContent = array(
+                    'slug' => $entry->slug,
+                    'section' => $entry->getSection()->handle,
+                    'enabled' => $entry->enabled,
+                    'locale' => $entry->locale,
+                    'localeEnabled' => $entry->localeEnabled,
+                    'postDate' => $entry->postDate,
+                    'expiryDate' => $entry->expiryDate,
+                    'title' => $entry->title,
+                    'entryType' => $entry->type->handle
+                );
 
-            $entryContent = array(
-                'slug' => $entry->slug,
-                'section' => $entry->getSection()->handle,
-                'enabled' => $entry->enabled,
-                'locale' => $entry->locale,
-                'localeEnabled' => $entry->localeEnabled,
-                'postDate' => $entry->postDate,
-                'expiryDate' => $entry->expiryDate,
-                'title' => $entry->title,
-                'entryType' => $entry->type->handle
-            );
+                if ($entry->getParent()) {
+                    $entryContent['parent'] = $primaryEntry->getParent()->slug;
+                }
 
-            if ($entry->getParent())
-            {
-                $entryContent['parent'] = $primaryEntry->getParent()->slug;
+                $this->getContent($entryContent, $entry);
+                $content['locales'][$locale->locale] = $entryContent;
             }
-
-            $this->getContent($entryContent, $entry);
-
-
-            $content['locales'][$locale->locale] = $entryContent;
         }
 
         return $content;

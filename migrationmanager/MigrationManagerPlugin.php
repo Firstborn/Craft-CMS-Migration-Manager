@@ -23,7 +23,7 @@ class MigrationManagerPlugin extends BasePlugin
 
     function getVersion()
     {
-        return '1.0.8';
+        return '1.0.8.1';
     }
 
     function getDeveloper()
