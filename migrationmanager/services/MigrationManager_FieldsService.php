@@ -6,7 +6,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
     protected $source = 'field';
     protected $destination = 'fields';
 
-    public function exportItem($id, $fullExport){
+    public function exportItem($id, $fullExport = false){
         $includeID = false;
         $field = craft()->fields->getFieldById($id);
         if (!$field){
@@ -40,6 +40,10 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
         if ($field->type == 'SuperTable') {
             $this->getSuperTableField($newField, $field->id, $includeID);
+        }
+
+        if ($field->type == 'Neo'){
+            $this->getNeoField($newField, $field->id, $includeID);
         }
 
         $this->getSettingHandles($newField);
@@ -83,6 +87,8 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
         if ($event->performAction) {
             $field = $this->createModel($event->params['value']);
+
+            MigrationManagerPlugin::log('import field: '. $field->handle, LogLevel::Error);
             $result = craft()->fields->saveField($field);
             if ($result) {
 
@@ -307,6 +313,60 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         unset($newField['typesettings']['columns']);
     }
 
+    private function getNeoField(&$newField, $fieldId, $includeID = false)
+    {
+        $groups = craft()->neo->getGroupsByFieldId($fieldId);
+        if (count($groups)){
+            $newField['typesettings']['groups'] = [
+                'name' => [],
+                'sortOrder' => []
+            ];
+
+            foreach($groups as $group){
+                $newField['typesettings']['groups']['name'][] = $group->name;
+                $newField['typesettings']['groups']['sortOrder'][] = $group->sortOrder;
+            }
+        }
+
+        $blockTypes = craft()->neo->getBlockTypesByFieldId($fieldId);
+        $blockCount = 1;
+        foreach ($blockTypes as $blockType)
+        {
+            if ($includeID)
+            {
+                $blockId = $blockType->id;
+            } else {
+                $blockId = 'new'.$blockCount;
+            }
+
+            $newField['typesettings']['blockTypes'][$blockId] = [
+                'name' => $blockType->name,
+                'handle' => $blockType->handle,
+                'maxBlocks' => $blockType->maxBlocks,
+                'maxChildBlocks' => $blockType->maxChildBlocks,
+                'childBlocks' => $blockType->childBlocks,
+                'topLevel' => $blockType->topLevel,
+                'sortOrder' => $blockType->sortOrder,
+                'fieldLayout' => []
+            ];
+
+            $fieldLayout = $blockType->getFieldLayout();
+            foreach ($fieldLayout->getTabs() as $tab) {
+                $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name] = array();
+                foreach ($tab->getFields() as $tabField) {
+
+                    $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name][] = $this->exportItem($tabField->fieldId, true);
+                    if ($tabField->required)
+                    {
+                        $newField['typesettings']['blockTypes'][$blockId]['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    }
+                }
+            }
+
+            ++$blockCount;
+        }
+    }
+
     /**
      * @param $field
      */
@@ -440,7 +500,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         if ($field['type'] == 'Tags') {
 
             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
-                MigrationManagerPlugin::log(json_encode($field), LogLevel::Error);
                 $value = $field['typesettings']['source'];
                 //foreach ($field['typesettings']['source'] as $key => $value) {
                 if (substr($value, 0, 9) == 'taggroup:') {
@@ -505,7 +564,22 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                     $this->getSettingIds($childField);
                 }
             }
+        }
 
+        if ($field['type'] == 'Neo' && key_exists('blockTypes', $field['typesettings']))
+        {
+            foreach ($field['typesettings']['blockTypes'] as &$blockType) {
+                //import each neo field
+                foreach($blockType['fieldLayout'] as &$fieldLayout) {
+                    $fieldIds = [];
+                    foreach($fieldLayout as $fieldLayoutField){
+                        if($this->importItem($fieldLayoutField)){
+                            $fieldIds[] = craft()->fields->getFieldByHandle($fieldLayoutField['handle'])->id;
+                        }
+                    }
+                    $fieldLayout = $fieldIds;
+                }
+            }
         }
     }
 
@@ -769,7 +843,6 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
                 $newFields[$key] = $field;
             }
-
         }
 
         $newBlock['fields'] = $newFields;
@@ -783,9 +856,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
                 return $field;
             }
         }
-
         return false;
-
     }
 
     private function getMatrixBlockByHandle($handle, $id)

@@ -2,13 +2,25 @@
 
 namespace Craft;
 
-
+/**
+ * Class MigrationManager_SectionsService
+ */
 class MigrationManager_SectionsService extends MigrationManager_BaseMigrationService
 {
+    /**
+     * @var string
+     */
     protected $source = 'section';
+
+    /**
+     * @var string
+     */
     protected $destination = 'sections';
 
-    public function exportItem($id, $fullExport)
+    /**
+     * {@inheritdoc}
+     */
+    public function exportItem($id, $fullExport = false)
     {
         $section = craft()->sections->getSectionById($id);
 
@@ -23,31 +35,29 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             'enableVersioning' => $section->attributes['enableVersioning'],
             'hasUrls' => $section->attributes['hasUrls'],
             'template' => $section->attributes['template'],
-            'maxLevels' => $section->attributes['maxLevels']
+            'maxLevels' => $section->attributes['maxLevels'],
         ];
 
         $this->addManifest($section->attributes['handle']);
 
         $locales = $section->getLocales();
 
-        if ((bool) $section->attributes['hasUrls'] === false ) {
+        if ((bool)$section->attributes['hasUrls'] === false) {
             $newSection['locales'] = [];
             foreach ($locales as $locale => $attributes) {
                 $newSection['locales'][$locale] = $attributes['enabledByDefault'];
             }
-
         } else {
 
             $newSection['locales'] = array();
 
-            foreach ($locales as $key => $locale ) {
-                 $newSection['locales'][$key] = [
+            foreach ($locales as $key => $locale) {
+                $newSection['locales'][$key] = [
                     'locale' => $locale->locale,
                     'urlFormat' => $locale->urlFormat,
                     'nestedUrlFormat' => $locale->nestedUrlFormat,
                     'enabledByDefault' => $locale->enabledByDefault,
                 ];
-
             }
         }
 
@@ -63,7 +73,7 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
                 'name' => $entryType->attributes['name'],
                 'handle' => $entryType->attributes['handle'],
                 'fieldLayout' => array(),
-                'requiredFields' => array()
+                'requiredFields' => array(),
             ];
 
             if ($newEntryType['titleFormat'] === null) {
@@ -77,8 +87,7 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
                 foreach ($tab->getFields() as $tabField) {
 
                     $newEntryType['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
-                    if ($tabField->required)
-                    {
+                    if ($tabField->required) {
                         $newEntryType['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
                     }
                 }
@@ -90,21 +99,30 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
         return $newSection;
     }
 
-
-
-    public function importItem(Array $data)
+    /**
+     * {@inheritdoc}
+     */
+    public function importItem(array $data)
     {
         $result = true;
         $existing = craft()->sections->getSectionByHandle($data['handle']);
 
         if ($existing) {
-              $this->mergeUpdates($data, $existing);
+            $this->mergeUpdates($data, $existing);
         }
 
         $section = $this->createModel($data);
 
         if ($section) {
             if (craft()->sections->saveSection($section)) {
+                if (!$existing){
+                    //wipe out the default entry type
+                    $defaultEntryType = craft()->sections->getEntryTypesBySectionId($section->id);
+                    if ($defaultEntryType) {
+                        craft()->sections->deleteEntryTypeById($defaultEntryType[0]->id);
+                    }
+                }
+
                 //add entry types
                 foreach ($data['entrytypes'] as $key => $newEntryType) {
                     $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
@@ -118,23 +136,24 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
                         $result = false;
                     }
                 }
-
             } else {
                 $result = false;
             }
         } else {
             $result = false;
-
         }
 
         return $result;
     }
 
-    public function createModel(Array $data)
+    /**
+     * {@inheritdoc}
+     */
+    public function createModel(array $data)
     {
 
         $section = new SectionModel();
-        if (array_key_exists('id', $data)){
+        if (array_key_exists('id', $data)) {
             $section->id = $data['id'];
         }
 
@@ -144,28 +163,21 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
         $section->enableVersioning = $data['enableVersioning'];
 
         // Type-specific attributes
-        if ($section->type == SectionType::Single)
-        {
+        if ($section->type == SectionType::Single) {
             $section->hasUrls = $data['hasUrls'] = true;
-        }
-        else
-        {
+        } else {
             $section->hasUrls = $data['hasUrls'];
         }
 
-        if ($section->hasUrls)
-        {
+        if ($section->hasUrls) {
             $section->template = $data['template'];
-        }
-        else
-        {
+        } else {
             $section->template = $data['template'] = null;
         }
 
-        if (array_key_exists('locales', $data))
-        {
+        if (array_key_exists('locales', $data)) {
             $locales = array();
-            foreach($data['locales'] as $key => $locale){
+            foreach ($data['locales'] as $key => $locale) {
                 //determine if locale exists
                 if (in_array($key, craft()->i18n->getSiteLocaleIds())) {
                     if ($section->hasUrls) {
@@ -177,7 +189,7 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
                         ));
                     } else {
                         $locales[$key] = new SectionLocaleModel(array(
-                            'locale' => $key
+                            'locale' => $key,
                         ));
                     }
                 } else {
@@ -188,27 +200,29 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
         }
 
         return $section;
-
     }
 
-
-
+    /**
+     * @param array        $data
+     * @param SectionModel $section
+     *
+     * @return EntryTypeModel
+     */
     private function createEntryType($data, $section)
     {
         $entryType = new EntryTypeModel(array(
             'sectionId' => $section->id,
-            'name' => $data['name'] ,
-            'handle' => $data['handle'] ,
+            'name' => $data['name'],
+            'handle' => $data['handle'],
             'hasTitleField' => $data['hasTitleField'],
-            'titleLabel' => $data['titleLabel']
+            'titleLabel' => $data['titleLabel'],
         ));
 
-        if (array_key_exists('titleFormat', $data))
-        {
+        if (array_key_exists('titleFormat', $data)) {
             $entryType->titleFormat = $data['titleFormat'];
         }
 
-        if (array_key_exists('id', $data)){
+        if (array_key_exists('id', $data)) {
             $entryType->id = $data['id'];
         }
 
@@ -223,10 +237,9 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
         }
 
         $layout = array();
-        foreach($data['fieldLayout'] as $key => $fields)
-        {
+        foreach ($data['fieldLayout'] as $key => $fields) {
             $fieldIds = array();
-            foreach($fields as $field) {
+            foreach ($fields as $field) {
                 $existingField = craft()->fields->getFieldByHandle($field);
                 if ($existingField) {
                     $fieldIds[] = $existingField->id;
@@ -235,39 +248,46 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             $layout[$key] = $fieldIds;
         }
 
-
         $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
         $fieldLayout->type = ElementType::Entry;
         $entryType->fieldLayout = $fieldLayout;
 
         return $entryType;
-
-
     }
 
-
+    /**
+     * @param array        $newSection
+     * @param SectionModel $section
+     */
     private function mergeUpdates(&$newSection, $section)
     {
         $newSection['id'] = $section->id;
     }
 
+    /**
+     * @param array          $newEntryType
+     * @param EntryTypeModel $entryType
+     */
     private function mergeEntryType(&$newEntryType, $entryType)
     {
         $newEntryType['id'] = $entryType->id;
     }
 
+    /**
+     * @param string $handle
+     * @param int    $sectionId
+     *
+     * @return bool
+     */
     private function getSectionEntryTypeByHandle($handle, $sectionId)
     {
         $entryTypes = craft()->sections->getEntryTypesBySectionId($sectionId);
-        foreach($entryTypes as $entryType)
-        {
-            if ($entryType->handle == $handle)
-            {
+        foreach ($entryTypes as $entryType) {
+            if ($entryType->handle == $handle) {
                 return $entryType;
             }
         }
+
         return false;
     }
-
-
 }

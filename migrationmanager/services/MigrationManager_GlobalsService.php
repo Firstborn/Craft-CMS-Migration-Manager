@@ -2,12 +2,25 @@
 
 namespace Craft;
 
+/**
+ * Class MigrationManager_GlobalsService
+ */
 class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationService
 {
+    /**
+     * @var string
+     */
     protected $source = 'global';
+
+    /**
+     * @var string
+     */
     protected $destination = 'globals';
 
-    public function exportItem($id, $fullExport)
+    /**
+     * {@inheritdoc}
+     */
+    public function exportItem($id, $fullExport = false)
     {
         $source = craft()->globals->getSetById($id);
 
@@ -19,7 +32,7 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
             'name' => $source->name,
             'handle' => $source->handle,
             'fieldLayout' => array(),
-            'requiredFields' => array()
+            'requiredFields' => array(),
         ];
 
         $this->addManifest($source->handle);
@@ -31,8 +44,7 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
             foreach ($tab->getFields() as $tabField) {
 
                 $newSource['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
-                if ($tabField->required)
-                {
+                if ($tabField->required) {
                     $newSource['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
                 }
             }
@@ -41,23 +53,29 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
         return $newSource;
     }
 
-
-    public function importItem(Array $data)
+    /**
+     * {@inheritdoc}
+     */
+    public function importItem(array $data)
     {
-
         $existing = craft()->globals->getSetByHandle($data['handle']);
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
+
         $set = $this->createModel($data);
         $result = craft()->globals->saveSet($set);
+
         return $result;
     }
 
-    public function createModel(Array $data)
+    /**
+     * {@inheritdoc}
+     */
+    public function createModel(array $data)
     {
         $globalSet = new GlobalSetModel();
-        if (array_key_exists('id', $data)){
+        if (array_key_exists('id', $data)) {
             $globalSet->id = $data['id'];
         }
 
@@ -75,11 +93,10 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
         }
 
         $layout = array();
-        foreach($data['fieldLayout'] as $key => $fields)
-        {
+        foreach ($data['fieldLayout'] as $key => $fields) {
             $fieldIds = array();
 
-            foreach($fields as $field) {
+            foreach ($fields as $field) {
                 $existingField = craft()->fields->getFieldByHandle($field);
 
                 if ($existingField) {
@@ -96,12 +113,14 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
         $globalSet->setFieldLayout($fieldLayout);
 
         return $globalSet;
-
     }
 
+    /**
+     * @param array $newSource
+     * @param GlobalSetModel $source
+     */
     private function mergeUpdates(&$newSource, $source)
     {
         $newSource['id'] = $source->id;
     }
-
 }

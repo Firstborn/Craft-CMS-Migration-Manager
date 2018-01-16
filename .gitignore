@@ -2,3 +2,4 @@
 Thumbs.db
 .idea
 /migrationmanager/migrations/generated/*
+/vendor/

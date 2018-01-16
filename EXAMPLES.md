@@ -1,9 +1,10 @@
-#Examples of custom migrations
+# Examples of custom migrations
 
 ## Migration file
+
 To create an empty migration file click the 'Create Migration' button on the Migration Manager/Create Migrations tab. A new empty migration will be added to the `craft/plugins/migrationmanager/migrations/generated` folder.
-```
-<?php
+
+```php
 namespace Craft;
 
 /**
@@ -11,18 +12,17 @@ namespace Craft;
  */
 class m170621_190506_migrationmanager_import extends BaseMigration
 {
-	/**
-	 * Any migration code in here is wrapped inside of a transaction.
-	 * Returning false will rollback the migration
-	 *
-	 * @return bool
-	 */
-	public function safeUp()
-	{
-	    //add your custom migration code, see the EXAMPLES.md for examples
+    /**
+     * Any migration code in here is wrapped inside of a transaction.
+     * Returning false will rollback the migration
+     *
+     * @return bool
+     */
+    public function safeUp()
+    {
+        //add your custom migration code, see the EXAMPLES.md for examples
         return true;
     }
-
 }
 ```
 
@@ -34,19 +34,21 @@ Make sure that the method returns true or false to indicate migration success. R
 
 ### Delete a field
 
-```
+```php
 $field = craft()->fields->getFieldByHandle('fieldHandle');
 return craft()->fields->deleteFieldById($field->id);
 ```
 
 ### Delete a section
-```
+
+```php
 $section = craft()->sections->getSectionByHandle('sectionHandle');
 return craft()->sections->deleteSectionById($section->id);
 ```
 
 ### Add category values
-```
+
+```php
 $categoryGroup = craft()->categories->getGroupByHandle('category');
 $locale = craft()->i18n->getPrimarySiteLocale();
 
@@ -70,12 +72,12 @@ if ($categoryGroup) {
 ```
 
 ### Add a new locale and update sections
-```
+
+```php
 $newLocale = 'es_us';
 $locales = craft()->i18n->getSiteLocaleIds();
 
-if (in_array($newLocale, $locales) === false)
-{
+if (in_array($newLocale, $locales) === false) {
     $locale = craft()->i18n->addSiteLocale($newLocale);
 } else {
     $locale = craft()->i18n->getLocaleById($newLocale);
@@ -83,6 +85,7 @@ if (in_array($newLocale, $locales) === false)
 
 $sectionIds = craft()->sections->getAllSectionIds();
 foreach($sectionIds as $id){
+    
     $section = craft()->sections->getSectionById($id);
     $locales = $section->getLocales();
     $sectionLocale = new SectionLocaleModel(array(
@@ -94,9 +97,9 @@ foreach($sectionIds as $id){
 
     $locales[$newLocale] = $sectionLocale;
     $section->setLocales($locales);
+
     craft()->sections->saveSection($section);
 }
+
 return true;
 ```
-
-

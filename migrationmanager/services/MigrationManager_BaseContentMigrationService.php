@@ -50,16 +50,42 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                         return $value;
                     });
                     break;
-                case 'SuperTable':
-
+                case 'Neo':
                     $model = $parent[$field->handle];
-                    $value = $this->getIteratorValues($model, function () {
+                    $value = $this->getIteratorValues($model, function ($item) {
+                        $itemType = $item->getType();
                         $value = [
-                            'type' => 1,
+                            'type' => $itemType->handle,
+                            'enabled' => $item->enabled,
+                            'modified' => $item->enabled,
+                            'collapsed' => $item->collapsed,
+                            'level' => $item->level,
                             'fields' => []
                         ];
+
                         return $value;
                     });
+                    break;
+                case 'SuperTable':
+                    $model = $parent[$field->handle];
+
+                    if ($field->settings['staticField'] == 1){
+                        $value = [
+                            'new1' => [
+                                'type' => 1,
+                                'fields' => []
+                            ]
+                        ];
+                        $this->getContent($value['new1']['fields'], $model);
+                    } else {
+                        $value = $this->getIteratorValues($model, function () {
+                            $value = [
+                                'type' => 1,
+                                'fields' => []
+                            ];
+                            return $value;
+                        });
+                    }
                     break;
                 case 'Dropdown':
                     $value = $value->value;
@@ -137,8 +163,8 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
     {
         $items = $element->getIterator();
         $value = [];
-
         $i = 1;
+
         foreach ($items as $item) {
             $itemType = $item->getType();
             $itemFields = $itemType->getFieldLayout()->getFields();
@@ -154,8 +180,6 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
             $value['new' . $i] = $itemValue;
             $i++;
         }
-
-
         return $value;
     }
 
