@@ -2,15 +2,30 @@
 
 namespace Craft;
 
+/**
+ * Class MigrationManager_AssetTransformsService
+ */
 class MigrationManager_AssetTransformsService extends MigrationManager_BaseMigrationService
 {
+    /**
+     * @var string
+     */
     protected $source = 'assetTransform';
+
+    /**
+     * @var string
+     */
     protected $destination = 'assetTransforms';
 
-    public function exportItem($id, $fullExport)
+    /**
+     * @param int $id
+     * @param bool $fullExport
+     *
+     * @return array|bool
+     */
+    public function exportItem($id, $fullExport = false)
     {
         $transform = MigrationManagerHelper::getTransformById($id);
-
         if (!$transform) {
             return false;
         }
@@ -25,7 +40,7 @@ class MigrationManager_AssetTransformsService extends MigrationManager_BaseMigra
             'format' => $transform->format,
             'mode' => $transform->mode,
             'position' => $transform->position,
-            'quality' => $transform->quality
+            'quality' => $transform->quality,
         ];
 
         return $newTransform;
@@ -33,9 +48,7 @@ class MigrationManager_AssetTransformsService extends MigrationManager_BaseMigra
 
     public function importItem(Array $data)
     {
-
         $existing = craft()->assetTransforms->getTransformByHandle($data['handle']);
-
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
@@ -49,7 +62,7 @@ class MigrationManager_AssetTransformsService extends MigrationManager_BaseMigra
     public function createModel(Array $data)
     {
         $transform = new AssetTransformModel();
-        if (array_key_exists('id', $data)){
+        if (array_key_exists('id', $data)) {
             $transform->id = $data['id'];
         }
 
@@ -63,15 +76,10 @@ class MigrationManager_AssetTransformsService extends MigrationManager_BaseMigra
         $transform->quality = $data['quality'];
 
         return $transform;
-
     }
 
     private function mergeUpdates(&$newSource, $source)
     {
         $newSource['id'] = $source->id;
     }
-
-
-
-
 }

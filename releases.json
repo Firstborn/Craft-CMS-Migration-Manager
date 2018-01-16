@@ -6,12 +6,24 @@
     "notes": [
       "[Added] Neo plugin is not supported for field and content migrations.",
       "[Added] Added release notes to track updates."
-    ],
+    ]
+  },
+  {
     "version": "1.0.8.1",
     "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.1.zip",
     "date": "2018-01-16T12:00:00-00:00",
     "notes": [
       "[Fixed] Fixed null element error when exporting localized entries."
+    ]
+  },
+  {
+    "version": "1.0.8.2",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.2.zip",
+    "date": "2018-01-16T13:55:00-00:00",
+    "notes": [
+      "[Improved] Separated migrations into easier to use tabs.",
+      "[Added] Command line interface to run migrations.",
+      "[Improved] README.md with new screenshots and note on CLI"
     ]
   }
 ]

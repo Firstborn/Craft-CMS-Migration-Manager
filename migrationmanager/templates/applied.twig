@@ -1,0 +1,44 @@
+{% extends 'migrationManager/_layouts/cp' %}
+
+{% set title = 'Applied Migrations'|t %}
+
+{% set crumbs = [
+    { label: craft.migrationManager.name, url: url('migrationmanager') },
+    { label: 'Pending Migrations'|t, url: url('migrationmanager/pending') },
+    { label: 'Applied Migrations'|t, url: url('migrationmanager/applied') }
+] %}
+
+{% block content %}
+
+    {% set migrations = craft.migrationManager.getAppliedMigrations() %}
+    {% if migrations | length > 0%}
+        <p>
+            {{ 'Select the previously applied migration you want to rerun.'|t }}
+        </p>
+
+        <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+            <input type="hidden" name="action" value="migrationManager/run/rerunApplied">
+            <input type="hidden" name="applied" value="1">
+            {{ getCsrfInput() }}
+
+            {% for migration in migrations %}
+                <input type="checkbox" id="{{ migration }}" class="checkbox" name="migration[]" value="{{ migration }}">
+                <label for="{{ migration }}">{{ migration }}</label>
+                {% if not loop.last %}<hr>{% endif %}
+            {% endfor %}
+
+            <div class="buttons clearafter">
+                <button class="btn submit export-btn" name="submit" value="create">
+                    {{ 'Rerun migrations'|t }}
+                </button>
+            </div>
+        </form>
+    {% else %}
+        <p>
+            {{ 'There are no previously applied migrations. Return to <a href="pending">pending migrations</a>.'|t|raw }}
+        </p>
+    {% endif %}
+
+{% endblock %}
+
+{% includeCssResource "migrationmanager/css/styles.css" %}

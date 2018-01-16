@@ -6,7 +6,7 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
     protected $source = 'entry';
     protected $destination = 'entries';
 
-    public function exportItem($id, $fullExport)
+    public function exportItem($id, $fullExport = false)
     {
         $primaryEntry = craft()->entries->getEntryById($id);
         $locales = $primaryEntry->getSection()->getLocales();

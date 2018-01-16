@@ -1,0 +1,38 @@
+<table class="data fullwidth collapsible">
+    <thead>
+    <tr>
+        <th>
+            <div class="field checkboxfield">
+                <input type="checkbox" id="allAssetTransforms" class="checkbox checkbox-toggle" name="allAssetTransforms" value="all" data-selector="assetTransform"> <label
+                        for="allAssetTransforms">Name</label>
+            </div>
+        </th>
+        <th>Handle</th>
+        <th>Mode</th>
+        <th>Dimensions</th>
+        <th>Format</th>
+    </tr>
+    </thead>
+    <tbody class="assetTransforms">
+    {% for assetTransform in imageTransforms %}
+        <tr>
+            <th scope="row" class="name">
+                <input type="checkbox" id="assetTransform{{ assetTransform.id }}" class="checkbox" name="assetTransform[]" value="{{ assetTransform.id }}"> <label
+                        for="assetTransform{{ assetTransform.id }}">{{ assetTransform }}</label>
+            </th>
+            <td>
+                <code>{{ assetTransform.handle }}</code>
+            </td>
+            <td>
+                {{ assetTransform.mode }}
+            </td>
+            <td>
+                <code>{{ assetTransform.width }} &times; {{ assetTransform.height }}</code>
+            </td>
+            <td>
+                {{ (assetTransform.format) ? assetTransform.format : 'auto' }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

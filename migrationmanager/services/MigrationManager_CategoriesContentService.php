@@ -6,7 +6,7 @@ class MigrationManager_CategoriesContentService extends MigrationManager_BaseCon
     protected $source = 'category';
     protected $destination = 'categories';
 
-    public function exportItem($id, $fullExport)
+    public function exportItem($id, $fullExport = false)
     {
         $primaryCategory = craft()->categories->getCategoryById($id);
         $locales = $primaryCategory->getGroup()->getLocales();

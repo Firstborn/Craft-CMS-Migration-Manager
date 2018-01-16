@@ -1,0 +1,25 @@
+{% extends '_layouts/cp' %}
+
+{% if title is not defined %}
+    {% set title = craft.migrationManager.name %}
+{% endif %}
+
+{% set subnav = {
+    create: {
+        label: 'Create Migration'|t,
+        url: url('migrationmanager/create')
+    },
+    pending: {
+        label: 'Pending Migration'|t,
+        url: url('migrationmanager/pending')
+    },
+    logs: {
+        label: 'Migration Logs'|t,
+        url: url('migrationmanager/logs')
+    }
+} %}
+
+{% if selectedSubnavItem is not defined %}
+    {% set selectedSubnavItem = craft.request.getSegment(2) %}
+{% endif %}
+

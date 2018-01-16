@@ -1,11 +1,10 @@
 {
-    "name": "firstborn/craft-cms-migration-manager",
-    "description": "Craft CMS Migration Manager",
-
-    "authors": [
-        {
-            "name": "Derrick Grigg",
-            "email": "derrick.grigg@firstborn.com"
-        }
-    ]
+  "name": "firstborn/craft-cms-migration-manager",
+  "description": "Craft CMS Migration Manager",
+  "authors": [
+    {
+      "name": "Derrick Grigg",
+      "email": "derrick.grigg@firstborn.com"
+    }
+  ]
 }

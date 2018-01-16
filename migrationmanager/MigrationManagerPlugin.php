@@ -1,5 +1,7 @@
 <?php
 
+namespace Craft;
+
 /**
  * Migration Manager plugin for Craft CMS
  *
@@ -16,71 +18,57 @@ namespace Craft;
 
 class MigrationManagerPlugin extends BasePlugin
 {
-    function getName()
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
     {
         return Craft::t('Migration Manager');
     }
 
-    function getVersion()
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
     {
-        return '1.0.8.1';
+        return '1.0.8.2';
     }
 
-    function getDeveloper()
+    /**
+     * {@inheritdoc}
+     */
+    public function getDeveloper()
     {
         return 'Derrick Grigg';
     }
 
-    function getDeveloperUrl()
+    /**
+     * {@inheritdoc}
+     */
+    public function getDeveloperUrl()
     {
         return 'https://www.firstborn.com';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getReleaseFeedUrl()
     {
-        return 'https://raw.githubusercontent.com/Firstborn/Craft-CMS-Migration-Manager/master/releases.json';
+        return 'https://github.com/Firstborn/Craft-CMS-Migration-Manager/tree/master/releases.json';
     }
 
-    public function hasCpSection()
+    /**
+     * {@inheritdoc}
+     */
+    public function getDocumentationUrl()
     {
-        if (craft()->userSession->isAdmin()) {
-            return true;
-        }
+        return 'https://github.com/Firstborn/Craft-CMS-Migration-Manager/tree/master/README.md';
     }
 
-    public function addEntryActions($source)
-    {
-        return array(
-            'Migrate',
-            new MigrationManager_MigrateEntryElementAction()
-        );
-    }
-
-    public function addCategoryActions($source)
-    {
-        return array(
-            'Migrate',
-            new MigrationManager_MigrateCategoryElementAction()
-        );
-    }
-
-    public function addUserActions($source)
-    {
-        return array(
-            'Migrate',
-            new MigrationManager_MigrateUserElementAction()
-        );
-    }
-
-    public function registerCpRoutes()
-    {
-        return array(
-            'migrationmanager/run-migration' => array('action' => 'migrationManager/runMigration'),
-            'migrationmanager/migrations' => array('action' => 'migrationManager/migrations'),
-            'migrationmanager/log' => array('action' => 'migrationManager/log')
-        );
-    }
-
+    /**
+     * {@inheritdoc}
+     */
     function init(){
         Craft::import('plugins.migrationmanager.helpers.MigrationManagerHelper');
         Craft::import('plugins.migrationmanager.services.MigrationManager_IMigrationService');
@@ -89,6 +77,8 @@ class MigrationManagerPlugin extends BasePlugin
         Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateEntryElementAction');
         Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateUserElementAction');
 
+         // check we have a cp request as we don't want to this js to run anywhere but the cp
+        // and while we're at it check for a logged in user as well
         if ( craft()->request->isCpRequest() && craft()->userSession->isLoggedIn()) {
 
             // add a Create Migration button to the globals screen
@@ -109,5 +99,58 @@ class MigrationManagerPlugin extends BasePlugin
 
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function hasCpSection()
+    {
+        return true;
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function registerCpRoutes()
+    {
+        return array(
+            'migrationmanager' => array('action' => 'migrationManager/index'),
+            'migrationmanager/create' => array('action' => 'migrationManager/create'),
+            'migrationmanager/pending' => array('action' => 'migrationManager/pending'),
+            'migrationmanager/applied' => array('action' => 'migrationManager/applied'),
+            'migrationmanager/logs' => array('action' => 'migrationManager/logs'),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addEntryActions($source)
+    {
+        return array(
+            'Migrate',
+            new MigrationManager_MigrateEntryElementAction(),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addCategoryActions($source)
+    {
+        return array(
+            'Migrate',
+            new MigrationManager_MigrateCategoryElementAction(),
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addUserActions($source)
+    {
+        return array(
+            'Migrate',
+            new MigrationManager_MigrateUserElementAction(),
+        );
+    }
 }

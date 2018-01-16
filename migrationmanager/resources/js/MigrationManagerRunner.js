@@ -14,7 +14,7 @@ Craft.MigrationManagerRunner = Garnish.Base.extend(
 		this.$status = $('#status');
         this.data = data;
 
-		this.postActionRequest('migrationManager/prepare');
+		this.postActionRequest('migrationManager/run/prepare');
 	},
 
 	updateStatus: function(msg)
