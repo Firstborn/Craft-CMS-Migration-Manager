@@ -144,6 +144,25 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                             }
                         }
                         break;
+                    case 'Neo':
+                        foreach($fieldValue as $key => &$neoBlock){
+                            $blockType = MigrationManagerHelper::getNeoBlockType($neoBlock['type'], $field->id);
+                            if ($blockType) {
+                                $blockTabs = $blockType->getFieldLayout()->getTabs();
+                                foreach($blockTabs as $blockTab){
+                                    $blockFields = $blockTab->getFields();
+                                    foreach($blockFields as &$blockTabField){
+                                        $neoBlockField = craft()->fields->getFieldById($blockTabField->fieldId);
+                                        if ($neoBlockField->type == 'SuperTable') {
+                                            $neoBlockFieldValue = &$neoBlock['fields'][$neoBlockField->handle];
+                                            $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        break;
                     case 'SuperTable':
                         $this->updateSupertableFieldValue($fieldValue, $field);
                         break;
