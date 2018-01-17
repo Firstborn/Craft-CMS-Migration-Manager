@@ -25,5 +25,13 @@
       "[Added] Command line interface to run migrations.",
       "[Improved] README.md with new screenshots and note on CLI"
     ]
+  },
+  {
+    "version": "1.0.8.3",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.3.zip",
+    "date": "2018-01-17T10:50:00-00:00",
+    "notes": [
+      "[Fixed] Fixed issue with nested SuperTables having empty rows when creating content migrations"
+    ]
   }
 ]
