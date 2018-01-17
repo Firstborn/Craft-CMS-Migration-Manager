@@ -20,7 +20,7 @@
     {% set tabs = tabs | merge({ sections: { label: 'Sections'|t, url: '#sections' } }) %}
 {% endif %}
 
-{% set assetSources = craft.sections.getAllSections() -%}
+{% set assetSources = craft.migrationManager.getAssetSources() -%}
 {% if assetSources is not empty %}
     {% set tabs = tabs | merge({ assetSources: { label: 'Asset Sources'|t, url: '#assetSources' } }) %}
 {% endif %}

@@ -70,7 +70,7 @@ class MigrationManager_RunController extends BaseController
         } else {
             $this->returnJson(array(
                 'alive' => true,
-                'errorDetails' => 'Check to migration <a href="log">log</a> for details. ',
+                'errorDetails' => 'Check the migration <a href="logs">log</a> for details. ',
                 'nextStatus' => Craft::t('An error was encountered. Rolling back…'),
                 'nextAction' => 'migrationManager/run/rollback',
                 'data' => $data,
