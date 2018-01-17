@@ -72,15 +72,16 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                     if ($field->settings['staticField'] == 1){
                         $value = [
                             'new1' => [
-                                'type' => 1,
+                                'type' => $model->typeId,
                                 'fields' => []
                             ]
                         ];
                         $this->getContent($value['new1']['fields'], $model);
                     } else {
-                        $value = $this->getIteratorValues($model, function () {
+
+                        $value = $this->getIteratorValues($model, function ($item) {
                             $value = [
-                                'type' => 1,
+                                'type' => $item->typeId,
                                 'fields' => []
                             ];
                             return $value;
@@ -169,7 +170,6 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
             $itemType = $item->getType();
             $itemFields = $itemType->getFieldLayout()->getFields();
             $itemValue = $settingsFunc($item);
-
             $fields = [];
 
             foreach ($itemFields as $field) {
