@@ -35,9 +35,12 @@
         </form>
     {% else %}
         <p>
-            {{ 'There are no previously applied migrations. Return to <a href="pending">pending migrations</a>.'|t|raw }}
+            {{ 'There are no previously applied migrations.'|t|raw }}
         </p>
     {% endif %}
+    <p>
+        {{ 'Return to <a class="link-muted" href="pending">pending migrations</a>.'|t|raw }}
+    </p>
 
 {% endblock %}
 

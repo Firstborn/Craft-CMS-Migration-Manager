@@ -35,9 +35,14 @@
                 {{ 'If you don\'t make a selection, all migrations will be run.'|t }}
             </div>
         </form>
-    {% else %}
+    {%  else %}
+        <p>{{ 'There are no pending migrations'|t }}</p>
+    {%  endif %}
+
+    {% set appliedMigrations = craft.migrationManager.getAppliedMigrations() %}
+    {% if appliedMigrations | length > 0 %}
         <p>
-            {{ 'There are no pending migrations. You can run previously <a href="applied">applied migrations</a>.'|t|raw }}
+            {{ 'You can run previously <a class="link-muted" href="applied">applied migrations</a>.'|t|raw }}
         </p>
     {% endif %}
 {% endblock %}
