@@ -96,6 +96,24 @@ class MigrationManagerHelper
     }
 
     /**
+     * @param $handle
+     * @param $fieldId
+     *
+     * @return bool|NeoBlockTypeModel
+     */
+    public static function getNeoBlockType($handle, $fieldId)
+    {
+        $blockTypes = craft()->neo->getBlockTypesByFieldId($fieldId);
+        foreach ($blockTypes as $block) {
+            if ($block->handle == $handle) {
+                return $block;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param array $element
      *
      * @return bool|BaseElementModel|null
