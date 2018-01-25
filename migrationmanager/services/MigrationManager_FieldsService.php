@@ -837,6 +837,7 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             $existingField = $this->getMatrixFieldByHandle($field['handle'], $existingFields);
 
             if ($existingField){
+                $this->mergeUpdates($field, $existingField);
                 $newFields[$existingField->id] = $field;
             } else {
 

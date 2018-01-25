@@ -33,5 +33,14 @@
     "notes": [
       "[Fixed] Fixed issue with nested SuperTables having empty rows when creating content migrations"
     ]
+  },
+  {
+    "version": "1.0.8.4",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.4.zip",
+    "date": "2018-01-25T16:35:00-00:00",
+    "critical": true,
+    "notes": [
+      "[Fixed] Fixed issue with nested SuperTable migrations creating new field blocks which removed existing content"
+    ]
   }
 ]
