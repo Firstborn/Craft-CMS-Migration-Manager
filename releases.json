@@ -42,5 +42,13 @@
     "notes": [
       "[Fixed] Fixed issue with nested SuperTable migrations creating new field blocks which removed existing content"
     ]
+  },
+  {
+    "version": "1.0.8.5",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.5.zip",
+    "date": "2018-01-26T14:44:00-00:00",
+    "notes": [
+      "[Added] Option to provide a name from migrations to override the auto generated value"
+    ]
   }
 ]
