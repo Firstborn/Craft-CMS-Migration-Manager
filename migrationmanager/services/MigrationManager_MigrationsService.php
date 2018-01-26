@@ -71,7 +71,6 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         //after all the fields have been created
 
         foreach ($this->_settingsDependencyTypes as $key => $value) {
-            Craft::log('getComponent: ' . $value, LogLevel::Error);
             $service = craft()->getComponent($value);
             if (array_key_exists($service->getSource(), $data)) {
                 $migration['settings']['dependencies'][$service->getDestination()] = $service->export($data[$service->getSource()], false);
@@ -111,7 +110,14 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $migration = null;
         }
 
-        $this->createMigration($migration, $manifest);
+        if (array_key_exists('migrationName', $data)){
+            $migrationName = trim($data['migrationName']);
+            $migrationName = str_replace(' ', '_', $migrationName);
+        } else {
+            $migrationName = '';
+        }
+
+        $this->createMigration($migration, $manifest, $migrationName);
 
         return true;
     }
@@ -167,20 +173,26 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      *
      * @throws Exception
      */
-    private function createMigration($migration, $manifest = array())
+    private function createMigration($migration, $manifest = array(), $migrationName = '')
     {
         $empty = is_null($migration);
         $date = new DateTime();
         $name = 'm%s_migration';
         $description = [];
-        foreach ($manifest as $key => $value) {
-            $description[] = $key;
-            foreach ($value as $item) {
-                $description[] = $item;
+
+        if ($migrationName == '') {
+
+            foreach ($manifest as $key => $value) {
+                $description[] = $key;
+                foreach ($value as $item) {
+                    $description[] = $item;
+                }
             }
+        } else {
+            $description[] = $migrationName;
         }
 
-        if (!$empty) {
+        if (!$empty || count($description)>0) {
             $description = implode('_', $description);
             $name .= '_' . $description;
         }

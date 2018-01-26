@@ -75,16 +75,19 @@
             {% endif %}
         {% endfor %}
 
-        <div class="field first" id="title-field">
+
+
+        <div class="field " id="title-field">
             <div class="heading">
                 <label id="title-label" for="title">Migration Name</label>
-            </div>
-            <div class="instructions"><p><span class="locale">* optional</span> enter a migration name instead of using the auto generated name. This allows you to enter a more descriptive name.</p>
+                <div class="instructions"><p><span class="locale">* Optional</span> enter a migration name instead of using the auto generated name. Alphanumeric and dashes only.</p>
+                </div>
             </div>
             <div class="input ltr">
-                <input class="text fullwidth" type="text" id="migrationName" name="migrationName" value="" maxlength="255" autofocus="" autocomplete="off">
+                <input class="text fullwidth" style="max-width:600px;" type="text" id="migrationName" name="migrationName" value="" maxlength="255" autofocus="" autocomplete="off" placeholder="migration name"  pattern="[A-Za-z0-9_\-]+">
             </div>
         </div>
+
 
         <div class="buttons clearafter">
 
