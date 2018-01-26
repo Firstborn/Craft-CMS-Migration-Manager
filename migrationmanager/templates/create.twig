@@ -75,7 +75,20 @@
             {% endif %}
         {% endfor %}
 
+        <div class="field first" id="title-field">
+            <div class="heading">
+                <label id="title-label" class="required" for="title">Migration Name<span class="locale">*</span></label>
+            </div>
+            <div class="instructions"><p>insturctions</p>
+            </div>
+            <div class="input ltr">
+                <input class="text fullwidth" type="text" id="migrationName" name="migrationName" value="" maxlength="255" autofocus="" autocomplete="off">
+            </div>
+        </div>
+
         <div class="buttons clearafter">
+
+
             <button class="btn submit export-btn" name="submit" value="create">
                 {{ 'Create Migration'|t }}
             </button>
