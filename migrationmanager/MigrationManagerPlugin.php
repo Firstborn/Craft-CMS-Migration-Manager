@@ -55,7 +55,7 @@ class MigrationManagerPlugin extends BasePlugin
      */
     public function getReleaseFeedUrl()
     {
-        return 'https://github.com/Firstborn/Craft-CMS-Migration-Manager/tree/master/releases.json';
+        return 'https://raw.githubusercontent.com/Firstborn/Craft-CMS-Migration-Manager/master/releases.json';
     }
 
     /**
