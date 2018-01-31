@@ -12,7 +12,12 @@ class MigrationManagerController extends BaseController
      */
     public function actionIndex()
     {
-        $this->redirect('migrationmanager/create');
+        $pendingMigrations = count(craft()->migrationManager_migrations->getNewMigrations());
+        if ($pendingMigrations > 0){
+            $this->redirect('migrationmanager/pending');
+        } else {
+            $this->redirect('migrationmanager/create');
+        }
     }
 
     /**
