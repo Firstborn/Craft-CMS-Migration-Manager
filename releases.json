@@ -50,5 +50,14 @@
     "notes": [
       "[Added] Option to provide a name from migrations to override the auto generated value"
     ]
+  },
+  {
+    "version": "1.0.8.6",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.6.zip",
+    "date": "2018-01-31T15:25:00-00:00",
+    "notes": [
+      "[Added] redirects to the Pending Migrations tab when the main Migration Manager link is clicked if there are any pending migrations",
+      "[Fixed] user group exports all user group permissions"
+    ]
   }
 ]
