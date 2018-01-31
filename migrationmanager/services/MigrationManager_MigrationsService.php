@@ -91,7 +91,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $service = craft()->getComponent($value);
 
             if (array_key_exists($service->getSource(), $data)) {
-                $migration['settings']['elements'][$service->getDestination()] = $service->export($data[$service->getSource()]);
+                $migration['settings']['elements'][$service->getDestination()] = $service->export($data[$service->getSource()], true);
                 $empty = false;
 
                 if ($service->hasErrors()) {
@@ -143,7 +143,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $service = craft()->getComponent($value);
 
             if (array_key_exists($service->getSource(), $data)) {
-                $migration['content'][$service->getDestination()] = $service->export($data[$service->getSource()]);
+                $migration['content'][$service->getDestination()] = $service->export($data[$service->getSource()], true);
                 $empty = false;
 
                 if ($service->hasErrors()) {
