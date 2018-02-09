@@ -1,0 +1,23 @@
+
+#nav-migrationmanager span[data-icon="newstamp"] {
+   position: absolute;
+   color:#da5a47;
+   display: block;
+   right:0;
+   width:22px;
+   height:22px;
+   font-size:22px;
+   margin:8px;
+   pointer-events: none;
+}
+
+#nav-migrationmanager span[data-icon="newstamp"] span {
+   color:white;
+   position: absolute;
+   font-size:11px;
+   line-height:22px;
+   top:0;
+   left:0;
+   width:100%;
+   text-align:center;
+}

@@ -1,10 +1,37 @@
 {
-  "name": "firstborn/craft-cms-migration-manager",
+  "name": "firstborn/migrationmanager",
   "description": "Craft CMS Migration Manager",
+  "version" : "1.0.0",
   "authors": [
     {
       "name": "Derrick Grigg",
       "email": "derrick.grigg@firstborn.com"
     }
-  ]
+  ],
+  "support": {
+    "docs": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/blob/master/README.md",
+    "issues": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/issues"
+  },
+  "license": "MIT",
+  "type": "craft-plugin",
+  "minimum-stability": "dev",
+  "require": {
+    "craftcms/cms": "^3.0.0-RC1"
+  },
+  "autoload": {
+    "psr-4": {
+      "firstborn\\migrationmanager\\": "src/"
+    }
+  },
+
+  "extra": {
+    "name": "Migration Manager",
+    "handle": "migrationmanager",
+    "developer": "FirstBorn",
+    "developerUrl": "https://firstborn.com",
+    "class": "firstborn\\migrationmanager\\MigrationManager",
+    "hasCpSettings": false,
+    "hasCpSection": true,
+    "changelogUrl": "https://raw.githubusercontent.com/Firstborn/Craft-CMS-Migration-Manager/master/CHANGELOG.md"
+  }
 }

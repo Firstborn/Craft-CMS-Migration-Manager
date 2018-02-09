@@ -1,0 +1,124 @@
+
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{# The title of this CP section #}
+{% set title = "Create Migration" %}
+
+
+{% set crumbs = [
+{ label: 'Migration Manager', url: url('migrationmanager') },
+{ label: 'Create Migration'|t, url: url('migrationmanager/create') }
+] %}
+
+{% set tabs = {} %}
+
+{# Supported types #}
+{% set fields = craft.fields.getAllFields() -%}
+{% if fields is not empty %}
+    {% set tabs = tabs | merge({ fields: { label: 'Fields'|t, url: '#fields' } }) %}
+{% endif %}
+
+{% set sections = craft.sections.getAllSections() -%}
+{% if sections is not empty %}
+    {% set tabs = tabs | merge({ sections: { label: 'Sections'|t, url: '#sections' } }) %}
+{% endif %}
+
+{% set assetVolumes = craft.app.getVolumes().getAllVolumes() -%}
+{% if assetVolumes is not empty %}
+    {% set tabs = tabs | merge({ assetVolumes: { label: 'Asset Volumes'|t, url: '#assetVolumes' } }) %}
+{% endif %}
+
+{% set imageTransforms = craft.app.getAssetTransforms().getAllTransforms() -%}
+{% if imageTransforms is not empty %}
+    {% set tabs = tabs | merge({ imageTransforms: { label: 'Image Transforms'|t, url: '#imageTransforms' } }) %}
+{% endif %}
+
+{% set globals = craft.globals.getAllSets() -%}
+{% if globals is not empty %}
+    {% set tabs = tabs | merge({ globals: { label: 'Globals'|t, url: '#globals' } }) %}
+{% endif %}
+
+{% set categories = craft.categoryGroups.getAllGroups() -%}
+{% if categories is not empty %}
+    {% set tabs = tabs | merge({ categories: { label: 'Categories'|t, url: '#categories' } }) %}
+{% endif %}
+
+{% set tags = craft.app.getTags().getAllTagGroups() -%}
+{% if tags is not empty %}
+    {% set tabs = tabs | merge({ tags: { label: 'Tags'|t, url: '#tags' } }) %}
+{% endif %}
+
+{% set locales = craft.i18n.getSiteLocales() -%}
+{% if locales is not empty %}
+    {% set tabs = tabs | merge({ locales: { label: 'Locales'|t, url: '#locales' } }) %}
+{% endif %}
+
+{% if CraftEdition > CraftClient %}
+    {% set userGroups = craft.userGroups.getAllGroups() -%}
+    {% if userGroups is not empty %}
+        {% set tabs = tabs | merge({ userGroups: { label: 'User Groups'|t, url: '#userGroups' } }) %}
+    {% endif %}
+{% endif %}
+
+{% set other = { label: 'Other Settings'|t, url: '#other' } %}
+{% set tabs = tabs | merge({ other: other }) %}
+
+{# The content of the CP Section#}
+
+{% set content %}
+    <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+        <input type="hidden" name="action" value="migrationmanager/migrations/create-migration">
+        {{ getCsrfInput() }}
+
+        {% set firstRendered = false %}
+        {% for tabHandle, tab in tabs %}
+            {% if attribute(_context, tabHandle) is not empty %}
+                <div id="{{ tabHandle }}"{% if firstRendered %} class="hidden"{% endif %}>
+                    {% include 'migrationmanager/types/' ~ tabHandle %}
+                </div>
+                {% set firstRendered = true %}
+            {% endif %}
+        {% endfor %}
+
+
+
+        <div class="field " id="title-field">
+            <div class="heading">
+                <label id="title-label" for="title">Migration Name</label>
+                <div class="instructions"><p><span class="locale">* Optional</span> enter a migration name instead of using the auto generated name. Alphanumeric and dashes only.</p>
+                </div>
+            </div>
+            <div class="input ltr">
+                <input class="text fullwidth" style="max-width:600px;" type="text" id="migrationName" name="migrationName" value="" maxlength="255" autocomplete="off" placeholder="migration name"  pattern="[A-Za-z0-9_\-]+">
+            </div>
+
+        </div>
+
+        <div class="field">
+            <div class="heading">
+            <div class="instructions">
+            <span class="info"></span>
+            {{ 'To create an empty migration for custom purposes (ie deleting a field) click "Create Migration" without selecting anything to export.'|t }}
+            </div>
+            </div>
+        </div>
+
+
+        <div class="buttons clearafter">
+
+
+            <button class="btn submit export-btn" name="submit" value="create">
+                {{ 'Create Migration'|t }}
+            </button>
+        </div>
+
+        <div class="instructions">
+                    </div>
+    </form>
+{% endset %}
+
+{% do view.registerAssetBundle("firstborn\\migrationmanager\\assetbundles\\cp\\CpAssetBundle") %}
+{% includejs %}
+new Craft.MigrationManagerExport();
+{% endincludejs %}
