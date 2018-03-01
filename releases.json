@@ -59,5 +59,13 @@
       "[Added] redirects to the Pending Migrations tab when the main Migration Manager link is clicked if there are any pending migrations",
       "[Fixed] user group exports all user group permissions"
     ]
+  },
+  {
+    "version": "1.0.8.7",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.7.zip",
+    "date": "2018-03-01T17:46:00-00:00",
+    "notes": [
+      "[Fixed] handle line breaks and slashes in migration json data"
+    ]
   }
 ]

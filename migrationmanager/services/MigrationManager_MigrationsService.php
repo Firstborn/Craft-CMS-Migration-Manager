@@ -235,7 +235,11 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      */
     public function import($data)
     {
+        $data = str_replace('\\', '\/', $data);
+        $data = str_replace('\/r', '\r', $data);
+        $data = str_replace('\/n', '\n', $data);
         $data = json_decode($data, true);
+
         try {
             if (array_key_exists('settings', $data)) {
                 // run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
