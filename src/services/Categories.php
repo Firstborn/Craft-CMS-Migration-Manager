@@ -2,14 +2,14 @@
 
 namespace firstborn\migrationmanager\services;
 
-class CategoriesService extends BaseMigrationService
+class Categories extends BaseMigration
 {
     protected $source = 'category';
     protected $destination = 'categories';
 
     public function exportItem($id, $fullExport = false)
     {
-        $category = craft()->categories->getGroupById($id);
+        $category = Craft::$app->categories->getGroupById($id);
 
         if (!$category) {
             return false;
@@ -49,9 +49,9 @@ class CategoriesService extends BaseMigrationService
                     $newCategory['fieldLayout'][$tab->name] = array();
                     foreach ($tab->getFields() as $tabField) {
 
-                        $newCategory['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        $newCategory['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                         if ($tabField->required) {
-                            $newCategory['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                            $newCategory['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                         }
                     }
                 }
@@ -65,14 +65,14 @@ class CategoriesService extends BaseMigrationService
     public function importItem(Array $data)
     {
 
-        $existing = craft()->categories->getGroupByHandle($data['handle']);
+        $existing = Craft::$app->categories->getGroupByHandle($data['handle']);
 
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
 
         $category = $this->createModel($data);
-        $result = craft()->categories->saveGroup($category);
+        $result = Craft::$app->categories->saveGroup($category);
 
         return $result;
     }
@@ -96,7 +96,7 @@ class CategoriesService extends BaseMigrationService
             $locales = array();
             foreach($data['locales'] as $key => $locale){
                 //determine if locale exists
-                if (in_array($key, craft()->i18n->getSiteLocaleIds())) {
+                if (in_array($key, Craft::$app->i18n->getSiteLocaleIds())) {
                     $locales[$key] = new CategoryGroupLocaleModel(array(
                         'locale' => $key,
                         'urlFormat' => $locale['urlFormat'],
@@ -114,7 +114,7 @@ class CategoriesService extends BaseMigrationService
             $requiredFields = array();
             if (array_key_exists('requiredFields', $data)) {
                 foreach ($data['requiredFields'] as $handle) {
-                    $field = craft()->fields->getFieldByHandle($handle);
+                    $field = Craft::$app->fields->getFieldByHandle($handle);
                     if ($field) {
                         $requiredFields[] = $field->id;
                     }
@@ -125,7 +125,7 @@ class CategoriesService extends BaseMigrationService
             foreach ($data['fieldLayout'] as $key => $fields) {
                 $fieldIds = array();
                 foreach ($fields as $field) {
-                    $existingField = craft()->fields->getFieldByHandle($field);
+                    $existingField = Craft::$app->fields->getFieldByHandle($field);
                     if ($existingField) {
                         $fieldIds[] = $existingField->id;
                     } else {
@@ -136,7 +136,7 @@ class CategoriesService extends BaseMigrationService
             }
 
 
-            $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+            $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
             $fieldLayout->type = ElementType::Category;
             $category->fieldLayout = $fieldLayout;
 

@@ -2,14 +2,14 @@
 
 namespace firstborn\migrationmanager\services;
 
-class CategoriesContentService extends BaseContentMigrationService
+class CategoriesContent extends BaseContentMigration
 {
     protected $source = 'category';
     protected $destination = 'categories';
 
     public function exportItem($id, $fullExport = false)
     {
-        $primaryCategory = craft()->categories->getCategoryById($id);
+        $primaryCategory = Craft::$app->categories->getCategoryById($id);
         $locales = $primaryCategory->getGroup()->getLocales();
         $content = array(
             'slug' => $primaryCategory->slug,
@@ -25,7 +25,7 @@ class CategoriesContentService extends BaseContentMigrationService
         }
 
         foreach($locales as $locale){
-            $category = craft()->categories->getCategoryById($id, $locale->locale);
+            $category = Craft::$app->categories->getCategoryById($id, $locale->locale);
             $categoryContent = array(
                 'slug' => $category->slug,
                 'category' => $category->getGroup()->handle,
@@ -49,7 +49,7 @@ class CategoriesContentService extends BaseContentMigrationService
 
     public function importItem(Array $data)
     {
-        $criteria = craft()->elements->getCriteria(ElementType::Category);
+        $criteria = Craft::$app->elements->getCriteria(ElementType::Category);
         $criteria->group = $data['category'];
         $criteria->slug = $data['slug'];
         $primaryCategory = $criteria->first();
@@ -68,7 +68,7 @@ class CategoriesContentService extends BaseContentMigrationService
             $category = $this->createModel($value);
 
             // save entry
-            if (!$success = craft()->categories->saveCategory($category)) {
+            if (!$success = Craft::$app->categories->saveCategory($category)) {
                 throw new Exception(print_r($category->getErrors(), true));
             }
 
@@ -92,7 +92,7 @@ class CategoriesContentService extends BaseContentMigrationService
             $category->id = $data['id'];
         }
 
-        $group = craft()->categories->getGroupByHandle($data['category']);
+        $group = Craft::$app->categories->getGroupByHandle($data['category']);
         $category->groupId = $group->id;
         $category->locale = $data['locale'];
         $category->slug = $data['slug'];

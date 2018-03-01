@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class RoutesService extends BaseMigrationService
+class Routes extends BaseMigration
 {
     /**
      * @var string
@@ -83,7 +83,7 @@ class RoutesService extends BaseMigrationService
             $locale = $data['locale'];
         }
 
-        $result = craft()->routes->saveRoute($urlParts, $data['template'], null, $locale);
+        $result = Craft::$app->routes->saveRoute($urlParts, $data['template'], null, $locale);
 
         return $result;
     }
@@ -95,7 +95,7 @@ class RoutesService extends BaseMigrationService
     {
         $ids = $this->getAllRouteIds();
         foreach ($ids as $id) {
-            craft()->routes->deleteRouteById($id);
+            Craft::$app->routes->deleteRouteById($id);
         }
     }
 
@@ -104,7 +104,7 @@ class RoutesService extends BaseMigrationService
      */
     private function getAllRouteIds()
     {
-        $routes = craft()->db->createCommand()
+        $routes = Craft::$app->db->createCommand()
             ->select('id')
             ->from('routes')
             ->order('sortOrder')
@@ -125,7 +125,7 @@ class RoutesService extends BaseMigrationService
      */
     private function getRouteById($id)
     {
-        $route = craft()->db->createCommand()
+        $route = Craft::$app->db->createCommand()
             ->select('id, locale, urlParts, urlPattern, template')
             ->from('routes')
             ->where('id = :id', array(':id' => $id))

@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class UserGroupsService extends BaseMigrationService
+class UserGroups extends BaseMigration
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class UserGroupsService extends BaseMigrationService
      */
     public function exportItem($id, $fullExport = false)
     {
-        $group = craft()->userGroups->getGroupById($id);
+        $group = Craft::$app->userGroups->getGroupById($id);
 
         if (!$group) {
             return false;
@@ -35,23 +35,23 @@ class UserGroupsService extends BaseMigrationService
         if ($fullExport) {
             $newGroup['fieldLayout'] = array();
             $newGroup['requiredFields'] = array();
-            $fieldLayout = craft()->fields->getLayoutByType('User');
+            $fieldLayout = Craft::$app->fields->getLayoutByType('User');
 
             foreach ($fieldLayout->getTabs() as $tab) {
                 $newGroup['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newGroup['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    $newGroup['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     if ($tabField->required) {
-                        $newGroup['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        $newGroup['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     }
                 }
             }
             $newGroup['permissions'] = $this->getGroupPermissionHandles($id);
-            $newGroup['settings'] = craft()->systemSettings->getSettings('users');
+            $newGroup['settings'] = Craft::$app->systemSettings->getSettings('users');
 
             if ($newGroup['settings']['defaultGroup'] != null) {
-                $group = craft()->userGroups->getGroupById($newGroup['settings']['defaultGroup']);
+                $group = Craft::$app->userGroups->getGroupById($newGroup['settings']['defaultGroup']);
                 $newGroup['settings']['defaultGroup'] = $group->handle;
             }
         }
@@ -64,18 +64,18 @@ class UserGroupsService extends BaseMigrationService
      */
     public function importItem(array $data)
     {
-        $existing = craft()->userGroups->getGroupByHandle($data['handle']);
+        $existing = Craft::$app->userGroups->getGroupByHandle($data['handle']);
 
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
 
         $userGroup = $this->createModel($data);
-        $result = craft()->userGroups->saveGroup($userGroup);
+        $result = Craft::$app->userGroups->saveGroup($userGroup);
         if ($result) {
             if (array_key_exists('permissions', $data)) {
                 $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
-                if (craft()->userPermissions->saveGroupPermissions($userGroup->id, $permissions)) {
+                if (Craft::$app->userPermissions->saveGroupPermissions($userGroup->id, $permissions)) {
 
                 } else {
                     $this->addError('error', 'Could not save user group permissions');
@@ -85,11 +85,11 @@ class UserGroupsService extends BaseMigrationService
             if (array_key_exists('settings', $data)) {
 
                 if ($data['settings']['defaultGroup'] != null) {
-                    $group = craft()->userGroups->getGroupByHandle($data['settings']['defaultGroup']);
+                    $group = Craft::$app->userGroups->getGroupByHandle($data['settings']['defaultGroup']);
                     $data['settings']['defaultGroup'] = $group->id;
                 }
 
-                if (craft()->systemSettings->saveSettings('users', $data['settings'])) {
+                if (Craft::$app->systemSettings->saveSettings('users', $data['settings'])) {
 
                 } else {
                     $this->addError('error', 'Could not save user group settings');
@@ -117,7 +117,7 @@ class UserGroupsService extends BaseMigrationService
             $requiredFields = array();
             if (array_key_exists('requiredFields', $data)) {
                 foreach ($data['requiredFields'] as $handle) {
-                    $field = craft()->fields->getFieldByHandle($handle);
+                    $field = Craft::$app->fields->getFieldByHandle($handle);
                     if ($field) {
                         $requiredFields[] = $field->id;
                     }
@@ -128,7 +128,7 @@ class UserGroupsService extends BaseMigrationService
             foreach ($data['fieldLayout'] as $key => $fields) {
                 $fieldIds = array();
                 foreach ($fields as $field) {
-                    $existingField = craft()->fields->getFieldByHandle($field);
+                    $existingField = Craft::$app->fields->getFieldByHandle($field);
                     if ($existingField) {
                         $fieldIds[] = $existingField->id;
                     } else {
@@ -138,12 +138,12 @@ class UserGroupsService extends BaseMigrationService
                 $layout[$key] = $fieldIds;
             }
 
-            $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+            $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
             $fieldLayout->type = ElementType::User;
 
-            craft()->fields->deleteLayoutsByType(ElementType::User);
+            Craft::$app->fields->deleteLayoutsByType(ElementType::User);
 
-            if (craft()->fields->saveLayout($fieldLayout)) {
+            if (Craft::$app->fields->saveLayout($fieldLayout)) {
 
             } else {
                 $this->addError('error', Craft::t('Couldn’t save user fields.'));
@@ -169,7 +169,7 @@ class UserGroupsService extends BaseMigrationService
      */
     private function getGroupPermissionHandles($id)
     {
-        $permissions = craft()->userPermissions->getPermissionsByGroupId($id);
+        $permissions = Craft::$app->userPermissions->getPermissionsByGroupId($id);
         $permissions = MigrationManagerHelper::getPermissionHandles($permissions);
 
         return $permissions;

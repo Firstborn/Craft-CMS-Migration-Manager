@@ -7,7 +7,7 @@ use craft\base\Component;
 /**
  * Class MigrationManager_BaseMigrationService
  */
-abstract class BaseMigrationService extends Component implements IMigrationService
+abstract class BaseMigration extends Component implements IMigrationService
 {
     /**
      * @var array

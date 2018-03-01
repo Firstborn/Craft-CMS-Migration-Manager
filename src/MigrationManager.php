@@ -3,16 +3,23 @@
 namespace firstborn\migrationmanager;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Plugin;
+use craft\elements\Entry;
 use craft\events\RegisterUrlRulesEvent;
+use craft\events\RegisterElementActionsEvent;
 use craft\web\UrlManager;
+use craft\web\View;
+
 
 use yii\base\Event;
-use craft\web\View;
+
 use firstborn\migrationmanager\assetbundles\cpsidebar\CpSideBarAssetBundle;
 use firstborn\migrationmanager\assetbundles\cpglobals\CpGlobalsAssetBundle;
-use firstborn\migrationmanager\services\MigrationsService as MigrationsService;
-
+use firstborn\migrationmanager\actions\MigrateCategoryElementAction;
+use firstborn\migrationmanager\actions\MigrateEntryElementAction;
+use firstborn\migrationmanager\actions\MigrateUserElementAction;
+use firstborn\migrationmanager\services\Migrations as MigrationsService;
 
 
 /**
@@ -31,53 +38,6 @@ use firstborn\migrationmanager\services\MigrationsService as MigrationsService;
 
 class MigrationManager extends Plugin
 {
-    /**
-     * {@inheritdoc}
-     */
-    /*public function getName()
-    {
-        return Craft::t('Migration Manager');
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function getVersion()
-    {
-        return '1.0.8.6';
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function getDeveloper()
-    {
-        return 'Derrick Grigg';
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function getDeveloperUrl()
-    {
-        return 'https://www.firstborn.com';
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function getReleaseFeedUrl()
-    {
-        return 'https://raw.githubusercontent.com/Firstborn/Craft-CMS-Migration-Manager/master/releases.json';
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function getDocumentationUrl()
-    {
-        return 'https://github.com/Firstborn/Craft-CMS-Migration-Manager/tree/master/README.md';
-    }*/
 
     // Static Properties
     // =========================================================================
@@ -110,34 +70,39 @@ class MigrationManager extends Plugin
         self::$plugin = $this;
 
         $this->setComponents([
-            'migrations' => \firstborn\migrationmanager\services\MigrationsService::class,
-            'locales' => \firstborn\migrationmanager\services\LocalesService::class,
-            'fields' => \firstborn\migrationmanager\services\FieldsService::class,
-            'sections' => \firstborn\migrationmanager\services\SectionsService::class,
-            'assetVolumes' => \firstborn\migrationmanager\services\AssetVolumesService::class,
-            'assetTransforms' => \firstborn\migrationmanager\services\AssetTransformsService::class,
-            'globals' => \firstborn\migrationmanager\services\GlobalsService::class,
-            'tags' => \firstborn\migrationmanager\services\TagsService::class,
-            'categories' => \firstborn\migrationmanager\services\CategoriesService::class,
-            'routes' => \firstborn\migrationmanager\services\RoutesService::class,
-            'userGroups' => \firstborn\migrationmanager\services\UserGroupsService::class,
-            'emailMessages' => \firstborn\migrationmanager\services\EmailMessagesService::class,
-            'categoriesContent' => \firstborn\migrationmanager\services\CategoriesContentService::class,
-            'entriesContent' => \firstborn\migrationmanager\services\EntriesContentService::class,
-            'globalsContent' => \firstborn\migrationmanager\services\GlobalsContentService::class,
-            'usersContent' => \firstborn\migrationmanager\services\UsersContentService::class,
-
+            'migrations' => \firstborn\migrationmanager\services\Migrations::class,
+            'locales' => \firstborn\migrationmanager\services\Locales::class,
+            'fields' => \firstborn\migrationmanager\services\Fields::class,
+            'sections' => \firstborn\migrationmanager\services\Sections::class,
+            'assetVolumes' => \firstborn\migrationmanager\services\AssetVolumes::class,
+            'assetTransforms' => \firstborn\migrationmanager\services\AssetTransforms::class,
+            'globals' => \firstborn\migrationmanager\services\Globals::class,
+            'tags' => \firstborn\migrationmanager\services\Tags::class,
+            'categories' => \firstborn\migrationmanager\services\Categories::class,
+            'routes' => \firstborn\migrationmanager\services\Routes::class,
+            'userGroups' => \firstborn\migrationmanager\services\UserGroups::class,
+            'emailMessages' => \firstborn\migrationmanager\services\EmailMessages::class,
+            'categoriesContent' => \firstborn\migrationmanager\services\CategoriesContent::class,
+            'entriesContent' => \firstborn\migrationmanager\services\EntriesContent::class,
+            'globalsContent' => \firstborn\migrationmanager\services\GlobalsContent::class,
+            'usersContent' => \firstborn\migrationmanager\services\UsersContent::class,
         ]);
-
-
 
         // Register our CP routes
         Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
+                $event->rules['migrationmanager/migrations'] = 'migrationmanager/cp/migrations';
                 $event->rules['migrationmanager'] = 'migrationmanager/cp/index';
-               
+
+            }
+        );
+
+        // Register Element Actions
+        Event::on(Entry::class, Element::EVENT_REGISTER_ACTIONS,
+            function(RegisterElementActionsEvent $event) {
+                $event->actions[] = MigrateEntryElementAction::class;
             }
         );
 
@@ -169,21 +134,21 @@ class MigrationManager extends Plugin
 
          // check we have a cp request as we don't want to this js to run anywhere but the cp
         // and while we're at it check for a logged in user as well
-        if ( craft()->request->isCpRequest() && craft()->userSession->isLoggedIn()) {
+        if ( Craft::$app->request->isCpRequest() && Craft::$app->userSession->isLoggedIn()) {
 
             // add a Create Migration button to the globals screen
-            if (craft()->request->getSegment(1) == 'globals' ) {
+            if (Craft::$app->request->getSegment(1) == 'globals' ) {
                 // the includeJsResource method will add a js file to the bottom of the page
-                craft()->templates->includeJsResource('migrationmanager/js/MigrationManagerGlobalsExport.js');
-                craft()->templates->includeJs("new Craft.MigrationManagerGlobalsExport();");
+                Craft::$app->templates->includeJsResource('migrationmanager/js/MigrationManagerGlobalsExport.js');
+                Craft::$app->templates->includeJs("new Craft.MigrationManagerGlobalsExport();");
             }
 
             //show alert on sidebar if migrations are pending
-            $pendingMigrations = count(craft()->migrationManager_migrations->getNewMigrations());
+            $pendingMigrations = count(Craft::$app->migrationManager_migrations->getNewMigrations());
             if ($pendingMigrations > 0) {
-                craft()->templates->includeCssResource('migrationmanager/css/styles.css');
-                craft()->templates->includeJsResource('migrationmanager/js/MigrationManagerSideBar.js');
-                craft()->templates->includeJs("new Craft.MigrationManagerSideBar({$pendingMigrations});");
+                Craft::$app->templates->includeCssResource('migrationmanager/css/styles.css');
+                Craft::$app->templates->includeJsResource('migrationmanager/js/MigrationManagerSideBar.js');
+                Craft::$app->templates->includeJs("new Craft.MigrationManagerSideBar({$pendingMigrations});");
             }
         }*/
 
@@ -193,65 +158,10 @@ class MigrationManager extends Plugin
     {
         $item = parent::getCpNavItem();
         $item['subnav'] = [
-            'create' => ['label' => 'Create', 'url' => 'migrationmanager/create'],
-            'pending' => ['label' => 'Pending', 'url' => 'migrationmanager/pending'],
-            'logs' => ['label' => 'Logs', 'url' => 'migrationmanager/logs'],
+            'create' => ['label' => 'Create', 'url' => 'migrationmanager'],
+            'migrations' => ['label' => 'Migrations', 'url' => 'migrationmanager/migrations']
         ];
         return $item;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-   /* public function hasCpSection()
-    {
-        return true;
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-   /*/ public function registerCpRoutes()
-    {
-        return array(
-            'migrationmanager' => array('action' => 'migrationManager/index'),
-            'migrationmanager/create' => array('action' => 'migrationManager/create'),
-            'migrationmanager/pending' => array('action' => 'migrationManager/pending'),
-            'migrationmanager/applied' => array('action' => 'migrationManager/applied'),
-            'migrationmanager/logs' => array('action' => 'migrationManager/logs'),
-        );
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function addEntryActions($source)
-    {
-        return array(
-            'Migrate',
-            new MigrationManager_MigrateEntryElementAction(),
-        );
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-   /* public function addCategoryActions($source)
-    {
-        return array(
-            'Migrate',
-            new MigrationManager_MigrateCategoryElementAction(),
-        );
-    }*/
-
-    /**
-     * {@inheritdoc}
-     */
-    /*public function addUserActions($source)
-    {
-        return array(
-            'Migrate',
-            new MigrationManager_MigrateUserElementAction(),
-        );
-    }*/
 }

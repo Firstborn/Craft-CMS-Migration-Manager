@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class EmailMessagesService extends BaseMigrationService
+class EmailMessages extends BaseMigration
 {
     protected $source = 'settingsEmailMessages';
     protected $destination = 'emailMessages';
@@ -11,21 +11,21 @@ class EmailMessagesService extends BaseMigrationService
     {
         //ignore incoming ids are grab all messages
         $messages = array();
-        $locales = craft()->i18n->getSiteLocaleIds();
+        $locales = Craft::$app->i18n->getSiteLocaleIds();
 
         foreach($locales as $locale)
         {
-            $localeMessages = craft()->emailMessages->getAllMessages($locale);
+            $localeMessages = Craft::$app->emailMessages->getAllMessages($locale);
             foreach ($localeMessages as $message)
             {
                 $this->addManifest($message->key);
 
-                $m = craft()->emailMessages->getMessage($message->key, $locale);
+                $m = Craft::$app->emailMessages->getMessage($message->key, $locale);
                 $messages[] = $this->exportItem($m);
             }
         }
 
-        $settings = craft()->systemSettings->getSettings('email');
+        $settings = Craft::$app->systemSettings->getSettings('email');
 
         return array(
             'settings' => $settings,
@@ -49,7 +49,7 @@ class EmailMessagesService extends BaseMigrationService
             $this->importItem($message);
         }
 
-        if (craft()->systemSettings->saveSettings('email', $data['settings']))
+        if (Craft::$app->systemSettings->saveSettings('email', $data['settings']))
         {
         } else {
             $this->addError('error', 'Could not save email settings');
@@ -60,7 +60,7 @@ class EmailMessagesService extends BaseMigrationService
     public function importItem(Array $data)
     {
         $msg = $this->createModel($data);
-        if (craft()->emailMessages->saveMessage($msg))
+        if (Craft::$app->emailMessages->saveMessage($msg))
         {
 
         }

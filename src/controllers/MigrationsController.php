@@ -18,11 +18,6 @@ class MigrationsController extends Controller
      */
     public function actionCreateMigration()
     {
-
-        //Craft::$app->getSession()->setError(Craft::t('migrationmanager', 'Migration created'));
-        //Craft::$app->getSession()->setNotice(Craft::t('migrationmanager', 'Migration created'));
-        //return $this->renderTemplate('migrationmanager/index');
-
         // Prevent GET Requests
         $this->requirePostRequest();
         $request = Craft::$app->getRequest();
@@ -35,7 +30,7 @@ class MigrationsController extends Controller
             Craft::$app->getSession()->setError(Craft::t('migrationmanager', 'Could not create migration, check log tab for errors.'));
         }
 
-        $this->redirectToPostedUrl();
+        return $this->redirectToPostedUrl();
     }
 
     /**
@@ -44,28 +39,56 @@ class MigrationsController extends Controller
     public function actionCreateGlobalsContentMigration()
     {
         $this->requirePostRequest();
-        craft()->userSession->requireAdmin();
+        Craft::$app->userSession->requireAdmin();
 
         $globalSet = new GlobalSetModel();
 
         // Set the simple stuff
-        $globalSet->id = craft()->request->getPost('setId');
-        $globalSet->name = craft()->request->getPost('name');
-        $globalSet->handle = craft()->request->getPost('handle');
+        $globalSet->id = Craft::$app->request->getPost('setId');
+        $globalSet->name = Craft::$app->request->getPost('name');
+        $globalSet->handle = Craft::$app->request->getPost('handle');
 
         // Set the field layout
-        $fieldLayout = craft()->fields->assembleLayoutFromPost();
+        $fieldLayout = Craft::$app->fields->assembleLayoutFromPost();
         $fieldLayout->type = ElementType::GlobalSet;
         $globalSet->setFieldLayout($fieldLayout);
 
-        $params['global'] = array(craft()->request->getPost('setId'));
+        $params['global'] = array(Craft::$app->request->getPost('setId'));
 
-        if (craft()->migrationManager_migrations->createContentMigration($params)) {
-            craft()->userSession->setNotice(Craft::t('Migration created.'));
+        if (Craft::$app->migrationManager_migrations->createContentMigration($params)) {
+            Craft::$app->userSession->setNotice(Craft::t('Migration created.'));
         } else {
-            craft()->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
+            Craft::$app->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
         }
 
         $this->redirectToPostedUrl($globalSet);
     }
+
+    /**
+     * @throws HttpException
+     */
+    public function actionStart()
+    {
+        $this->requirePostRequest();
+
+        $plugin = MigrationManager::getInstance();
+        $request = Craft::$app->getRequest();
+        $post = $request->post();
+
+        $data = array(
+            'data' => array(
+                'handle' => Craft::$app->security->hashData($plugin->getHandle()),
+                'uid' => Craft::$app->security->hashData(StringHelper::UUID()),
+                'migrations' =>  $post['migration']
+            ),
+        );
+
+        //$this->renderTemplate('migrationManager/migrations', array('pending' => $pending, 'applied' => $applied));
+
+        return $this->renderTemplate('migrationManager/actions/run', $data);
+    }
+
+
+
+
 }

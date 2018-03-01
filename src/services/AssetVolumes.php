@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class AssetVolumesService extends BaseMigrationService
+class AssetVolumes extends BaseMigration
 {
     /**
      * @var string
@@ -22,7 +22,7 @@ class AssetVolumesService extends BaseMigrationService
      */
     public function exportItem($id, $fullExport = false)
     {
-        $source = craft()->assetSources->getSourceById($id);
+        $source = Craft::$app->assetSources->getSourceById($id);
         if (!$source) {
             return false;
         }
@@ -47,9 +47,9 @@ class AssetVolumesService extends BaseMigrationService
                 $newSource['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newSource['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    $newSource['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     if ($tabField->required) {
-                        $newSource['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        $newSource['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     }
                 }
             }
@@ -72,7 +72,7 @@ class AssetVolumesService extends BaseMigrationService
         }
 
         $source = $this->createModel($data);
-        $result = craft()->assetSources->saveSource($source);
+        $result = Craft::$app->assetSources->saveSource($source);
 
         return $result;
     }
@@ -99,7 +99,7 @@ class AssetVolumesService extends BaseMigrationService
             $requiredFields = array();
             if (array_key_exists('requiredFields', $data)) {
                 foreach ($data['requiredFields'] as $handle) {
-                    $field = craft()->fields->getFieldByHandle($handle);
+                    $field = Craft::$app->fields->getFieldByHandle($handle);
                     if ($field) {
                         $requiredFields[] = $field->id;
                     }
@@ -110,7 +110,7 @@ class AssetVolumesService extends BaseMigrationService
             foreach ($data['fieldLayout'] as $key => $fields) {
                 $fieldIds = array();
                 foreach ($fields as $field) {
-                    $existingField = craft()->fields->getFieldByHandle($field);
+                    $existingField = Craft::$app->fields->getFieldByHandle($field);
                     if ($existingField) {
                         $fieldIds[] = $existingField->id;
                     } else {
@@ -120,7 +120,7 @@ class AssetVolumesService extends BaseMigrationService
                 $layout[$key] = $fieldIds;
             }
 
-            $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+            $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
             $fieldLayout->type = ElementType::Asset;
             $source->fieldLayout = $fieldLayout;
         }

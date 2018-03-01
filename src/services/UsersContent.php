@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class UsersContentService extends BaseContentMigrationService
+class UsersContent extends BaseContentMigration
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class UsersContentService extends BaseContentMigrationService
      */
     public function exportItem($id, $fullExport = false)
     {
-        $user = craft()->users->getUserById($id);
+        $user = Craft::$app->users->getUserById($id);
 
         $this->addManifest($id);
 
@@ -42,7 +42,7 @@ class UsersContentService extends BaseContentMigrationService
      */
     public function importItem(Array $data)
     {
-        $user = craft()->users->getUserByUsernameOrEmail($data['username']);
+        $user = Craft::$app->users->getUserByUsernameOrEmail($data['username']);
 
         if ($user) {
             $data['id'] = $user->id;
@@ -50,13 +50,13 @@ class UsersContentService extends BaseContentMigrationService
         $user = $this->createModel($data);
 
         // save user
-        if (craft()->users->saveUser($user)) {
+        if (Craft::$app->users->saveUser($user)) {
 
             $groups = $this->getUserGroupIds($data['groups']);
-            craft()->userGroups->assignUserToGroups($user->id, $groups);
+            Craft::$app->userGroups->assignUserToGroups($user->id, $groups);
 
             $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
-            craft()->userPermissions->saveUserPermissions($user->id, $permissions);
+            Craft::$app->userPermissions->saveUserPermissions($user->id, $permissions);
         } else {
             throw new Exception(print_r($user->getErrors(), true));
         }
@@ -104,7 +104,7 @@ class UsersContentService extends BaseContentMigrationService
         $userGroups = [];
 
         foreach ($groups as $group) {
-            $userGroup = craft()->userGroups->getGroupByHandle($group);
+            $userGroup = Craft::$app->userGroups->getGroupByHandle($group);
             $userGroups[] = $userGroup->id;
         }
 
@@ -131,7 +131,7 @@ class UsersContentService extends BaseContentMigrationService
      */
     private function getUserPermissionHandles(&$content, $element)
     {
-        $permissions = craft()->userPermissions->getPermissionsByUserId($element->id);
+        $permissions = Craft::$app->userPermissions->getPermissionsByUserId($element->id);
         $permissions = MigrationManagerHelper::getPermissionHandles($permissions);
         $content['permissions'] = $permissions;
     }

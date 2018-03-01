@@ -14,7 +14,7 @@ class MigrationManagerHelper
      */
     public static function getTransformById($id)
     {
-        $transforms = craft()->assetTransforms->getAllTransforms();
+        $transforms = Craft::$app->assetTransforms->getAllTransforms();
         foreach ($transforms as $key => $transform) {
             if ($transform->id == $id) {
                 return $transform;
@@ -31,9 +31,9 @@ class MigrationManagerHelper
      */
     public static function getAssetSourceByFolderId($id)
     {
-        $folder = craft()->assets->getFolderById($id);
+        $folder = Craft::$app->assets->getFolderById($id);
         if ($folder) {
-            $source = craft()->assetSources->getSourceById($folder->sourceId);
+            $source = Craft::$app->assetSources->getSourceById($folder->sourceId);
             if ($source) {
                 return $source;
             }
@@ -49,7 +49,7 @@ class MigrationManagerHelper
      */
     public static function getAssetSourceByHandle($handle)
     {
-        $sources = craft()->assetSources->getAllSources();
+        $sources = Craft::$app->assetSources->getAllSources();
         foreach ($sources as $source) {
             if ($source->handle == $handle) {
                 return $source;
@@ -67,7 +67,7 @@ class MigrationManagerHelper
      */
     public static function getFieldByHandleContext($handle, $context)
     {
-        $fields = craft()->fields->getAllFields(null, $context);
+        $fields = Craft::$app->fields->getAllFields(null, $context);
         foreach ($fields as $field) {
             if ($field->handle == $handle) {
                 return $field;
@@ -85,7 +85,7 @@ class MigrationManagerHelper
      */
     public static function getMatrixBlockType($handle, $fieldId)
     {
-        $blockTypes = craft()->matrix->getBlockTypesByFieldId($fieldId);
+        $blockTypes = Craft::$app->matrix->getBlockTypesByFieldId($fieldId);
         foreach ($blockTypes as $block) {
             if ($block->handle == $handle) {
                 return $block;
@@ -103,7 +103,7 @@ class MigrationManagerHelper
      */
     public static function getNeoBlockType($handle, $fieldId)
     {
-        $blockTypes = craft()->neo->getBlockTypesByFieldId($fieldId);
+        $blockTypes = Craft::$app->neo->getBlockTypesByFieldId($fieldId);
         foreach ($blockTypes as $block) {
             if ($block->handle == $handle) {
                 return $block;
@@ -128,10 +128,10 @@ class MigrationManagerHelper
             $folderCriteria->name = $element['folder'];
             $folderCriteria->sourceId = $source->id;
 
-            $folder = craft()->assets->findFolder($folderCriteria);
+            $folder = Craft::$app->assets->findFolder($folderCriteria);
             if ($folder) {
 
-                $criteria = craft()->elements->getCriteria(ElementType::Asset);
+                $criteria = Craft::$app->elements->getCriteria(ElementType::Asset);
                 $criteria->sourceId = $source->id;
                 $criteria->folderId = $folder->id;
                 $criteria->filename = $element['filename'];
@@ -154,10 +154,10 @@ class MigrationManagerHelper
      */
     public static function getCategoryByHandle($element)
     {
-        $categoryGroup = craft()->categories->getGroupByHandle($element['category']);
+        $categoryGroup = Craft::$app->categories->getGroupByHandle($element['category']);
         if ($categoryGroup) {
 
-            $criteria = craft()->elements->getCriteria(ElementType::Category);
+            $criteria = Craft::$app->elements->getCriteria(ElementType::Category);
             $criteria->groupId = $categoryGroup->id;
             $criteria->slug = $element['slug'];
 
@@ -178,10 +178,10 @@ class MigrationManagerHelper
      */
     public static function getEntryByHandle($element)
     {
-        $section = craft()->sections->getSectionByHandle($element['section']);
+        $section = Craft::$app->sections->getSectionByHandle($element['section']);
         if ($section) {
 
-            $criteria = craft()->elements->getCriteria(ElementType::Entry);
+            $criteria = Craft::$app->elements->getCriteria(ElementType::Entry);
             $criteria->slug = $element['slug'];
             $criteria->sectionId = $section->id;
 
@@ -201,7 +201,7 @@ class MigrationManagerHelper
      */
     public static function getUserByHandle($element)
     {
-        $user = craft()->users->getUserByUsernameOrEmail($element['username']);
+        $user = Craft::$app->users->getUserByUsernameOrEmail($element['username']);
         if ($user) {
             return $user;
         }
@@ -217,10 +217,10 @@ class MigrationManagerHelper
      */
     public static function getTagByHandle($element)
     {
-        $group = craft()->tags->getTagGroupByHandle($element['group']);
+        $group = Craft::$app->tags->getTagGroupByHandle($element['group']);
         if ($group) {
 
-            $criteria = craft()->elements->getCriteria(ElementType::Tag);
+            $criteria = Craft::$app->elements->getCriteria(ElementType::Tag);
             $criteria->groupId = $group->id;
             $criteria->slug = 'tag1';
 
@@ -245,11 +245,11 @@ class MigrationManagerHelper
                 $element = null;
 
                 if (preg_match('/entries|entrydrafts/', $permissionParts[0])) {
-                    $element = craft()->sections->getSectionByHandle($permissionParts[1]);
+                    $element = Craft::$app->sections->getSectionByHandle($permissionParts[1]);
                 } elseif (preg_match('/assetsource/', $permissionParts[0])) {
                     $element = MigrationManagerHelper::getAssetSourceByHandle($permissionParts[1]);
                 } elseif (preg_match('/categories/', $permissionParts[0])) {
-                    $element = craft()->categories->getGroupByHandle($permissionParts[1]);
+                    $element = Craft::$app->categories->getGroupByHandle($permissionParts[1]);
                 }
 
                 if ($element != null) {
@@ -275,11 +275,11 @@ class MigrationManagerHelper
                 $element = null;
 
                 if (preg_match('/entries|entrydrafts/', $permissionParts[0])) {
-                    $element = craft()->sections->getSectionById($permissionParts[1]);
+                    $element = Craft::$app->sections->getSectionById($permissionParts[1]);
                 } elseif (preg_match('/assetsource/', $permissionParts[0])) {
-                    $element = craft()->assetSources->getSourceById($permissionParts[1]);
+                    $element = Craft::$app->assetSources->getSourceById($permissionParts[1]);
                 } elseif (preg_match('/categories/', $permissionParts[0])) {
-                    $element = craft()->categories->getGroupById($permissionParts[1]);
+                    $element = Craft::$app->categories->getGroupById($permissionParts[1]);
                 }
 
                 if ($element != null) {

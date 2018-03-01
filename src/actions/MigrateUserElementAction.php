@@ -1,8 +1,9 @@
 <?php
 
-namespace Craft;
+namespace firstborn\migrationmanager\actions;
+use Craft;
 
-class MigrationManager_MigrateUserElementAction extends BaseElementAction
+class MigrateUserElementAction extends BaseElementAction
 {
     /**
      * {@inheritdoc}
@@ -18,7 +19,7 @@ class MigrationManager_MigrateUserElementAction extends BaseElementAction
     public function performAction(ElementCriteriaModel $criteria)
     {
         $params['user'] = $criteria->ids();
-        if (craft()->migrationManager_migrations->createContentMigration($params)) {
+        if (Craft::$app->migrationManager_migrations->createContentMigration($params)) {
 
             $this->setMessage(Craft::t('Migration created.'));
             return true;

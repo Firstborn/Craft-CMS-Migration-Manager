@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class GlobalsContentService extends BaseContentMigrationService
+class GlobalsContent extends BaseContentMigration
 {
     protected $source = 'global';
     protected $destination = 'globals';
@@ -10,7 +10,7 @@ class GlobalsContentService extends BaseContentMigrationService
     public function exportItem($id, $fullExport = false)
     {
 
-        $globalSet = craft()->globals->getSetById($id);
+        $globalSet = Craft::$app->globals->getSetById($id);
         $locales = $globalSet->getLocales();
 
         $content = array(
@@ -22,7 +22,7 @@ class GlobalsContentService extends BaseContentMigrationService
 
 
         foreach($locales as $locale){
-            $set = craft()->globals->getSetById($id, $locale);
+            $set = Craft::$app->globals->getSetById($id, $locale);
 
             $setContent = array(
                 'slug' => $set->handle,
@@ -37,18 +37,18 @@ class GlobalsContentService extends BaseContentMigrationService
 
     public function importItem(Array $data)
     {
-        $globalSet = craft()->globals->getSetByHandle($data['handle']);
+        $globalSet = Craft::$app->globals->getSetByHandle($data['handle']);
 
         foreach($data['locales'] as $key => $value) {
 
-            $set = craft()->globals->getSetById($globalSet->id, $key);
+            $set = Craft::$app->globals->getSetById($globalSet->id, $key);
 
             $this->getSourceIds($value);
             $this->validateImportValues($value);
             $set->setContentFromPost($value);
 
             // save set
-            if (!$success = craft()->globals->saveContent($set)) {
+            if (!$success = Craft::$app->globals->saveContent($set)) {
                 throw new Exception(print_r($set->getErrors(), true));
             }
         }

@@ -3,10 +3,13 @@
 namespace firstborn\migrationmanager\services;
 
 use Craft;
+use craft\models\FieldGroup;
+use craft\db\Query;
 use yii\base\Event;
 use firstborn\migrationmanager\events\FieldEvent;
 
-class FieldsService extends BaseMigrationService
+
+class Fields extends BaseMigration
 {
     // Constants
     // =========================================================================
@@ -50,18 +53,11 @@ class FieldsService extends BaseMigrationService
             'handle' => $field->handle,
             'instructions' => $field->instructions,
             'translationMethod' => $field->translationMethod,
+            'translationKeyFormat' => $field->translationKeyFormat,
             'required' => $field->required,
             'type' => $field->className(),
             'typesettings' => $field->settings
         ];
-
-        /*if ($field->className() == 'PositionSelect') {
-            $options = [];
-            foreach ($newField['typesettings']['options'] as $value) {
-                $options[$value] = true;
-            }
-            $newField['typesettings']['options'] = $options;
-        }*/
 
         if ($field->className() == 'Matrix') {
             $this->getMatrixField($newField, $field->id, $includeID);
@@ -99,7 +95,7 @@ class FieldsService extends BaseMigrationService
     public function importItem(Array $data)
     {
 
-        $existing = craft()->fields->getFieldByHandle($data['handle']);
+        $existing = Craft::$app->fields->getFieldByHandle($data['handle']);
 
         if ($existing) {
             $this->mergeUpdates($data, $existing);
@@ -117,10 +113,9 @@ class FieldsService extends BaseMigrationService
         if ($event->isValid) {
             $field = $this->createModel($event->value);
 
-            $result = craft()->fields->saveField($field);
+            $result = Craft::$app->fields->saveField($field);
             if ($result) {
-
-            } else {
+             } else {
                 $this->addError('error', 'Could not save the ' . $data['handle'] . ' field.');
             }
 
@@ -134,54 +129,53 @@ class FieldsService extends BaseMigrationService
 
     public function createModel(Array $data)
     {
-        $field = new FieldModel();
-        //find group id
-        $field->id = $data['id'];
+        $fieldsService = Craft::$app->getFields();
 
         $group = $this->getFieldGroupByName($data['group']);
         if (!$group){
-            $group = new FieldGroupModel();
+            $group = new FieldGroup();
             $group->name = $data['group'];
-            craft()->fields->saveGroup($group);
+            $fieldsService->saveGroup($group);
         }
 
         //go get any extra settings that need to be set based on handles
         $this->getSettingIds($data);
 
-        $field->groupId = $group->id;
-        $field->name = $data['name'];
-        $field->handle = $data['handle'];
-        $field->instructions = $data['instructions'];
-
-        if (array_key_exists('translatable', $data)) {
-            $field->translationMethod = $data['translationMethod'];
-        }
-        $field->type = $data['type'];
-        $field->settings = $data['typesettings'];
+        $field = $fieldsService->createField([
+            'type' => str_replace('/', '\\', $data['type']),
+            'id' => $data['id'],
+            'groupId' => $group->id,
+            'name' => $data['name'],
+            'handle' => $data['handle'],
+            'instructions' => $data['instructions'],
+            'translationMethod' => $data['translationMethod'],
+            'translationKeyFormat' => $data['translationKeyFormat'],
+            'settings' => $data['typesettings']
+        ]);
 
         return $field;
     }
 
     private function getFieldGroupByName($name)
     {
+        $query = (new Query())
+            ->select(['id', 'name'])
+            ->from(['fieldgroups'])
+            ->orderBy(['name' => SORT_DESC])
+            ->where(['name' => $name]);
 
-        $results = craft()->db->createCommand()->select('id, name')->from('fieldgroups')->order('name')->queryAll();
-        $groups = array();
+        $result = $query->one();
 
-        foreach ($results as $result)
-        {
-            $group = new FieldGroupModel($result);
-            $groups[$group->id] = $group;
+        if ($result){
+            $group = new FieldGroup();
+            $group->id = $result['id'];
+            $group->name = $result['name'];
+            return $group;
+
+
+        } else {
+            return false;
         }
-
-        // Loop through field groups
-        foreach ($groups as $group) {
-            // Return matching group
-            if ($group->name == $name) {
-                return $group;
-            }
-        }
-        return false;
     }
 
     /**
@@ -195,7 +189,7 @@ class FieldsService extends BaseMigrationService
      */
     public function onExportField(Event $event)
     {
-        $this->trigger(FieldsService::EVENT_EXPORT_FIELD, $event);
+        $this->trigger(Fields::EVENT_EXPORT_FIELD, $event);
     }
 
     /**
@@ -210,7 +204,7 @@ class FieldsService extends BaseMigrationService
      */
     public function onExportFieldContent(Event $event)
     {
-        $this->trigger(FieldsService::EVENT_EXPORT_FIELD_CONTENT, $event);
+        $this->trigger(Fields::EVENT_EXPORT_FIELD_CONTENT, $event);
     }
 
     /**
@@ -224,7 +218,7 @@ class FieldsService extends BaseMigrationService
      */
     public function onImportField(Event $event)
     {
-        $this->trigger(FieldsService::EVENT_IMPORT_FIELD, $event);
+        $this->trigger(Fields::EVENT_IMPORT_FIELD, $event);
     }
 
     /**
@@ -239,12 +233,12 @@ class FieldsService extends BaseMigrationService
      */
     public function onImportFieldContent(Event $event)
     {
-        $this->trigger(FieldsService::EVENT_IMPORT_FIELD_CONTENT, $event);
+        $this->trigger(Fields::EVENT_IMPORT_FIELD_CONTENT, $event);
     }
 
     private function getMatrixField(&$newField, $fieldId, $includeID = false)
     {
-        $blockTypes = craft()->matrix->getBlockTypesByFieldId($fieldId);
+        $blockTypes = Craft::$app->matrix->getBlockTypesByFieldId($fieldId);
         $blockCount = 1;
         foreach ($blockTypes as $blockType)
         {
@@ -299,7 +293,7 @@ class FieldsService extends BaseMigrationService
 
     private function getSuperTableField(&$newField, $fieldId, $includeID = false)
     {
-        $blockTypes = craft()->superTable->getBlockTypesByFieldId($fieldId);
+        $blockTypes = Craft::$app->superTable->getBlockTypesByFieldId($fieldId);
         $fieldCount = 1;
         foreach ($blockTypes as $blockType) {
             if ($includeID) {
@@ -343,7 +337,7 @@ class FieldsService extends BaseMigrationService
 
     private function getNeoField(&$newField, $fieldId, $includeID = false)
     {
-        $groups = craft()->neo->getGroupsByFieldId($fieldId);
+        $groups = Craft::$app->neo->getGroupsByFieldId($fieldId);
         if (count($groups)){
             $newField['typesettings']['groups'] = [
                 'name' => [],
@@ -356,7 +350,7 @@ class FieldsService extends BaseMigrationService
             }
         }
 
-        $blockTypes = craft()->neo->getBlockTypesByFieldId($fieldId);
+        $blockTypes = Craft::$app->neo->getBlockTypesByFieldId($fieldId);
         $blockCount = 1;
         foreach ($blockTypes as $blockType)
         {
@@ -386,7 +380,7 @@ class FieldsService extends BaseMigrationService
                     $newField['typesettings']['blockTypes'][$blockId]['fieldLayout'][$tab->name][] = $this->exportItem($tabField->fieldId, true);
                     if ($tabField->required)
                     {
-                        $newField['typesettings']['blockTypes'][$blockId]['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        $newField['typesettings']['blockTypes'][$blockId]['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     }
                 }
             }
@@ -444,14 +438,14 @@ class FieldsService extends BaseMigrationService
             }
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = craft()->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
+                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
                 }
             }
 
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = craft()->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
+                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }
@@ -463,7 +457,7 @@ class FieldsService extends BaseMigrationService
             if (array_key_exists('availableAssetSources', $field['typesettings']) && is_array($field['typesettings']['availableAssetSources'])) {
                 if ($field['typesettings']['availableAssetSources'] !== '*' && $field['typesettings']['availableAssetSources'] != '') {
                     foreach ($field['typesettings']['availableAssetSources'] as $key => $value) {
-                        $source = craft()->assetSources->getSourceById($value);
+                        $source = Craft::$app->assetSources->getSourceById($value);
                         if ($source) {
                             $field['typesettings']['availableAssetSources'][$key] = $source->handle;
                         }
@@ -474,7 +468,7 @@ class FieldsService extends BaseMigrationService
             }
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = craft()->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
+                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
                 }
@@ -482,7 +476,7 @@ class FieldsService extends BaseMigrationService
             }
 
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = craft()->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
+                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }
@@ -493,11 +487,11 @@ class FieldsService extends BaseMigrationService
             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
                 $value = $field['typesettings']['source'];
                 if (substr($value, 0, 6) == 'group:') {
-                    $categories = craft()->categories->getAllGroupIds();
+                    $categories = Craft::$app->categories->getAllGroupIds();
                     $categoryId = intval(substr($value, 6));
                     if (in_array($categoryId, $categories))
                     {
-                        $category = craft()->categories->getGroupById($categoryId);
+                        $category = Craft::$app->categories->getGroupById($categoryId);
                         if ($category) {
                             $field['typesettings']['source'] = $category->handle;
                         } else {
@@ -514,7 +508,7 @@ class FieldsService extends BaseMigrationService
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 8) == 'section:') {
-                        $section = craft()->sections->getSectionById(intval(substr($value, 8)));
+                        $section = Craft::$app->sections->getSectionById(intval(substr($value, 8)));
                         if ($section) {
                             $field['typesettings']['sources'][$key] = $section->handle;
                         }
@@ -531,7 +525,7 @@ class FieldsService extends BaseMigrationService
                 $value = $field['typesettings']['source'];
                 //foreach ($field['typesettings']['source'] as $key => $value) {
                 if (substr($value, 0, 9) == 'taggroup:') {
-                    $tag = craft()->tags->getTagGroupById(intval(substr($value, 9)));
+                    $tag = Craft::$app->tags->getTagGroupById(intval(substr($value, 9)));
                     if ($tag) {
                         $field['typesettings']['source'] = $tag->handle;
                     }
@@ -544,7 +538,7 @@ class FieldsService extends BaseMigrationService
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 6) == 'group:') {
-                        $userGroup = craft()->userGroups->getGroupById(intval(substr($value, 6)));
+                        $userGroup = Craft::$app->userGroups->getGroupById(intval(substr($value, 6)));
                         if ($userGroup) {
                             $field['typesettings']['sources'][$key] = $userGroup->handle;
                         }
@@ -602,7 +596,7 @@ class FieldsService extends BaseMigrationService
                     $fieldIds = [];
                     foreach($fieldLayout as $fieldLayoutField){
                         if($this->importItem($fieldLayoutField)){
-                            $fieldIds[] = craft()->fields->getFieldByHandle($fieldLayoutField['handle'])->id;
+                            $fieldIds[] = Craft::$app->fields->getFieldByHandle($fieldLayoutField['handle'])->id;
                         }
                     }
                     $fieldLayout = $fieldIds;
@@ -617,7 +611,7 @@ class FieldsService extends BaseMigrationService
             if (array_key_exists('availableTransforms', $field['typesettings']) && is_array($field['typesettings']['availableTransforms'])) {
                 $newTransforms = array();
                 foreach ($field['typesettings']['availableTransforms'] as $value) {
-                    $transform = craft()->assetTransforms->getTransformByHandle($value);
+                    $transform = Craft::$app->assetTransforms->getTransformByHandle($value);
                     if ($transform) {
                         $newTransforms[] = $transform->id;
                     }
@@ -693,7 +687,7 @@ class FieldsService extends BaseMigrationService
         }
 
         if ($field['type'] == 'Categories') {
-            $newSource = craft()->categories->getGroupByHandle($field['typesettings']['source']);
+            $newSource = Craft::$app->categories->getGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
                 $newSource = 'group:' . $newSource->id;
             } else {
@@ -706,7 +700,7 @@ class FieldsService extends BaseMigrationService
         if ($field['type'] == 'Entries') {
             $newSources = array();
             foreach ($field['typesettings']['sources'] as $source) {
-                $newSource = craft()->sections->getSectionByHandle($source);
+                $newSource = Craft::$app->sections->getSectionByHandle($source);
                 if ($newSource)
                 {
                     $newSources[] = 'section:' . $newSource->id;
@@ -723,7 +717,7 @@ class FieldsService extends BaseMigrationService
         }
 
         if ($field['type'] == 'Tags') {
-            $newSource = craft()->tags->getTagGroupByHandle($field['typesettings']['source']);
+            $newSource = Craft::$app->tags->getTagGroupByHandle($field['typesettings']['source']);
             if ($newSource) {
                 $newSource = 'taggroup:' . $newSource->id;
             } else {
@@ -735,7 +729,7 @@ class FieldsService extends BaseMigrationService
         if ($field['type'] == 'Users') {
             $newSources = array();
             foreach ($field['typesettings']['sources'] as $source) {
-                $newSource = craft()->userGroups->getGroupByHandle($source);
+                $newSource = Craft::$app->userGroups->getGroupByHandle($source);
                 if ($newSource)
                 {
                     $newSources[] = 'group:' . $newSource->id;
@@ -775,7 +769,7 @@ class FieldsService extends BaseMigrationService
     {
         $newBlockTypes = [];
         $blockTypes = $newField['typesettings']['blockTypes'];
-        $existingBlockTypes = craft()->superTable->getBlockTypesByFieldId($field->id);
+        $existingBlockTypes = Craft::$app->superTable->getBlockTypesByFieldId($field->id);
 
         //there's only one blocktype in SuperTables to deal with
         $blockType = reset($blockTypes);
@@ -796,7 +790,7 @@ class FieldsService extends BaseMigrationService
     private function mergeSuperTableBlockType(&$newBlockType, $existingBlockType)
     {
         $newFields = [];
-        $existingFields = craft()->fields->getAllFields(null, 'superTableBlockType:' . $existingBlockType->id);
+        $existingFields = Craft::$app->fields->getAllFields(null, 'superTableBlockType:' . $existingBlockType->id);
 
         foreach($newBlockType['fields'] as $key => &$tableField)
         {
@@ -860,7 +854,7 @@ class FieldsService extends BaseMigrationService
 
         $fields = $newBlock['fields'];
         $newFields = [];
-        $existingFields = craft()->fields->getAllFields(null, 'matrixBlockType:' . $block->id);
+        $existingFields = Craft::$app->fields->getAllFields(null, 'matrixBlockType:' . $block->id);
 
         foreach($fields as $key => &$field){
             $existingField = $this->getMatrixFieldByHandle($field['handle'], $existingFields);
@@ -890,7 +884,7 @@ class FieldsService extends BaseMigrationService
 
     private function getMatrixBlockByHandle($handle, $id)
     {
-        $blocks = craft()->matrix->getBlockTypesByFieldId($id);
+        $blocks = Craft::$app->matrix->getBlockTypesByFieldId($id);
         foreach($blocks as $block)
         {
             if ($block->handle == $handle){

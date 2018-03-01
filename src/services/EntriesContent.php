@@ -1,20 +1,24 @@
 <?php
 
 namespace firstborn\migrationmanager\services;
+use Craft;
 
-class EntriesContentService extends BaseContentMigrationService
+class EntriesContent extends BaseContentMigration
 {
     protected $source = 'entry';
     protected $destination = 'entries';
 
     public function exportItem($id, $fullExport = false)
     {
-        $primaryEntry = craft()->entries->getEntryById($id);
-        $locales = $primaryEntry->getSection()->getLocales();
+        $primaryEntry = Craft::$app->entries->getEntryById($id);
+
+        $sites = $primaryEntry->getSection()->getSiteIds();
+        //$locales = $primaryEntry->getSection()->getLocales();
+
         $content = array(
             'slug' => $primaryEntry->slug,
             'section' => $primaryEntry->getSection()->handle,
-            'locales' => array()
+            'sites' => array()
         );
 
         $this->addManifest($content['slug']);
@@ -24,15 +28,16 @@ class EntriesContentService extends BaseContentMigrationService
             $content['parent'] = $this->exportItem($primaryEntry->getParent()->id, true);
         }
 
-        foreach($locales as $locale){
-            $entry = craft()->entries->getEntryById($id, $locale->locale);
+        foreach($sites as $siteId){
+            $site = Craft::$app->sites->getSiteById($siteId);
+            $entry = Craft::$app->entries->getEntryById($id, $siteId);
             if ($entry) {
                 $entryContent = array(
                     'slug' => $entry->slug,
                     'section' => $entry->getSection()->handle,
                     'enabled' => $entry->enabled,
-                    'locale' => $entry->locale,
-                    'localeEnabled' => $entry->localeEnabled,
+                    'site' => $site->handle,
+                    'enabledForSite' => $entry->enabledForSite,
                     'postDate' => $entry->postDate,
                     'expiryDate' => $entry->expiryDate,
                     'title' => $entry->title,
@@ -44,7 +49,7 @@ class EntriesContentService extends BaseContentMigrationService
                 }
 
                 $this->getContent($entryContent, $entry);
-                $content['locales'][$locale->locale] = $entryContent;
+                $content['sites'][$site->handle] = $entryContent;
             }
         }
 
@@ -53,7 +58,7 @@ class EntriesContentService extends BaseContentMigrationService
 
     public function importItem(Array $data)
     {
-        $criteria = craft()->elements->getCriteria(ElementType::Entry);
+        $criteria = Craft::$app->elements->getCriteria(ElementType::Entry);
         $criteria->section = $data['section'];
         $criteria->slug = $data['slug'];
         $primaryEntry = $criteria->first();
@@ -63,7 +68,7 @@ class EntriesContentService extends BaseContentMigrationService
             $this->importItem($data['parent']);
         }
 
-        foreach($data['locales'] as $value) {
+        foreach($data['sites'] as $value) {
             if ($primaryEntry) {
                 $value['id'] = $primaryEntry->id;
             }
@@ -74,7 +79,7 @@ class EntriesContentService extends BaseContentMigrationService
             $entry->setContentFromPost($value);
 
            // save entry
-            if (!$success = craft()->entries->saveEntry($entry)) {
+            if (!$success = Craft::$app->entries->saveEntry($entry)) {
 
                 throw new Exception(print_r($entry->getErrors(), true));
             }
@@ -94,7 +99,7 @@ class EntriesContentService extends BaseContentMigrationService
             $entry->id = $data['id'];
         }
 
-        $section = craft()->sections->getSectionByHandle($data['section']);
+        $section = Craft::$app->sections->getSectionByHandle($data['section']);
         $entry->sectionId = $section->id;
 
         $entryType = $this->getEntryType($data['entryType'], $entry->sectionId);
@@ -102,16 +107,16 @@ class EntriesContentService extends BaseContentMigrationService
             $entry->typeId = $entryType->id;
         }
 
-        $entry->locale = $data['locale'];
         $entry->slug = $data['slug'];
         $entry->postDate = $data['postDate'];
         $entry->expiryDate = $data['expiryDate'];
         $entry->enabled = $data['enabled'];
-        $entry->localeEnabled = $data['localeEnabled'];
+        $entry->enabledForSite = $data['enabledForSite'];
+        $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
 
         if (array_key_exists('parent', $data))
         {
-            $criteria = craft()->elements->getCriteria(ElementType::Entry);
+            $criteria = Craft::$app->elements->getCriteria(ElementType::Entry);
             $criteria->slug = $data['parent'];
             $criteria->section = $section;
             $parent = $criteria->first();

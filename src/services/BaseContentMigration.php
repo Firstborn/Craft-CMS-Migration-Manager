@@ -4,7 +4,7 @@ namespace firstborn\migrationmanager\services;
 
 use firstborn\migrationmanager\events\FieldEvent;
 
-abstract class BaseContentMigrationService extends BaseMigrationService
+abstract class BaseContentMigration extends BaseMigration
 {
 
     protected function getContent(&$content, $element){
@@ -115,7 +115,7 @@ abstract class BaseContentMigrationService extends BaseMigrationService
 
     protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
     {
-        $field = craft()->fields->getFieldByHandle($fieldHandle);
+        $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
 
         if ($field) {
             // Fire an 'onImportFieldContent' event
@@ -136,7 +136,7 @@ abstract class BaseContentMigrationService extends BaseMigrationService
                         foreach($fieldValue as $key => &$matrixBlock){
                             $blockType = MigrationManagerHelper::getMatrixBlockType($matrixBlock['type'], $field->id);
                             if ($blockType) {
-                                $blockFields = craft()->fields->getAllFields(null, 'matrixBlockType:' . $blockType->id);
+                                $blockFields = Craft::$app->fields->getAllFields(null, 'matrixBlockType:' . $blockType->id);
                                 foreach($blockFields as &$blockField){
                                     if ($blockField->className() == 'SuperTable') {
                                         $matrixBlockFieldValue = &$matrixBlock['fields'][$blockField->handle];
@@ -154,7 +154,7 @@ abstract class BaseContentMigrationService extends BaseMigrationService
                                 foreach($blockTabs as $blockTab){
                                     $blockFields = $blockTab->getFields();
                                     foreach($blockFields as &$blockTabField){
-                                        $neoBlockField = craft()->fields->getFieldById($blockTabField->fieldId);
+                                        $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId);
                                         if ($neoBlockField->className() == 'SuperTable') {
                                             $neoBlockFieldValue = &$neoBlock['fields'][$neoBlockField->handle];
                                             $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
@@ -175,7 +175,7 @@ abstract class BaseContentMigrationService extends BaseMigrationService
     }
 
     protected function updateSupertableFieldValue(&$fieldValue, $field){
-        $blockType = craft()->superTable->getBlockTypesByFieldId($field->id)[0];
+        $blockType = Craft::$app->superTable->getBlockTypesByFieldId($field->id)[0];
         foreach ($fieldValue as $key => &$value) {
             $value['type'] = $blockType->id;
         }
@@ -206,7 +206,7 @@ abstract class BaseContentMigrationService extends BaseMigrationService
 
     protected function getEntryType($handle, $sectionId)
     {
-        $entryTypes = craft()->sections->getEntryTypesBySectionId($sectionId);
+        $entryTypes = Craft::$app->sections->getEntryTypesBySectionId($sectionId);
         foreach($entryTypes as $entryType)
         {
             if ($entryType->handle == $handle){

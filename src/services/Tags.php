@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class TagsService extends BaseMigrationService
+class Tags extends BaseMigration
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class TagsService extends BaseMigrationService
      */
     public function exportItem($id, $fullExport = false)
     {
-        $tag = craft()->tags->getTagGroupById($id);
+        $tag = Craft::$app->tags->getTagGroupById($id);
 
         if (!$tag) {
             return false;
@@ -43,9 +43,9 @@ class TagsService extends BaseMigrationService
                 $newTag['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newTag['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    $newTag['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     if ($tabField->required) {
-                        $newTag['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        $newTag['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     }
                 }
             }
@@ -59,14 +59,14 @@ class TagsService extends BaseMigrationService
      */
     public function importItem(Array $data)
     {
-        $existing = craft()->tags->getTagGroupByHandle($data['handle']);
+        $existing = Craft::$app->tags->getTagGroupByHandle($data['handle']);
 
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
 
         $tag = $this->createModel($data);
-        $result = craft()->tags->saveTagGroup($tag);
+        $result = Craft::$app->tags->saveTagGroup($tag);
 
         return $result;
     }
@@ -99,7 +99,7 @@ class TagsService extends BaseMigrationService
             $requiredFields = array();
             if (array_key_exists('requiredFields', $data)) {
                 foreach ($data['requiredFields'] as $handle) {
-                    $field = craft()->fields->getFieldByHandle($handle);
+                    $field = Craft::$app->fields->getFieldByHandle($handle);
                     if ($field) {
                         $requiredFields[] = $field->id;
                     }
@@ -110,7 +110,7 @@ class TagsService extends BaseMigrationService
             foreach ($data['fieldLayout'] as $key => $fields) {
                 $fieldIds = array();
                 foreach ($fields as $field) {
-                    $existingField = craft()->fields->getFieldByHandle($field);
+                    $existingField = Craft::$app->fields->getFieldByHandle($field);
                     if ($existingField) {
                         $fieldIds[] = $existingField->id;
                     } else {
@@ -121,7 +121,7 @@ class TagsService extends BaseMigrationService
             }
 
 
-            $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+            $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
             $tag->fieldLayout = $fieldLayout;
         }
 

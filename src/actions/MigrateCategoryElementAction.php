@@ -1,11 +1,11 @@
 <?php
 
-namespace Craft;
-
+namespace firstborn\migrationmanager\actions;
+use Craft;
 /**
  * Class MigrationManager_MigrateCategoryElementAction
  */
-class MigrationManager_MigrateCategoryElementAction extends BaseElementAction
+class MigrateCategoryElementAction extends BaseElementAction
 {
     /**
      * {@inheritdoc}
@@ -22,7 +22,7 @@ class MigrationManager_MigrateCategoryElementAction extends BaseElementAction
     {
         $params['category'] = $criteria->ids();
 
-        if (craft()->migrationManager_migrations->createContentMigration($params)) {
+        if (Craft::$app->migrationManager_migrations->createContentMigration($params)) {
 
             $this->setMessage(Craft::t('Migration created.'));
             return true;

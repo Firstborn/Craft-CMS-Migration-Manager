@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class SectionsService extends BaseMigrationService
+class Sections extends BaseMigration
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class SectionsService extends BaseMigrationService
      */
     public function exportItem($id, $fullExport = false)
     {
-        $section = craft()->sections->getSectionById($id);
+        $section = Craft::$app->sections->getSectionById($id);
 
         if (!$section) {
             return false;
@@ -83,9 +83,9 @@ class SectionsService extends BaseMigrationService
                 $newEntryType['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newEntryType['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    $newEntryType['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     if ($tabField->required) {
-                        $newEntryType['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                        $newEntryType['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     }
                 }
             }
@@ -102,7 +102,7 @@ class SectionsService extends BaseMigrationService
     public function importItem(array $data)
     {
         $result = true;
-        $existing = craft()->sections->getSectionByHandle($data['handle']);
+        $existing = Craft::$app->sections->getSectionByHandle($data['handle']);
 
         if ($existing) {
             $this->mergeUpdates($data, $existing);
@@ -111,12 +111,12 @@ class SectionsService extends BaseMigrationService
         $section = $this->createModel($data);
 
         if ($section) {
-            if (craft()->sections->saveSection($section)) {
+            if (Craft::$app->sections->saveSection($section)) {
                 if (!$existing){
                     //wipe out the default entry type
-                    $defaultEntryType = craft()->sections->getEntryTypesBySectionId($section->id);
+                    $defaultEntryType = Craft::$app->sections->getEntryTypesBySectionId($section->id);
                     if ($defaultEntryType) {
-                        craft()->sections->deleteEntryTypeById($defaultEntryType[0]->id);
+                        Craft::$app->sections->deleteEntryTypeById($defaultEntryType[0]->id);
                     }
                 }
 
@@ -129,7 +129,7 @@ class SectionsService extends BaseMigrationService
 
                     $entryType = $this->createEntryType($newEntryType, $section);
 
-                    if (!craft()->sections->saveEntryType($entryType)) {
+                    if (!Craft::$app->sections->saveEntryType($entryType)) {
                         $result = false;
                     }
                 }
@@ -176,7 +176,7 @@ class SectionsService extends BaseMigrationService
             $locales = array();
             foreach ($data['locales'] as $key => $locale) {
                 //determine if locale exists
-                if (in_array($key, craft()->i18n->getSiteLocaleIds())) {
+                if (in_array($key, Craft::$app->i18n->getSiteLocaleIds())) {
                     if ($section->hasUrls) {
                         $locales[$key] = new SectionLocaleModel(array(
                             'locale' => $key,
@@ -226,7 +226,7 @@ class SectionsService extends BaseMigrationService
         $requiredFields = array();
         if (array_key_exists('requiredFields', $data)) {
             foreach ($data['requiredFields'] as $handle) {
-                $field = craft()->fields->getFieldByHandle($handle);
+                $field = Craft::$app->fields->getFieldByHandle($handle);
                 if ($field) {
                     $requiredFields[] = $field->id;
                 }
@@ -237,7 +237,7 @@ class SectionsService extends BaseMigrationService
         foreach ($data['fieldLayout'] as $key => $fields) {
             $fieldIds = array();
             foreach ($fields as $field) {
-                $existingField = craft()->fields->getFieldByHandle($field);
+                $existingField = Craft::$app->fields->getFieldByHandle($field);
                 if ($existingField) {
                     $fieldIds[] = $existingField->id;
                 }
@@ -245,7 +245,7 @@ class SectionsService extends BaseMigrationService
             $layout[$key] = $fieldIds;
         }
 
-        $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+        $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
         $fieldLayout->type = ElementType::Entry;
         $entryType->fieldLayout = $fieldLayout;
 
@@ -278,7 +278,7 @@ class SectionsService extends BaseMigrationService
      */
     private function getSectionEntryTypeByHandle($handle, $sectionId)
     {
-        $entryTypes = craft()->sections->getEntryTypesBySectionId($sectionId);
+        $entryTypes = Craft::$app->sections->getEntryTypesBySectionId($sectionId);
         foreach ($entryTypes as $entryType) {
             if ($entryType->handle == $handle) {
                 return $entryType;

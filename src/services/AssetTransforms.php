@@ -5,7 +5,7 @@ namespace firstborn\migrationmanager\services;
 /**
  * Class MigrationManager_AssetTransformsService
  */
-class AssetTransformsService extends BaseMigrationService
+class AssetTransforms extends BaseMigration
 {
     /**
      * @var string
@@ -48,13 +48,13 @@ class AssetTransformsService extends BaseMigrationService
 
     public function importItem(Array $data)
     {
-        $existing = craft()->assetTransforms->getTransformByHandle($data['handle']);
+        $existing = Craft::$app->assetTransforms->getTransformByHandle($data['handle']);
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
 
         $transform = $this->createModel($data);
-        $result = craft()->assetTransforms->saveTransform($transform);
+        $result = Craft::$app->assetTransforms->saveTransform($transform);
 
         return $result;
     }

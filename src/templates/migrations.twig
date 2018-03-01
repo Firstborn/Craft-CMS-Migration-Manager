@@ -1,0 +1,92 @@
+{% extends 'migrationManager/_layouts/cp' %}
+
+{% set title = 'Migrations'|t %}
+
+{% set crumbs = [
+    { label: 'Migration Manager', url: url('migrationmanager') },
+    { label: 'Migrations'|t, url: url('migrationmanager/migrations') }
+] %}
+
+{% set tabs = {} %}
+
+{% set tabs = tabs | merge( { pending: {label: 'Pending'|t, url: '#pending'  }}) %}
+{% set tabs = tabs | merge({ applied: {label: 'Applied'|t, url: '#applied' }}) %}
+
+{% block content %}
+
+    <div id="pending">
+
+    {% if pending | length > 0%}
+        <p>
+            {{ 'Select the migration(s) you want to run.'|t }}
+        </p>
+
+        <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+            <input type="hidden" name="action" value="migrationmanager/migrations/start">
+            {{ getCsrfInput() }}
+
+            {% for migration in pending %}
+                <input type="checkbox" id="{{ migration }}" class="checkbox" name="migration[]" value="{{ migration }}">
+                <label for="{{ migration }}">{{ migration }}</label>
+                {% if not loop.last %}<hr>{% endif %}
+            {% endfor %}
+
+
+
+            <div class="buttons clearafter">
+                <button class="btn submit export-btn" name="submit" value="create">
+                    {{ 'Run migrations'|t }}
+                </button>
+            </div>
+
+            <div class="warning">
+                {{ 'If you don\'t make a selection, all migrations will be run.'|t }}
+            </div>
+        </form>
+    {%  else %}
+        <p>{{ 'There are no pending migrations'|t }}</p>
+    {%  endif %}
+
+    </div>
+
+    <div id="applied" class="hidden">
+        {% if applied | length > 0%}
+            <p>
+                {{ 'Select the migration(s) you want to revert.'|t }}
+            </p>
+
+            <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
+                <input type="hidden" name="action" value="migrationManager/revert/start">
+                {{ getCsrfInput() }}
+
+
+
+
+
+                {% for migrationName, migration in applied %}
+                    <input type="checkbox" id="{{ migrationName }}" class="checkbox" name="migration[]" value="{{ migrationName }}">
+                    <label for="{{ migrationName}}">{{ migrationName }}</label>
+                    {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+
+                <div class="buttons clearafter">
+                    <button class="btn submit export-btn" name="submit" value="create">
+                        {{ 'Revert migrations'|t }}
+                    </button>
+                </div>
+
+
+            </form>
+        {%  else %}
+            <p>{{ 'There are no applied migrations'|t }}</p>
+        {%  endif %}
+
+
+    </div>
+{% endblock %}
+
+
+{% do view.registerAssetBundle("firstborn\\migrationmanager\\assetbundles\\cp\\CpAssetBundle") %}
+{% includejs %}
+
+{% endincludejs %}

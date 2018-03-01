@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class GlobalsService extends BaseMigrationService
+class Globals extends BaseMigration
 {
     /**
      * @var string
@@ -19,7 +19,7 @@ class GlobalsService extends BaseMigrationService
      */
     public function exportItem($id, $fullExport = false)
     {
-        $source = craft()->globals->getSetById($id);
+        $source = Craft::$app->globals->getSetById($id);
 
         if (!$source) {
             return false;
@@ -40,9 +40,9 @@ class GlobalsService extends BaseMigrationService
             $newSource['fieldLayout'][$tab->name] = array();
             foreach ($tab->getFields() as $tabField) {
 
-                $newSource['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                $newSource['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                 if ($tabField->required) {
-                    $newSource['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    $newSource['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                 }
             }
         }
@@ -55,13 +55,13 @@ class GlobalsService extends BaseMigrationService
      */
     public function importItem(array $data)
     {
-        $existing = craft()->globals->getSetByHandle($data['handle']);
+        $existing = Craft::$app->globals->getSetByHandle($data['handle']);
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
 
         $set = $this->createModel($data);
-        $result = craft()->globals->saveSet($set);
+        $result = Craft::$app->globals->saveSet($set);
 
         return $result;
     }
@@ -82,7 +82,7 @@ class GlobalsService extends BaseMigrationService
         $requiredFields = array();
         if (array_key_exists('requiredFields', $data)) {
             foreach ($data['requiredFields'] as $handle) {
-                $field = craft()->fields->getFieldByHandle($handle);
+                $field = Craft::$app->fields->getFieldByHandle($handle);
                 if ($field) {
                     $requiredFields[] = $field->id;
                 }
@@ -94,7 +94,7 @@ class GlobalsService extends BaseMigrationService
             $fieldIds = array();
 
             foreach ($fields as $field) {
-                $existingField = craft()->fields->getFieldByHandle($field);
+                $existingField = Craft::$app->fields->getFieldByHandle($field);
 
                 if ($existingField) {
                     $fieldIds[] = $existingField->id;
@@ -105,7 +105,7 @@ class GlobalsService extends BaseMigrationService
             $layout[$key] = $fieldIds;
         }
 
-        $fieldLayout = craft()->fields->assembleLayout($layout, $requiredFields);
+        $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
         $fieldLayout->type = ElementType::GlobalSet;
         $globalSet->setFieldLayout($fieldLayout);
 

@@ -12,7 +12,7 @@ class MigrationManagerVariable
      */
     public function getName()
     {
-        return craft()->plugins->getPlugin('migrationManager')->getName();
+        return Craft::$app->plugins->getPlugin('migrationManager')->getName();
     }
 
     /**
@@ -20,7 +20,7 @@ class MigrationManagerVariable
      */
     public function getNewMigrations()
     {
-        return craft()->migrationManager_migrations->getNewMigrations();
+        return Craft::$app->migrationManager_migrations->getNewMigrations();
     }
 
     /**
@@ -28,7 +28,7 @@ class MigrationManagerVariable
      */
     public function getAppliedMigrations()
     {
-        return craft()->migrationManager_migrations->getAppliedMigrations();
+        return Craft::$app->migrationManager_migrations->getAppliedMigrations();
     }
 
     /**
@@ -36,7 +36,7 @@ class MigrationManagerVariable
      */
     public function getAssetSources()
     {
-        return craft()->assetSources->getAllSources();
+        return Craft::$app->assetSources->getAllSources();
     }
 
     /**
@@ -44,7 +44,7 @@ class MigrationManagerVariable
      */
     public function getAssetTransforms()
     {
-        return craft()->assetTransforms->getAllTransforms();
+        return Craft::$app->assetTransforms->getAllTransforms();
     }
 
     /**
@@ -52,6 +52,6 @@ class MigrationManagerVariable
      */
     public function getAllTagGroups()
     {
-        return craft()->tags->getAllTagGroups();
+        return Craft::$app->tags->getAllTagGroups();
     }
 }

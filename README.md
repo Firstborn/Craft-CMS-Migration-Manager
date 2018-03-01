@@ -108,7 +108,7 @@ For importing custom fields the imported value should match the fields required 
 When using events to modify the import/export of a field be sure to set `$event->performAction = false;` to prevent the default field action from happening. The value you want to be exported/imported must be assigned to the `$event->params['value']` variable.
 
 ```php
-craft()->on('migrationManager_entries.exportField', function(Event $event){
+Craft::$app->on('migrationManager_entries.exportField', function(Event $event){
     $event->params['value'] = 'my value';
     $event->performAction = false;
 });
@@ -119,11 +119,11 @@ This is an example of a custom plugin that listens for the 'migrationManager_fie
 ```php
 public function init()
 {
-    craft()->on('migrationManager_fields.exportField', function(Event $event){
+    Craft::$app->on('migrationManager_fields.exportField', function(Event $event){
         if ($event->params['field']['type'] == 'FruitLinkIt') {
             // replace source ids with handles
             foreach ($event->params['value']['typesettings']['entrySources'] as $key => $value) {
-                $section = craft()->sections->getSectionById(intval(substr($value, 8)));
+                $section = Craft::$app->sections->getSectionById(intval(substr($value, 8)));
                 if ($section) {
                      $event->params['value']['typesettings']['entrySources'][$key] = $section->handle;
                 }
@@ -131,10 +131,10 @@ public function init()
 
             foreach ($event->params['value']['typesettings']['categorySources'] as $key => $value) {
                 if (substr($value, 0, 6) == 'group:') {
-                    $categories = craft()->categories->getAllGroupIds();
+                    $categories = Craft::$app->categories->getAllGroupIds();
                     $categoryId = intval(substr($value, 6));
                     if (in_array($categoryId, $categories)) {
-                        $category = craft()->categories->getGroupById($categoryId);
+                        $category = Craft::$app->categories->getGroupById($categoryId);
                         if ($category) {
                             $event->params['value']['typesettings']['categorySources'][$key] = $category->handle;
                         }
@@ -144,7 +144,7 @@ public function init()
 
             foreach ($event->params['value']['typesettings']['assetSources'] as $key => $value) {
                 if (substr($value, 0, 7) == 'folder:') {
-                    $source = craft()->assetSources->getSourceById(intval(substr($value, 7)));
+                    $source = Craft::$app->assetSources->getSourceById(intval(substr($value, 7)));
                     if ($source) {
                         $event->params['value']['typesettings']['assetSources'][$key] = $source->handle;
                     }
@@ -153,13 +153,13 @@ public function init()
         }
     });
 
-    craft()->on('migrationManager_fields.importField', function(Event $event){
+    Craft::$app->on('migrationManager_fields.importField', function(Event $event){
         if ($event->params['value']['type'] == 'FruitLinkIt') {
             // replace source handles with ids
             if (is_array($event->params['value']['typesettings']['entrySources'])) {
                 $entrySources = [];
                 foreach ($event->params['value']['typesettings']['entrySources'] as $value) {
-                    $source = craft()->sections->getSectionByHandle($value);
+                    $source = Craft::$app->sections->getSectionByHandle($value);
                     if ($source) {
                         $entrySources[] = 'section:' . $source->id;
                     } elseif ($value == 'singles') {
@@ -174,7 +174,7 @@ public function init()
                 $categorySources = [];
                 foreach ($event->params['value']['typesettings']['categorySources'] as $value) {
 
-                    $source = craft()->categories->getGroupByHandle($value);
+                    $source = Craft::$app->categories->getGroupByHandle($value);
                     if ($source) {
                         $categorySources[] = 'group:' . $source->id;
                     }
@@ -198,7 +198,7 @@ public function init()
         }
     });
 
-    craft()->on('migrationManager_fields.exportFieldContent', function(Event $event){
+    Craft::$app->on('migrationManager_fields.exportFieldContent', function(Event $event){
         if ($event->params['field']['type'] == 'FruitLinkIt') {
             // format value to expected LinkIt structure 
             if ($event->params['value'] != '') {
@@ -218,7 +218,7 @@ public function init()
         }
     });
 
-    craft()->on('migrationManager_fieldks.importFieldContent', function(Event $event){
+    Craft::$app->on('migrationManager_fieldks.importFieldContent', function(Event $event){
         if ( $event->params['field']->type == 'RichText'){
             //convert the value to uppercase before import
             $event->params['value'] = strtoupper($event->params['value']);

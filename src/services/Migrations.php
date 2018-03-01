@@ -8,7 +8,7 @@ use craft\helpers\FileHelper;
 use firstborn\migrationmanager\MigrationManager;
 use DateTime;
 
-class MigrationsService extends Component
+class Migrations extends Component
 {
     private $_migrationTable;
 
@@ -143,9 +143,10 @@ class MigrationsService extends Component
         );
 
         $empty = true;
+        $plugin = MigrationManager::getInstance();
 
         foreach ($this->_contentMigrationTypes as $key => $value) {
-            $service = craft()->getComponent($value);
+            $service = $plugin->get($value);
 
             if (array_key_exists($service->getSource(), $data)) {
                 $migration['content'][$service->getDestination()] = $service->export($data[$service->getSource()], true);
@@ -154,7 +155,7 @@ class MigrationsService extends Component
                 if ($service->hasErrors()) {
                     $errors = $service->getErrors();
                     foreach ($errors as $error) {
-                        MigrationManagerPlugin::log($error, LogLevel::Error);
+                        Craft::error($error);
                     }
 
                     return false;
@@ -206,8 +207,8 @@ class MigrationsService extends Component
         $filename = substr($filename, 0, 250);
         $filename = str_replace('-', '_', $filename);
 
-        //$plugin = craft()->plugins->getPlugin('migrationmanager', false);
-        //$migrationPath = craft()->migrations->getMigrationPath($plugin) . '/generated';
+        //$plugin = Craft::$app->plugins->getPlugin('migrationmanager', false);
+        //$migrationPath = Craft::$app->migrations->getMigrationPath($plugin) . '/generated';
         $migrator = Craft::$app->getContentMigrator();
         $migrationPath = $migrator->migrationPath;
 
@@ -220,23 +221,19 @@ class MigrationsService extends Component
             $path = sprintf($migrationPath . '/%s.php', $filename);
         }
 
-        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+        //$migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        //$migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT);
+        Craft::error($migration);
         $content = Craft::$app->view->renderTemplate('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 
         FileHelper::writeToFile($path, $content);
 
         // mark the migration as completed if it's not a blank one
         if (!$empty) {
-            //$plugin = craft()->plugins->getPlugin('migrationmanager');
-            //$pluginInfo = craft()->plugins->getPluginInfo($plugin);
 
-            /*craft()->db->createCommand()->insert($this->_migrationTable, array(
-                'version' => $filename,
-                'applyTime' => DateTimeHelper::currentTimeForDb(),
-                'pluginId' => $pluginInfo['id'],
-            ));*/
 
-            $migrator->addMigrationHistory($filename);
+            //$migrator->addMigrationHistory($filename);
         }
     }
 
@@ -245,12 +242,19 @@ class MigrationsService extends Component
      */
     public function import($data)
     {
-        $data = json_decode($data, true);
+
+        $data = json_decode(str_replace('\\', '\/', $data), true);
+        $plugin = MigrationManager::getInstance();
+
         try {
+
+
             if (array_key_exists('settings', $data)) {
                 // run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
                 foreach ($this->_settingsDependencyTypes as $key => $value) {
-                    $service = craft()->getComponent($value);
+
+                    //$service = Craft::$app->getComponent($value);
+                    $service = $plugin->get($value);
 
                     if (array_key_exists($service->getDestination(), $data['settings']['dependencies'])) {
                         $service->import($data['settings']['dependencies'][$service->getDestination()]);
@@ -258,7 +262,7 @@ class MigrationsService extends Component
                         if ($service->hasErrors()) {
                             $errors = $service->getErrors();
                             foreach ($errors as $error) {
-                                MigrationManagerPlugin::log($error, LogLevel::Error);
+                                Craft::error($error);
                             }
 
                             return false;
@@ -267,7 +271,8 @@ class MigrationsService extends Component
                 }
 
                 foreach ($this->_settingsMigrationTypes as $key => $value) {
-                    $service = craft()->getComponent($value);
+                    //$service = Craft::$app->getComponent($value);
+                    $service = $plugin->get($value);
 
                     if (array_key_exists($service->getDestination(), $data['settings']['elements'])) {
                         $service->import($data['settings']['elements'][$service->getDestination()]);
@@ -275,7 +280,7 @@ class MigrationsService extends Component
                         if ($service->hasErrors()) {
                             $errors = $service->getErrors();
                             foreach ($errors as $error) {
-                                MigrationManagerPlugin::log($error, LogLevel::Error);
+                                Craft::error($error);
                             }
 
                             return false;
@@ -285,9 +290,11 @@ class MigrationsService extends Component
             }
 
             if (array_key_exists('content', $data)) {
+                Craft::error('get content');
 
                 foreach ($this->_contentMigrationTypes as $key => $value) {
-                    $service = craft()->getComponent($value);
+                    //$service = Craft::$app->getComponent($value);
+                    $service = $plugin->get($value);
 
                     if (array_key_exists($service->getDestination(), $data['content'])) {
                         $service->import($data['content'][$service->getDestination()]);
@@ -295,7 +302,7 @@ class MigrationsService extends Component
                         if ($service->hasErrors()) {
                             $errors = $service->getErrors();
                             foreach ($errors as $error) {
-                                MigrationManagerPlugin::log($error, LogLevel::Error);
+                                Craft::error($error);
                             }
 
                             return false;
@@ -304,8 +311,8 @@ class MigrationsService extends Component
                 }
             }
         } catch (\Exception $e) {
-            MigrationManagerPlugin::log('Exception handled: ' . $e->getMessage(), LogLevel::Error);
-
+            Craft::error(json_encode($e));
+            Craft::error('Exception handled: ' . $e->getMessage());
             return false;
         }
 
@@ -321,9 +328,9 @@ class MigrationsService extends Component
     public function runToTop($migrationsToRun = null)
     {
         // This might take a while
-        craft()->config->maxPowerCaptain();
+        Craft::$app->config->maxPowerCaptain();
 
-        $plugin = craft()->plugins->getPlugin('migrationmanager');
+        $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
 
         if (is_array($migrationsToRun)) {
             $migrations = array();
@@ -340,26 +347,25 @@ class MigrationsService extends Component
         $total = count($migrations);
 
         if ($total == 0) {
-            MigrationManagerPlugin::log('No new migration(s) found. Your system is up-to-date.', LogLevel::Info, true);
-
+            Craft::info('No new migration(s) found. Your system is up-to-date.');
             return true;
         }
 
-        MigrationManagerPlugin::log("Total $total new " . ($total === 1 ? 'migration' : 'migrations') . " to be applied for Craft:", LogLevel::Info, true);
+        Craft::info("Total $total new " . ($total === 1 ? 'migration' : 'migrations') . " to be applied for Craft:");
 
         foreach ($migrations as $migration) {
             // Refresh the DB cache
-            craft()->db->getSchema()->refresh();
+            Craft::$app->db->getSchema()->refresh();
 
             if ($this->migrateUp($migration, $plugin) === false) {
-                MigrationManagerPlugin::log('Migration ' . $migration . ' failed . All later migrations are canceled.', LogLevel::Info, true);
+                Craft::info('Migration ' . $migration . ' failed . All later migrations are canceled.');
 
                 // Refresh the DB cache
-                craft()->db->getSchema()->refresh();
+                Craft::$app->db->getSchema()->refresh();
 
                 return false;
             } else {
-                MigrationManagerPlugin::log('Migration ' . $migration . ' successfully ran' . LogLevel::Info, true);
+                Craft::info('Migration ' . $migration . ' successfully ran' . LogLevel::Info, true);
             }
         }
 
@@ -370,7 +376,7 @@ class MigrationsService extends Component
         }
 
         // Refresh the DB cache
-        craft()->db->getSchema()->refresh();
+        Craft::$app->db->getSchema()->refresh();
 
         return true;
     }
@@ -382,11 +388,11 @@ class MigrationsService extends Component
      */
     public function setMigrationsAsNotApplied($migrations)
     {
-        $plugin = craft()->plugins->getPlugin('migrationmanager');
-        $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+        $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
+        $pluginInfo = Craft::$app->plugins->getPluginInfo($plugin);
 
         foreach ($migrations as $migration) {
-            craft()->db->createCommand()->delete($this->_migrationTable, array(
+            Craft::$app->db->createCommand()->delete($this->_migrationTable, array(
                 'version' => $migration,
                 'pluginId' => $pluginInfo['id'],
             ));
@@ -400,14 +406,14 @@ class MigrationsService extends Component
      */
     public function setMigrationsAsApplied($migrations)
     {
-        $plugin = craft()->plugins->getPlugin('migrationmanager');
-        $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+        $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
+        $pluginInfo = Craft::$app->plugins->getPluginInfo($plugin);
 
         foreach ($migrations as $migration) {
-            $plugin = craft()->plugins->getPlugin('migrationmanager');
-            $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+            $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
+            $pluginInfo = Craft::$app->plugins->getPluginInfo($plugin);
 
-            craft()->db->createCommand()->insert($this->_migrationTable, array(
+            Craft::$app->db->createCommand()->insert($this->_migrationTable, array(
                 'version' => $migration,
                 'applyTime' => DateTimeHelper::currentTimeForDb(),
                 'pluginId' => $pluginInfo['id'],
@@ -427,15 +433,15 @@ class MigrationsService extends Component
     {
         $migrations = array();
         if ($plugin == null) {
-            $plugin = craft()->plugins->getPlugin('migrationmanager', false);
+            $plugin = Craft::$app->plugins->getPlugin('migrationmanager', false);
         }
 
-        $migrationPath = craft()->migrations->getMigrationPath($plugin) . 'generated/';
+        $migrationPath = Craft::$app->migrations->getMigrationPath($plugin) . 'generated/';
 
         if (IOHelper::folderExists($migrationPath) && IOHelper::isReadable($migrationPath)) {
             $applied = array();
 
-            foreach (craft()->migrations->getMigrationHistory($plugin) as $migration) {
+            foreach (Craft::$app->migrations->getMigrationHistory($plugin) as $migration) {
                 $applied[] = $migration['version'];
             }
 
@@ -475,15 +481,15 @@ class MigrationsService extends Component
     {
         $migrations = array();
         if ($plugin == null) {
-            $plugin = craft()->plugins->getPlugin('migrationmanager', false);
+            $plugin = Craft::$app->plugins->getPlugin('migrationmanager', false);
         }
 
-        $migrationPath = craft()->migrations->getMigrationPath($plugin) . 'generated/';
+        $migrationPath = Craft::$app->migrations->getMigrationPath($plugin) . 'generated/';
 
         if (IOHelper::folderExists($migrationPath) && IOHelper::isReadable($migrationPath)) {
             $applied = array();
 
-            foreach (craft()->migrations->getMigrationHistory($plugin) as $migration) {
+            foreach (Craft::$app->migrations->getMigrationHistory($plugin) as $migration) {
                 $applied[] = $migration['version'];
             }
 
@@ -520,10 +526,10 @@ class MigrationsService extends Component
      */
     public function getNewMigration($id)
     {
-        $plugin = craft()->plugins->getPlugin('migrationmanager', false);
+        $plugin = Craft::$app->plugins->getPlugin('migrationmanager', false);
 
         $applied = array();
-        foreach (craft()->migrations->getMigrationHistory($plugin) as $migration) {
+        foreach (Craft::$app->migrations->getMigrationHistory($plugin) as $migration) {
             $applied[] = $migration['version'];
         }
 
@@ -551,7 +557,7 @@ class MigrationsService extends Component
      */
     public function getMigration($file, $plugin)
     {
-        $migrationPath = craft()->migrations->getMigrationPath($plugin) . 'generated/';
+        $migrationPath = Craft::$app->migrations->getMigrationPath($plugin) . 'generated/';
         $path = IOHelper::normalizePathSeparators($migrationPath . $file);
         $class = IOHelper::getFileName($path, false);
 
@@ -571,7 +577,7 @@ class MigrationsService extends Component
      */
     private function migrateUp($class, $plugin = null)
     {
-        if ($class === craft()->migrations->getBaseMigration()) {
+        if ($class === Craft::$app->migrations->getBaseMigration()) {
             return null;
         }
 
@@ -586,15 +592,15 @@ class MigrationsService extends Component
 
         if ($migration->up() !== false) {
             if ($plugin) {
-                $pluginInfo = craft()->plugins->getPluginInfo($plugin);
+                $pluginInfo = Craft::$app->plugins->getPluginInfo($plugin);
 
-                craft()->db->createCommand()->insert($this->_migrationTable, array(
+                Craft::$app->db->createCommand()->insert($this->_migrationTable, array(
                     'version' => $class,
                     'applyTime' => DateTimeHelper::currentTimeForDb(),
                     'pluginId' => $pluginInfo['id'],
                 ));
             } else {
-                craft()->db->createCommand()->insert($this->_migrationTable, array(
+                Craft::$app->db->createCommand()->insert($this->_migrationTable, array(
                     'version' => $class,
                     'applyTime' => DateTimeHelper::currentTimeForDb(),
                 ));
@@ -618,7 +624,7 @@ class MigrationsService extends Component
      */
     private function instantiateMigration($class, $plugin = null)
     {
-        $file = IOHelper::normalizePathSeparators(craft()->migrations->getMigrationPath($plugin) . 'generated/' . $class . '.php');
+        $file = IOHelper::normalizePathSeparators(Craft::$app->migrations->getMigrationPath($plugin) . 'generated/' . $class . '.php');
 
         if (!IOHelper::fileExists($file) || !IOHelper::isReadable($file)) {
             MigrationManagerPlugin::log('Tried to find migration file ' . $file . ' for class ' . $class . ', but could not.', LogLevel::Error);
@@ -629,7 +635,7 @@ class MigrationsService extends Component
 
         $class = __NAMESPACE__ . '\\' . $class;
         $migration = new $class;
-        $migration->setDbConnection(craft()->db);
+        $migration->setDbConnection(Craft::$app->db);
 
         return $migration;
     }

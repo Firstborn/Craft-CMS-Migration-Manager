@@ -12,6 +12,6 @@ class MigrationManagerCommand extends BaseCommand
      */
     public function actionRun()
     {
-        craft()->migrationManager_migrations->runToTop();
+        Craft::$app->migrationManager_migrations->runToTop();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace firstborn\migrationmanager\services;
 
-class LocalesService extends BaseMigrationService
+class Locales extends BaseMigration
 {
     /**
      * @var string
@@ -31,10 +31,10 @@ class LocalesService extends BaseMigrationService
      */
     public function importItem(Array $data)
     {
-        $locales = craft()->i18n->getSiteLocaleIds();
+        $locales = Craft::$app->i18n->getSiteLocaleIds();
 
         if (in_array($data['id'], $locales) === false) {
-            $result = craft()->i18n->addSiteLocale($data['id']);
+            $result = Craft::$app->i18n->addSiteLocale($data['id']);
         } else {
             $result = true;
         }

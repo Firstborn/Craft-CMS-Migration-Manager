@@ -1,31 +1,42 @@
 <?php
 
-namespace Craft;
+namespace firstborn\migrationmanager\controllers;
+
+use Craft;
+use craft\web\Controller;
+use firstborn\migrationmanager\MigrationManager;
+
 
 /**
  * Class MigrationManager_RunController
  */
-class MigrationManager_RunController extends BaseController
+class RunController extends Controller
 {
     /**
      * @throws HttpException
      */
     public function actionStart()
     {
+
+
+
         $this->requirePostRequest();
 
-        $plugin = craft()->plugins->getPlugin('migrationmanager');
+        $plugin = MigrationManager::getInstance();
+        $request = Craft::$app->getRequest();
+        $post = $request->post();
 
         $data = array(
             'data' => array(
-                'handle' => craft()->security->hashData($plugin->getClassHandle()),
-                'uid' => craft()->security->hashData(StringHelper::UUID()),
-                'migrations' => craft()->request->getPost('migration'),
-                'applied' => craft()->request->getPost('applied'),
+                'handle' => Craft::$app->security->hashData($plugin->getClassHandle()),
+                'uid' => Craft::$app->security->hashData(StringHelper::UUID()),
+                'migrations' =>  $post('migration')
             ),
         );
 
-        $this->renderTemplate('migrationManager/actions/run', $data);
+        //$this->renderTemplate('migrationManager/migrations', array('pending' => $pending, 'applied' => $applied));
+
+        return $this->renderTemplate('migrationManager/actions/run', $data);
     }
 
     /**
@@ -35,16 +46,16 @@ class MigrationManager_RunController extends BaseController
     {
         $this->requirePostRequest();
 
-        $migrations = craft()->request->getPost('migration');
+        $migrations = Craft::$app->request->getPost('migration');
         if (empty($migrations)) {
 
-            craft()->userSession->setError(Craft::t('You must select a migration to re run'));
+            Craft::$app->userSession->setError(Craft::t('You must select a migration to re run'));
             $this->redirectToPostedUrl();
 
         } else {
 
             // unset the selected migrations
-            craft()->migrationManager_migrations->setMigrationsAsNotApplied($migrations);
+            Craft::$app->migrationManager_migrations->setMigrationsAsNotApplied($migrations);
             $this->actionStart();
         }
     }
@@ -56,12 +67,12 @@ class MigrationManager_RunController extends BaseController
     {
         $this->requirePostRequest();
         $this->requireAjaxRequest();
-        $data = craft()->request->getRequiredPost('data');
+        $data = Craft::$app->request->getRequiredPost('data');
 
         // give a little on screen pause
         sleep(2);
 
-        if (craft()->migrationManager_migrations->runToTop($data['migrations'])) {
+        if (Craft::$app->migrationManager_migrations->runToTop($data['migrations'])) {
             $this->returnJson(array(
                 'alive' => true,
                 'finished' => true,
@@ -86,7 +97,7 @@ class MigrationManager_RunController extends BaseController
         $this->requirePostRequest();
         $this->requireAjaxRequest();
 
-        $data = craft()->request->getRequiredPost('data');
+        $data = Craft::$app->request->getRequiredPost('data');
 
         $this->returnJson(array(
             'alive' => true,
@@ -103,10 +114,10 @@ class MigrationManager_RunController extends BaseController
     {
         $this->requirePostRequest();
         $this->requireAjaxRequest();
-        $data = craft()->request->getRequiredPost('data');
+        $data = Craft::$app->request->getRequiredPost('data');
 
-        if (craft()->config->get('backupDbOnUpdate')) {
-            $return = craft()->updates->backupDatabase();
+        if (Craft::$app->config->get('backupDbOnUpdate')) {
+            $return = Craft::$app->updates->backupDatabase();
 
             MigrationManagerPlugin::log('running database backup', LogLevel::Info);
 
@@ -140,29 +151,29 @@ class MigrationManager_RunController extends BaseController
 
         MigrationManagerPlugin::log('rolling back database', LogLevel::Error);
 
-        $data = craft()->request->getRequiredPost('data');
-        $handle = craft()->security->validateData($data['uid']);
-        $uid = craft()->security->validateData($data['uid']);
+        $data = Craft::$app->request->getRequiredPost('data');
+        $handle = Craft::$app->security->validateData($data['uid']);
+        $uid = Craft::$app->security->validateData($data['uid']);
 
         if (!$uid) {
             throw new Exception(('Could not validate UID'));
         }
 
         if (isset($data['dbBackupPath'])) {
-            $dbBackupPath = craft()->security->validateData($data['dbBackupPath']);
+            $dbBackupPath = Craft::$app->security->validateData($data['dbBackupPath']);
 
             if (!$dbBackupPath) {
                 throw new Exception('Could not validate database backup path.');
             }
 
-            $return = craft()->updates->rollbackUpdate($uid, $handle, $dbBackupPath);
+            $return = Craft::$app->updates->rollbackUpdate($uid, $handle, $dbBackupPath);
         } else {
-            $return = craft()->updates->rollbackUpdate($uid, $handle);
+            $return = Craft::$app->updates->rollbackUpdate($uid, $handle);
         }
 
         //reset the status of the migrations if they were reruns
         if ($data['applied'] == 1) {
-            craft()->migrationManager_migrations->setMigrationsAsApplied($data['migrations']);
+            Craft::$app->migrationManager_migrations->setMigrationsAsApplied($data['migrations']);
         }
 
         if (!$return['success']) {
@@ -172,4 +183,6 @@ class MigrationManager_RunController extends BaseController
 
         $this->returnJson(array('alive' => true, 'finished' => true, 'rollBack' => true));
     }
+
+
 }

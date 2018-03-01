@@ -35,22 +35,22 @@ Make sure that the method returns true or false to indicate migration success. R
 ### Delete a field
 
 ```php
-$field = craft()->fields->getFieldByHandle('fieldHandle');
-return craft()->fields->deleteFieldById($field->id);
+$field = Craft::$app->fields->getFieldByHandle('fieldHandle');
+return Craft::$app->fields->deleteFieldById($field->id);
 ```
 
 ### Delete a section
 
 ```php
-$section = craft()->sections->getSectionByHandle('sectionHandle');
-return craft()->sections->deleteSectionById($section->id);
+$section = Craft::$app->sections->getSectionByHandle('sectionHandle');
+return Craft::$app->sections->deleteSectionById($section->id);
 ```
 
 ### Add category values
 
 ```php
-$categoryGroup = craft()->categories->getGroupByHandle('category');
-$locale = craft()->i18n->getPrimarySiteLocale();
+$categoryGroup = Craft::$app->categories->getGroupByHandle('category');
+$locale = Craft::$app->i18n->getPrimarySiteLocale();
 
 if ($categoryGroup) {
     $category = new CategoryModel();
@@ -65,7 +65,7 @@ if ($categoryGroup) {
     $fieldData = array('plaintext' => 'hello world');
     $category->setContentFromPost($fieldData);
 
-    return craft()->categories->saveCategory($category);
+    return Craft::$app->categories->saveCategory($category);
 } else {
     return false;
 }
@@ -75,18 +75,18 @@ if ($categoryGroup) {
 
 ```php
 $newLocale = 'es_us';
-$locales = craft()->i18n->getSiteLocaleIds();
+$locales = Craft::$app->i18n->getSiteLocaleIds();
 
 if (in_array($newLocale, $locales) === false) {
-    $locale = craft()->i18n->addSiteLocale($newLocale);
+    $locale = Craft::$app->i18n->addSiteLocale($newLocale);
 } else {
-    $locale = craft()->i18n->getLocaleById($newLocale);
+    $locale = Craft::$app->i18n->getLocaleById($newLocale);
 }
 
-$sectionIds = craft()->sections->getAllSectionIds();
+$sectionIds = Craft::$app->sections->getAllSectionIds();
 foreach($sectionIds as $id){
     
-    $section = craft()->sections->getSectionById($id);
+    $section = Craft::$app->sections->getSectionById($id);
     $locales = $section->getLocales();
     $sectionLocale = new SectionLocaleModel(array(
         'locale' => $locale,
@@ -98,7 +98,7 @@ foreach($sectionIds as $id){
     $locales[$newLocale] = $sectionLocale;
     $section->setLocales($locales);
 
-    craft()->sections->saveSection($section);
+    Craft::$app->sections->saveSection($section);
 }
 
 return true;
