@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\elements\Entry;
+use craft\elements\Category;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterElementActionsEvent;
 use craft\web\UrlManager;
@@ -103,6 +104,13 @@ class MigrationManager extends Plugin
         Event::on(Entry::class, Element::EVENT_REGISTER_ACTIONS,
             function(RegisterElementActionsEvent $event) {
                 $event->actions[] = MigrateEntryElementAction::class;
+            }
+        );
+
+        // Register Element Actions
+        Event::on(Category::class, Element::EVENT_REGISTER_ACTIONS,
+            function(RegisterElementActionsEvent $event) {
+                $event->actions[] = MigrateCategoryElementAction::class;
             }
         );
 

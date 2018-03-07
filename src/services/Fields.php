@@ -16,21 +16,26 @@ class Fields extends BaseMigration
 
     /**
      * @event FieldEvent The event that is triggered before a field is exported
+     * You may set [[FieldEvent::isValid]] to `false` to prevent the field from being exported.
      */
+
     const EVENT_EXPORT_FIELD = 'exportField';
 
     /**
      * @event FieldEvent The event that is triggered before a field is imported
+     * You may set [[FieldEvent::isValid]] to `false` to prevent the field from being imported
      */
     const EVENT_IMPORT_FIELD = 'importField';
 
     /**
      * @event FieldEvent The event that is triggered before a field's content is exported
+     * You may set [[FieldEvent::isValid]] to `false` to prevent the content from being exported
      */
     const EVENT_EXPORT_FIELD_CONTENT = 'exportFieldContent';
 
     /**
      * @event FieldEvent The event that is triggered before a field's content is imported
+     * You may set [[FieldEvent::isValid]] to `false` to prevent the content from being imported
      */
     const EVENT_IMPORT_FIELD_CONTENT = 'importFieldContent';
 
@@ -187,9 +192,11 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onExportField(Event $event)
+    public function onExportField(FieldEvent $event)
     {
-        $this->trigger(Fields::EVENT_EXPORT_FIELD, $event);
+        if ($this->hasEventHandlers(self::EVENT_EXPORT_FIELD)) {
+            $this->trigger(self::EVENT_EXPORT_FIELD, $event);
+        }
     }
 
     /**
@@ -202,7 +209,7 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onExportFieldContent(Event $event)
+    public function onExportFieldContent(FieldEvent $event)
     {
         $this->trigger(Fields::EVENT_EXPORT_FIELD_CONTENT, $event);
     }
@@ -216,7 +223,7 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onImportField(Event $event)
+    public function onImportField(FieldEvent $event)
     {
         $this->trigger(Fields::EVENT_IMPORT_FIELD, $event);
     }
@@ -231,7 +238,7 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onImportFieldContent(Event $event)
+    public function onImportFieldContent(FieldEvent $event)
     {
         $this->trigger(Fields::EVENT_IMPORT_FIELD_CONTENT, $event);
     }

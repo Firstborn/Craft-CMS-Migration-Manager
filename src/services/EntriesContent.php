@@ -13,6 +13,7 @@ class EntriesContent extends BaseContentMigration
         $primaryEntry = Craft::$app->entries->getEntryById($id);
 
         $sites = $primaryEntry->getSection()->getSiteIds();
+
         //$locales = $primaryEntry->getSection()->getLocales();
 
         $content = array(

@@ -2,7 +2,11 @@
 
 namespace firstborn\migrationmanager\services;
 
+use firstborn\migrationmanager\MigrationManager;
 use firstborn\migrationmanager\events\FieldEvent;
+use Craft;
+use craft\fields\BaseOptionsField;
+use craft\fields\BaseRelationField;
 
 abstract class BaseContentMigration extends BaseMigration
 {
@@ -15,8 +19,14 @@ abstract class BaseContentMigration extends BaseMigration
 
     protected function getFieldContent(&$content, $fieldModel, $parent)
     {
-        $field = $fieldModel->getField();
+        $field = $fieldModel;//->getField();
         $value = $parent->getFieldValue($field->handle);
+
+        // Fire an 'onExportField' event
+        /*$event = new FieldEvent(array(
+            'field' => $field,
+            'value' => $newField
+        ));*/
 
         // Fire an 'onExportField' event
         $event = new FieldEvent(array(
@@ -94,9 +104,9 @@ abstract class BaseContentMigration extends BaseMigration
                     $value = $value->value;
                     break;
                 default:
-                    if ($field->getFieldType() instanceof BaseElementFieldType) {
+                    if ($field instanceof BaseRelationField) {
                         $this->getSourceHandles($value);
-                    } elseif ($field->getFieldType() instanceof BaseOptionsFieldType){
+                    } elseif ($field instanceof BaseOptionsField){
                         $this->getSelectedOptions($value);
                     }
                     break;
@@ -363,7 +373,7 @@ abstract class BaseContentMigration extends BaseMigration
      *
      * @return null
      */
-    public function onExportFieldContent(Event $event)
+    public function onExportFieldContent(FieldEvent $event)
     {
         //route this through fields service for simplified event listening
         $plugin = MigrationManager::getInstance();
@@ -380,7 +390,7 @@ abstract class BaseContentMigration extends BaseMigration
      *
      * @return null
      */
-    public function onImportFieldContent(Event $event)
+    public function onImportFieldContent(FieldEvent $event)
     {
         //route this through fields service for simplified event listening
         $plugin = MigrationManager::getInstance();

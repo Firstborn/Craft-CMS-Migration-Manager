@@ -2,6 +2,8 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+
 class Sections extends BaseMigration
 {
     /**
@@ -30,33 +32,36 @@ class Sections extends BaseMigration
             'handle' => $section->attributes['handle'],
             'type' => $section->attributes['type'],
             'enableVersioning' => $section->attributes['enableVersioning'],
-            'hasUrls' => $section->attributes['hasUrls'],
-            'template' => $section->attributes['template'],
+
             'maxLevels' => $section->attributes['maxLevels'],
         ];
 
         $this->addManifest($section->attributes['handle']);
 
-        $locales = $section->getLocales();
+        //$locales = $section->getLocales();
+        $siteSettings = $section->getSiteSettings();
 
-        if ((bool)$section->attributes['hasUrls'] === false) {
-            $newSection['locales'] = [];
-            foreach ($locales as $locale => $attributes) {
+        /*if ((bool)$section->attributes['hasUrls'] === false) {
+            $newSection['sites'] = [];
+            foreach ($siteSettings as $siteSetting) {
                 $newSection['locales'][$locale] = $attributes['enabledByDefault'];
             }
-        } else {
+        } else {*/
 
-            $newSection['locales'] = array();
 
-            foreach ($locales as $key => $locale) {
-                $newSection['locales'][$key] = [
-                    'locale' => $locale->locale,
-                    'urlFormat' => $locale->urlFormat,
-                    'nestedUrlFormat' => $locale->nestedUrlFormat,
-                    'enabledByDefault' => $locale->enabledByDefault,
+            $newSection['sites'] = array();
+
+            foreach ($siteSettings as $siteSetting) {
+                $site = Craft::$app->sites->getSiteById($siteSetting->siteId);
+                $newSection['sites'][$site->handle] = [
+                    'site' => $site->handle,
+                    'hasUrls' => $siteSetting->hasUrls,
+                    'uriFormat' => $siteSetting->uriFormat,
+                    'enabledByDefault' => $siteSetting->enabledByDefault,
+                    'template' => $siteSetting->template,
                 ];
             }
-        }
+        //}
 
         $newSection['entrytypes'] = array();
 

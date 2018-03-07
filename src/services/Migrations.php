@@ -231,8 +231,7 @@ class Migrations extends Component
 
         // mark the migration as completed if it's not a blank one
         if (!$empty) {
-
-
+            //TODO turn this back on
             //$migrator->addMigrationHistory($filename);
         }
     }
@@ -242,29 +241,26 @@ class Migrations extends Component
      */
     public function import($data)
     {
+        //$data = json_decode(str_replace('\\', '\/', $data), true);
+        $data = str_replace('\\', '\/', $data);
+        $data = str_replace('\/r', '\r', $data);
+        $data = str_replace('\/n', '\n', $data);
+        $data = json_decode($data, true);
 
-        $data = json_decode(str_replace('\\', '\/', $data), true);
         $plugin = MigrationManager::getInstance();
 
         try {
-
-
             if (array_key_exists('settings', $data)) {
                 // run through dependencies first to create any elements that need to be in place for fields, field layouts and other dependencies
                 foreach ($this->_settingsDependencyTypes as $key => $value) {
-
-                    //$service = Craft::$app->getComponent($value);
                     $service = $plugin->get($value);
-
                     if (array_key_exists($service->getDestination(), $data['settings']['dependencies'])) {
                         $service->import($data['settings']['dependencies'][$service->getDestination()]);
-
                         if ($service->hasErrors()) {
                             $errors = $service->getErrors();
                             foreach ($errors as $error) {
                                 Craft::error($error);
                             }
-
                             return false;
                         }
                     }
@@ -273,16 +269,13 @@ class Migrations extends Component
                 foreach ($this->_settingsMigrationTypes as $key => $value) {
                     //$service = Craft::$app->getComponent($value);
                     $service = $plugin->get($value);
-
                     if (array_key_exists($service->getDestination(), $data['settings']['elements'])) {
                         $service->import($data['settings']['elements'][$service->getDestination()]);
-
                         if ($service->hasErrors()) {
                             $errors = $service->getErrors();
                             foreach ($errors as $error) {
                                 Craft::error($error);
                             }
-
                             return false;
                         }
                     }
@@ -290,21 +283,15 @@ class Migrations extends Component
             }
 
             if (array_key_exists('content', $data)) {
-                Craft::error('get content');
-
                 foreach ($this->_contentMigrationTypes as $key => $value) {
-                    //$service = Craft::$app->getComponent($value);
                     $service = $plugin->get($value);
-
                     if (array_key_exists($service->getDestination(), $data['content'])) {
                         $service->import($data['content'][$service->getDestination()]);
-
                         if ($service->hasErrors()) {
                             $errors = $service->getErrors();
                             foreach ($errors as $error) {
                                 Craft::error($error);
                             }
-
                             return false;
                         }
                     }

@@ -2,6 +2,8 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+
 class CategoriesContent extends BaseContentMigration
 {
     protected $source = 'category';
@@ -10,11 +12,12 @@ class CategoriesContent extends BaseContentMigration
     public function exportItem($id, $fullExport = false)
     {
         $primaryCategory = Craft::$app->categories->getCategoryById($id);
-        $locales = $primaryCategory->getGroup()->getLocales();
+        //$locales = $primaryCategory->getGroup()->getLocales();
+        $sites = $primaryCategory->getGroup()->getSiteSettings();
         $content = array(
             'slug' => $primaryCategory->slug,
             'category' => $primaryCategory->getGroup()->handle,
-            'locales' => array()
+            'sites' => array()
         );
 
         $this->addManifest($content['slug']);
@@ -24,14 +27,15 @@ class CategoriesContent extends BaseContentMigration
             $content['parent'] = $this->exportItem($primaryCategory->getParent()->id, true);
         }
 
-        foreach($locales as $locale){
-            $category = Craft::$app->categories->getCategoryById($id, $locale->locale);
+        foreach($sites as $siteSetting){
+            $site = Craft::$app->sites->getSiteById($siteSetting->siteId);
+            $category = Craft::$app->categories->getCategoryById($id, $site->id);
             $categoryContent = array(
                 'slug' => $category->slug,
                 'category' => $category->getGroup()->handle,
                 'enabled' => $category->enabled,
-                'locale' => $category->locale,
-                'localeEnabled' => $category->localeEnabled,
+                'site' => $site->handle,
+                'enabledForSite' => $category->enabledForSite,
                 'title' => $category->title
             );
 
@@ -41,7 +45,7 @@ class CategoriesContent extends BaseContentMigration
             }
 
             $this->getContent($categoryContent, $category);
-            $content['locales'][$locale->locale] = $categoryContent;
+            $content['sites'][$site->handle] = $categoryContent;
         }
 
         return $content;
