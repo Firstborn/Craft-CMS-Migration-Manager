@@ -58,7 +58,15 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
             }
         }
 
-        return $newCategory;
+        // Fire an 'onExport' event
+        $event = new Event($this, array(
+            'element' => $category,
+            'value' => $newCategory
+        ));
+        if ($fullExport) {
+            $this->onExport($event);
+        }
+        return $event->params['value'];
     }
 
 
@@ -73,6 +81,15 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
 
         $category = $this->createModel($data);
         $result = craft()->categories->saveGroup($category);
+
+        if ($result) {
+            // Fire an 'onImport' event
+            $event = new Event($this, array(
+                'element' => $category,
+                'value' => $data
+            ));
+            $this->onImport($event);
+        }
 
         return $result;
     }
@@ -141,6 +158,7 @@ class MigrationManager_CategoriesService extends MigrationManager_BaseMigrationS
             $category->fieldLayout = $fieldLayout;
 
         }
+
         return $category;
 
     }

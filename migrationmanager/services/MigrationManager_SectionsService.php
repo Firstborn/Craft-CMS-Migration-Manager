@@ -96,7 +96,15 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             array_push($newSection['entrytypes'], $newEntryType);
         }
 
-        return $newSection;
+        // Fire an 'onExport' event
+        $event = new Event($this, array(
+            'element' => $section,
+            'value' => $newSection
+        ));
+        if ($fullExport) {
+            $this->onExport($event);
+        }
+        return $event->params['value'];
     }
 
     /**
@@ -143,6 +151,16 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             $result = false;
         }
 
+        if ($result){
+            // Fire an 'onImport' event
+            $event = new Event($this, array(
+                'element' => $section,
+                'value' => $data
+            ));
+            $this->onImport($event);
+        }
+
+
         return $result;
     }
 
@@ -175,6 +193,10 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
             $section->template = $data['template'] = null;
         }
 
+        if ($section->type == SectionType::Structure) {
+            $section->maxLevels = $data['maxLevels'];
+        }
+
         if (array_key_exists('locales', $data)) {
             $locales = array();
             foreach ($data['locales'] as $key => $locale) {
@@ -185,7 +207,7 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
                             'locale' => $key,
                             'enabledByDefault' => array_key_exists('enabledByDefault', $locale) ? $locale['enabledByDefault'] : true,
                             'urlFormat' => $locale['urlFormat'],
-                            'nestedUrlFormat' => $locale['nestedUrlFormat'],
+                            'nestedUrlFormat' => !empty($locale['nestedUrlFormat'])? $locale['nestedUrlFormat'] : '',
                         ));
                     } else {
                         $locales[$key] = new SectionLocaleModel(array(

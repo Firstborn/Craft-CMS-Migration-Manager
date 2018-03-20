@@ -54,7 +54,15 @@ class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
             }
         }
 
-        return $newTag;
+        // Fire an 'onExport' event
+        $event = new Event($this, array(
+            'element' => $tag,
+            'value' => $newTag
+        ));
+        if ($fullExport) {
+            $this->onExport($event);
+        }
+        return $event->params['value'];
     }
 
     /**
@@ -70,6 +78,15 @@ class MigrationManager_TagsService extends MigrationManager_BaseMigrationService
 
         $tag = $this->createModel($data);
         $result = craft()->tags->saveTagGroup($tag);
+
+        if ($result) {
+            // Fire an 'onImport' event
+            $event = new Event($this, array(
+                'element' => $tag,
+                'value' => $data
+            ));
+            $this->onImport($event);
+        }
 
         return $result;
     }

@@ -351,6 +351,34 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
         return true;
     }
 
+    protected function localizeData(BaseElementModel $element, Array &$data)
+    {
+        //look for matrix/supertables/neo that are not localized and update the keys to ensure the locale values on child elements remain intact
+        $fieldLayout = $element->getFieldLayout();
+
+        foreach ($fieldLayout->getTabs() as $tab) {
+            foreach ($tab->getFields() as $tabField) {
+                $field = craft()->fields->getFieldById($tabField->fieldId);
+                $fieldValue = $element[$field->handle];
+                if ($field->translatable == false) {
+                    if ( in_array ($field->type , ['Matrix', 'SuperTable', 'Neo']) ) {
+                        if ($field->type == 'SuperTable' && $field->settings['staticField'] == 1){
+                            $data[$field->handle][$fieldValue->id] = $data[$field->handle]['new1'];
+                        } else {
+                            $items = $fieldValue->getIterator();
+                            $i = 1;
+                            foreach ($items as $item) {
+                                $data[$field->handle][$item->id] = $data[$field->handle]['new' . $i];
+                                unset($data[$field->handle]['new' . $i]);
+                                $i++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Fires an 'onExportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
      *

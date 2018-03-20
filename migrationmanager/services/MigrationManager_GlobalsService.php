@@ -22,35 +22,42 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
      */
     public function exportItem($id, $fullExport = false)
     {
-        $source = craft()->globals->getSetById($id);
+        $set = craft()->globals->getSetById($id);
 
-        if (!$source) {
+        if (!$set) {
             return false;
         }
 
-        $newSource = [
-            'name' => $source->name,
-            'handle' => $source->handle,
+        $newSet = [
+            'name' => $set->name,
+            'handle' => $set->handle,
             'fieldLayout' => array(),
             'requiredFields' => array(),
         ];
 
-        $this->addManifest($source->handle);
+        $this->addManifest($set->handle);
 
-        $fieldLayout = $source->getFieldLayout();
+        $fieldLayout = $set->getFieldLayout();
 
         foreach ($fieldLayout->getTabs() as $tab) {
-            $newSource['fieldLayout'][$tab->name] = array();
+            $newSet['fieldLayout'][$tab->name] = array();
             foreach ($tab->getFields() as $tabField) {
-
-                $newSource['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                $newSet['fieldLayout'][$tab->name][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
                 if ($tabField->required) {
-                    $newSource['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
+                    $newSet['requiredFields'][] = craft()->fields->getFieldById($tabField->fieldId)->handle;
                 }
             }
         }
 
-        return $newSource;
+        // Fire an 'onExport' event
+        $event = new Event($this, array(
+            'element' => $set,
+            'value' => $newSet
+        ));
+        if ($fullExport) {
+            $this->onExport($event);
+        }
+        return $event->params['value'];
     }
 
     /**
@@ -65,6 +72,15 @@ class MigrationManager_GlobalsService extends MigrationManager_BaseMigrationServ
 
         $set = $this->createModel($data);
         $result = craft()->globals->saveSet($set);
+
+        if ($result) {
+            // Fire an 'onImport' event
+            $event = new Event($this, array(
+                'element' => $set,
+                'value' => $data
+            ));
+            $this->onImport($event);
+        }
 
         return $result;
     }

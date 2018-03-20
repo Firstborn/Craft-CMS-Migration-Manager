@@ -58,7 +58,15 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
             }
         }
 
-        return $newSource;
+        // Fire an 'onExport' event
+        $event = new Event($this, array(
+            'element' => $source,
+            'value' => $newSource
+        ));
+        if ($fullExport) {
+            $this->onExport($event);
+        }
+        return $event->params['value'];
     }
 
     /**
@@ -76,6 +84,15 @@ class MigrationManager_AssetSourcesService extends MigrationManager_BaseMigratio
 
         $source = $this->createModel($data);
         $result = craft()->assetSources->saveSource($source);
+
+        if ($result) {
+            // Fire an 'onImport' event
+            $event = new Event($this, array(
+                'element' => $source,
+                'value' => $data
+            ));
+            $this->onImport($event);
+        }
 
         return $result;
     }

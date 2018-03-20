@@ -162,4 +162,64 @@ abstract class MigrationManager_BaseMigrationService extends BaseApplicationComp
      * @return mixed
      */
     abstract public function importItem(array $data);
+
+    /**
+     * Fires an 'onExportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
+     *
+     * @param Event $event
+     *          $event->params['field'] - field
+     *          $event->params['parent'] - field parent
+     *          $event->params['value'] - current field value, change this value in the event handler to output a different value
+     *
+     * @return null
+     */
+    public function onExportFieldContent(Event $event)
+    {
+        //route this through fields service for simplified event listening
+        craft()->migrationManager_fields->onExportFieldContent($event);
+    }
+
+    /**
+     * Fires an 'onImportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
+     *
+     * @param Event $event
+     *          $event->params['field'] - field
+     *          $event->params['parent'] - field parent
+     *          $event->params['value'] - current field value, change this value in the event handler to import a different value
+     *
+     * @return null
+     */
+    public function onImportFieldContent(Event $event)
+    {
+        //route this through fields service for simplified event listening
+        craft()->migrationManager_fields->onImportFieldContent($event);
+    }
+
+    /**
+     * Fires an 'onExport' event after an element has been prepped for export.
+     *
+     * @param Event $event
+     *          $event->params['element'] - element being exported
+     *          $event->params['value'] - data to be exported, change this value in the event handler to export a different value
+     *
+     * @return null
+     */
+    public function onExport(Event &$event)
+    {
+        $this->raiseEvent('onExport', $event);
+    }
+
+    /**
+     * Fires an 'onImport' event after an element has been imported into the CMS
+     *
+     * @param Event $event
+     *          $event->params['element'] - element being imported
+     *          $event->params['value'] - the data that was used to construct the imported object
+     *
+     * @return null
+     */
+    public function onImport(Event $event)
+    {
+        $this->raiseEvent('onImport', $event);
+    }
 }

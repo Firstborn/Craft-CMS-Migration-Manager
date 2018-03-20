@@ -65,6 +65,7 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
         foreach($data['locales'] as $value) {
             if ($primaryEntry) {
                 $value['id'] = $primaryEntry->id;
+                $this->localizeData($primaryEntry, $value);
             }
 
             $entry = $this->createModel($value);
@@ -72,7 +73,7 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
             $this->validateImportValues($value);
             $entry->setContentFromPost($value);
 
-           // save entry
+            // save entry
             if (!$success = craft()->entries->saveEntry($entry)) {
 
                 throw new Exception(print_r($entry->getErrors(), true));
@@ -120,14 +121,8 @@ class MigrationManager_EntriesContentService extends MigrationManager_BaseConten
         }
 
         $entry->getContent()->title = $data['title'];
-
         return $entry;
     }
-
-
-
-
-
 
 
 }

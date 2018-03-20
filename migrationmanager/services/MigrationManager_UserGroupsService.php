@@ -59,7 +59,16 @@ class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationS
             }
         }
 
-        return $newGroup;
+        // Fire an 'onExport' event
+        $event = new Event($this, array(
+            'element' => $group,
+            'value' => $newGroup
+        ));
+        if ($fullExport) {
+            $this->onExport($event);
+        }
+        return $event->params['value'];
+
     }
 
     /**
@@ -97,6 +106,15 @@ class MigrationManager_UserGroupsService extends MigrationManager_BaseMigrationS
                 } else {
                     $this->addError('Could not save user group settings');
                 }
+            }
+
+            if ($result) {
+                // Fire an 'onImport' event
+                $event = new Event($this, array(
+                    'element' => $userGroup,
+                    'value' => $data
+                ));
+                $this->onImport($event);
             }
         }
 

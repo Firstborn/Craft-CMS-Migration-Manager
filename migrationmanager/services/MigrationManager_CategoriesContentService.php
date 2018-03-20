@@ -62,6 +62,7 @@ class MigrationManager_CategoriesContentService extends MigrationManager_BaseCon
         foreach($data['locales'] as $value) {
             if ($primaryCategory) {
                 $value['id'] = $primaryCategory->id;
+                $this->localizeData($primaryCategory, $value);
             }
 
             $category = $this->createModel($value);
