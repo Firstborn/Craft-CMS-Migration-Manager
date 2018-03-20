@@ -100,12 +100,25 @@ To import/export field settings for custom field types use:
 To export content field values for custom field types use (ideal for complex fieldtype data structures).
 - migrationManager_fields.exportFieldContent
 
-
 Any values in the field data that contains id's should be converted to handles/slug or some string based value that can be looked up on the destination site without depending on matching id values as id values can differ between website database instances.
 
 For importing custom fields the imported value should match the fields required input structure. Check the field type's fieldtypes/[type] `prepValueFromPost` and `prepValue` methods for help on determining the correct structure.
 
 When using events to modify the import/export of a field be sure to set `$event->performAction = false;` to prevent the default field action from happening. The value you want to be exported/imported must be assigned to the `$event->params['value']` variable.
+
+To export/import settings related to entry types, field layouts and other non field related items. These events are not cancelable.
+- migrationManager_sections.export
+- migrationManager_sections.import
+- migrationManager_categories.export
+- migrationManager_categories.import
+- migrationManager_globals.export
+- migrationManager_globals.import
+- migrationManager_tags.export
+- migrationManager_tags.import
+- migrationManager_assetSources.export
+- migrationManager_assetSources.import
+- migrationManager_userGroups.export
+- migrationManager_userGroups.import
 
 ```php
 craft()->on('migrationManager_entries.exportField', function(Event $event){
@@ -226,6 +239,39 @@ public function init()
         }
     });
 }
+```
+
+This is a partial example of a custom plugin that listens for the 'migrationManager_sections.export' and 'migrationManager_sections.import' events and then modifies the migration to pass along data that can be used with the Relabel plugin to change field labels and instructions.
+
+
+```php
+    #Export/Import Sections
+    craft()->on('migrationManager_sections.export', function(Event $event){
+        $section = $event->params['value'];
+        foreach($section['entrytypes'] as &$entrytype){
+            $relabelFields = [];
+            foreach($entrytype['fieldLayout'] as $key => $fields){
+                foreach($fields as $field){
+                    $relabelFields[$field] = 'some relabel data';
+                }
+            }
+            $entrytype['relabelFields'] = $relabelFields;
+        }
+        $event->params['value'] = $section;
+    });
+    
+    craft()->on('migrationManager_sections.import', function(Event $event){
+        $section = $event->params['value'];
+        foreach ($section['entrytypes'] as $entrytype){
+            if (key_exists('relabelFields', $entrytype)){
+                foreach($entrytype['relabelFields'] as $key => $value){
+                    Craft::log('relabel: '. $key . ' ' . $value, LogLevel::Error);
+                    //do some work with the field and entrytype/fieldlayout to put these value into the Relabel table
+                }
+            }
+        }
+    });
+
 ```
 
 ## Custom migrations

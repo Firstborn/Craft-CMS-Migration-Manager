@@ -67,5 +67,16 @@
     "notes": [
       "[Fixed] handle line breaks and slashes in migration json data"
     ]
+  },
+  {
+    "version": "1.0.8.8",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.8.zip",
+    "date": "2018-03-20T16:05:00-00:00",
+    "notes": [
+      "[Fixed] content migrations for static SuperTable fields",
+      "[Fixed] content migrations for localized entries that contains Matrix and SuperTable fields",
+      "[Fixed] settings for migrating structured sections",
+      "[Added] export and import events for Asset Sources, Categories, Globals, Sections, Tags, User Groups to modify migration payload before migrations are created and to handle the modifications on import."
+    ]
   }
 ]
