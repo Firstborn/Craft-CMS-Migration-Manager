@@ -3,6 +3,11 @@
 namespace firstborn\migrationmanager\services;
 
 use Craft;
+use craft\models\Section;
+use craft\models\Section_SiteSettings;
+use craft\models\EntryType;
+use craft\models\Entry;
+
 
 class Sections extends BaseMigration
 {
@@ -32,36 +37,30 @@ class Sections extends BaseMigration
             'handle' => $section->attributes['handle'],
             'type' => $section->attributes['type'],
             'enableVersioning' => $section->attributes['enableVersioning'],
-
-            'maxLevels' => $section->attributes['maxLevels'],
+            'propagateEntries' => $section->attributes['propagateEntries'],
         ];
+
+        if ($section->type == Section::TYPE_STRUCTURE){
+            $newSection['maxLevels'] =  $section->attributes['maxLevels'];
+        }
 
         $this->addManifest($section->attributes['handle']);
 
-        //$locales = $section->getLocales();
         $siteSettings = $section->getSiteSettings();
 
-        /*if ((bool)$section->attributes['hasUrls'] === false) {
-            $newSection['sites'] = [];
-            foreach ($siteSettings as $siteSetting) {
-                $newSection['locales'][$locale] = $attributes['enabledByDefault'];
-            }
-        } else {*/
+        $newSection['sites'] = array();
 
+        foreach ($siteSettings as $siteSetting) {
+            $site = Craft::$app->sites->getSiteById($siteSetting->siteId);
+            $newSection['sites'][$site->handle] = [
+                'site' => $site->handle,
+                'hasUrls' => $siteSetting->hasUrls,
+                'uriFormat' => $siteSetting->uriFormat,
+                'enabledByDefault' => $siteSetting->enabledByDefault,
+                'template' => $siteSetting->template,
+            ];
+        }
 
-            $newSection['sites'] = array();
-
-            foreach ($siteSettings as $siteSetting) {
-                $site = Craft::$app->sites->getSiteById($siteSetting->siteId);
-                $newSection['sites'][$site->handle] = [
-                    'site' => $site->handle,
-                    'hasUrls' => $siteSetting->hasUrls,
-                    'uriFormat' => $siteSetting->uriFormat,
-                    'enabledByDefault' => $siteSetting->enabledByDefault,
-                    'template' => $siteSetting->template,
-                ];
-            }
-        //}
 
         $newSection['entrytypes'] = array();
 
@@ -88,9 +87,9 @@ class Sections extends BaseMigration
                 $newEntryType['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newEntryType['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                    $newEntryType['fieldLayout'][$tab->name][] = $tabField->handle;
                     if ($tabField->required) {
-                        $newEntryType['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                        $newEntryType['requiredFields'][] = $tabField->handle;
                     }
                 }
             }
@@ -114,6 +113,7 @@ class Sections extends BaseMigration
         }
 
         $section = $this->createModel($data);
+        Craft::error('create section model');
 
         if ($section) {
             if (Craft::$app->sections->saveSection($section)) {
@@ -126,6 +126,7 @@ class Sections extends BaseMigration
                 }
 
                 //add entry types
+                Craft::error('create entry type');
                 foreach ($data['entrytypes'] as $key => $newEntryType) {
                     $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
                     if ($existingType) {
@@ -139,6 +140,7 @@ class Sections extends BaseMigration
                     }
                 }
             } else {
+                Craft::info('failed to create section');
                 $result = false;
             }
         } else {
@@ -153,8 +155,7 @@ class Sections extends BaseMigration
      */
     public function createModel(array $data)
     {
-
-        $section = new SectionModel();
+        $section = new Section();
         if (array_key_exists('id', $data)) {
             $section->id = $data['id'];
         }
@@ -163,43 +164,29 @@ class Sections extends BaseMigration
         $section->handle = $data['handle'];
         $section->type = $data['type'];
         $section->enableVersioning = $data['enableVersioning'];
+        $section->propagateEntries = $data['propagateEntries'];
 
-        // Type-specific attributes
-        if ($section->type == SectionType::Single) {
-            $section->hasUrls = $data['hasUrls'] = true;
-        } else {
-            $section->hasUrls = $data['hasUrls'];
+        if ($section->type == Section::TYPE_STRUCTURE){
+            $section->maxLevels = $data['maxLevels'];
         }
 
-        if ($section->hasUrls) {
-            $section->template = $data['template'];
-        } else {
-            $section->template = $data['template'] = null;
-        }
+        $allSiteSettings = [];
+        if (array_key_exists('sites', $data)) {
 
-        if (array_key_exists('locales', $data)) {
-            $locales = array();
-            foreach ($data['locales'] as $key => $locale) {
+            foreach ($data['sites'] as $key => $siteData) {
                 //determine if locale exists
-                if (in_array($key, Craft::$app->i18n->getSiteLocaleIds())) {
-                    if ($section->hasUrls) {
-                        $locales[$key] = new SectionLocaleModel(array(
-                            'locale' => $key,
-                            'enabledByDefault' => array_key_exists('enabledByDefault', $locale) ? $locale['enabledByDefault'] : true,
-                            'urlFormat' => $locale['urlFormat'],
-                            'nestedUrlFormat' => $locale['nestedUrlFormat'],
-                        ));
-                    } else {
-                        $locales[$key] = new SectionLocaleModel(array(
-                            'locale' => $key,
-                        ));
-                    }
-                } else {
-                    $this->addError('error', 'missing locale: ' . $key . ' in section: ' . $section->handle . ', locale not defined in system');
-                }
+                $site = Craft::$app->getSites()->getSiteByHandle($key);
+                $siteSettings = new Section_SiteSettings();
+                $siteSettings->siteId = $site->id;
+                $siteSettings->hasUrls = $siteData['hasUrls'];
+                $siteSettings->uriFormat = $siteData['uriFormat'];
+                $siteSettings->template = $siteData['template'];
+                $siteSettings->enabledByDefault = (bool)$siteData['enabledByDefault'];
+                $allSiteSettings[$site->id] = $siteSettings;
             }
-            $section->setLocales($locales);
         }
+
+        $section->setSiteSettings($allSiteSettings);
 
         return $section;
     }
@@ -212,7 +199,7 @@ class Sections extends BaseMigration
      */
     private function createEntryType($data, $section)
     {
-        $entryType = new EntryTypeModel(array(
+        $entryType = new EntryType(array(
             'sectionId' => $section->id,
             'name' => $data['name'],
             'handle' => $data['handle'],
@@ -251,7 +238,7 @@ class Sections extends BaseMigration
         }
 
         $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-        $fieldLayout->type = ElementType::Entry;
+        $fieldLayout->type = Entry::class;
         $entryType->fieldLayout = $fieldLayout;
 
         return $entryType;

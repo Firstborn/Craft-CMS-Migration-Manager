@@ -2,6 +2,8 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+use craft\models\AssetTransform;
 /**
  * Class MigrationManager_AssetTransformsService
  */
@@ -25,7 +27,7 @@ class AssetTransforms extends BaseMigration
      */
     public function exportItem($id, $fullExport = false)
     {
-        $transform = MigrationManagerHelper::getTransformById($id);
+        $transform = Craft::$app->assetTransforms->getTransformById($id);
         if (!$transform) {
             return false;
         }
@@ -41,7 +43,10 @@ class AssetTransforms extends BaseMigration
             'mode' => $transform->mode,
             'position' => $transform->position,
             'quality' => $transform->quality,
+            'interlace' => $transform->interlace
         ];
+
+
 
         return $newTransform;
     }
@@ -61,7 +66,7 @@ class AssetTransforms extends BaseMigration
 
     public function createModel(Array $data)
     {
-        $transform = new AssetTransformModel();
+        $transform = new AssetTransform();
         if (array_key_exists('id', $data)) {
             $transform->id = $data['id'];
         }
@@ -74,6 +79,7 @@ class AssetTransforms extends BaseMigration
         $transform->mode = $data['mode'];
         $transform->position = $data['position'];
         $transform->quality = $data['quality'];
+        $transform->interlace = $data['interlace'];
 
         return $transform;
     }

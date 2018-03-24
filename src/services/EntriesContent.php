@@ -2,6 +2,8 @@
 
 namespace firstborn\migrationmanager\services;
 use Craft;
+use craft\elements\Entry;
+use craft\helpers\DateTimeHelper;
 
 class EntriesContent extends BaseContentMigration
 {
@@ -14,7 +16,7 @@ class EntriesContent extends BaseContentMigration
 
         $sites = $primaryEntry->getSection()->getSiteIds();
 
-        //$locales = $primaryEntry->getSection()->getLocales();
+
 
         $content = array(
             'slug' => $primaryEntry->slug,
@@ -59,10 +61,17 @@ class EntriesContent extends BaseContentMigration
 
     public function importItem(Array $data)
     {
-        $criteria = Craft::$app->elements->getCriteria(ElementType::Entry);
-        $criteria->section = $data['section'];
-        $criteria->slug = $data['slug'];
-        $primaryEntry = $criteria->first();
+
+        //$currentEntry = Craft::$app->getEntries()->getEntryById($entry->id, $entry->siteId);
+
+
+        $primaryEntry = Entry::find()
+            ->section($data['section'])
+            ->slug($data['slug'])
+            ->site('default')
+            ->first();
+
+        Craft::error('existing entry: '. $primaryEntry->id);
 
         if (array_key_exists('parent', $data))
         {
@@ -77,11 +86,15 @@ class EntriesContent extends BaseContentMigration
             $entry = $this->createModel($value);
             $this->getSourceIds($value);
             $this->validateImportValues($value);
-            $entry->setContentFromPost($value);
+            $entry->setFieldValues($value['fields']);
+
+            Craft::error('save entry: '. $entry->id);
 
            // save entry
-            if (!$success = Craft::$app->entries->saveEntry($entry)) {
-
+            $result = Craft::$app->getElements()->saveElement($entry);
+            Craft::error('saved entry: '. ($result ? 'yes' : 'no'));
+            if (!$result) {
+                Craft::error('error saving entry');
                 throw new Exception(print_r($entry->getErrors(), true));
             }
 
@@ -94,10 +107,11 @@ class EntriesContent extends BaseContentMigration
 
     public function createModel(Array $data)
     {
-        $entry = new EntryModel();
+        $entry = new Entry();
 
         if (array_key_exists('id', $data)){
             $entry->id = $data['id'];
+            $entry->contentId = $data['id'];
         }
 
         $section = Craft::$app->sections->getSectionByHandle($data['section']);
@@ -109,8 +123,8 @@ class EntriesContent extends BaseContentMigration
         }
 
         $entry->slug = $data['slug'];
-        $entry->postDate = $data['postDate'];
-        $entry->expiryDate = $data['expiryDate'];
+        $entry->postDate = DateTimeHelper::toDateTime($data['postDate']);
+        $entry->expiryDate = DateTimeHelper::toDateTime($data['expiryDate']);
         $entry->enabled = $data['enabled'];
         $entry->enabledForSite = $data['enabledForSite'];
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
@@ -126,7 +140,7 @@ class EntriesContent extends BaseContentMigration
             }
         }
 
-        $entry->getContent()->title = $data['title'];
+        $entry->title = $data['title'];
 
         return $entry;
     }

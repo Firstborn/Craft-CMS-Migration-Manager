@@ -2,6 +2,10 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+use craft\elements\Tag;
+use craft\models\TagGroup;
+
 class Tags extends BaseMigration
 {
     /**
@@ -33,19 +37,15 @@ class Tags extends BaseMigration
         $this->addManifest($tag->handle);
 
         if ($fullExport) {
-
             $newTag['fieldLayout'] = array();
             $newTag['requiredFields'] = array();
-
             $fieldLayout = $tag->getFieldLayout();
-
             foreach ($fieldLayout->getTabs() as $tab) {
                 $newTag['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
-
-                    $newTag['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                    $newTag['fieldLayout'][$tab->name][] = $tabField->handle;
                     if ($tabField->required) {
-                        $newTag['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                        $newTag['requiredFields'][] = $tabField->handle;
                     }
                 }
             }
@@ -87,7 +87,7 @@ class Tags extends BaseMigration
      */
     public function createModel(array $data)
     {
-        $tag = new TagGroupModel();
+        $tag = new TagGroup();
         if (array_key_exists('id', $data)) {
             $tag->id = $data['id'];
         }
@@ -122,6 +122,7 @@ class Tags extends BaseMigration
 
 
             $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
+            $fieldLayout->type = Tag::class;
             $tag->fieldLayout = $fieldLayout;
         }
 

@@ -2,28 +2,33 @@
 
 namespace firstborn\migrationmanager\services;
 
-class Locales extends BaseMigration
+class Sites extends BaseMigration
 {
     /**
      * @var string
      */
-    protected $source = 'locale';
+    protected $source = 'sites';
 
     /**
      * @var string
      */
-    protected $destination = 'locales';
+    protected $destination = 'sites';
 
     /**
      * {@inheritdoc}
      */
     public function exportItem($id, $fullExport = false)
     {
-        $locale = ['id' => $id];
+        $site =
+        $newSite = [
+            'handle' => $site->handle,
+            'group' => $site->getGroup()->handle,
+            'language' => $site->language
+        ];
 
-        $this->addManifest($id);
+        $this->addManifest($site->handle);
 
-        return $locale;
+        return $newSite;
     }
 
     /**

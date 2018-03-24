@@ -34,7 +34,7 @@ class CpController extends Controller
         $migrator = Craft::$app->getContentMigrator();
         $pending = $migrator->getNewMigrations();
         $applied = $migrator->getMigrationHistory();
-        return $this->renderTemplate('migrationManager/migrations', array('pending' => $pending, 'applied' => $applied));
+        return $this->renderTemplate('migrationmanager/migrations', array('pending' => $pending, 'applied' => $applied));
     }
 
 

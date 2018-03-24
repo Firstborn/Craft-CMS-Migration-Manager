@@ -2,6 +2,11 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+use craft\elements\Category;
+use craft\models\CategoryGroup;
+use craft\models\CategoryGroup_SiteSettings;
+
 class Categories extends BaseMigration
 {
     protected $source = 'category';
@@ -20,19 +25,19 @@ class Categories extends BaseMigration
         $newCategory = [
             'name' => $category->name,
             'handle' => $category->handle,
-            'hasUrls' => $category->hasUrls,
-            'template' => $category->template,
             'maxLevels' => $category->maxLevels
         ];
 
-        $locales = $category->getLocales();
 
-        $newCategory['locales'] = array();
-        foreach ($locales as $key => $locale ) {
-            $newCategory['locales'][$key] = [
-                'locale' => $locale->locale,
-                'urlFormat' => $locale->urlFormat,
-                'nestedUrlFormat' => $locale->nestedUrlFormat
+        $siteSettings = $category->getSiteSettings();
+        $newCategory['sites'] = array();
+        foreach ($siteSettings as $siteSetting) {
+            $site = Craft::$app->sites->getSiteById($siteSetting->siteId);
+            $newCategory['sites'][$site->handle] = [
+                'site' => $site->handle,
+                'hasUrls' => $siteSetting->hasUrls,
+                'uriFormat' => $siteSetting->uriFormat,
+                'template' => $siteSetting->template,
             ];
         }
 
@@ -49,9 +54,9 @@ class Categories extends BaseMigration
                     $newCategory['fieldLayout'][$tab->name] = array();
                     foreach ($tab->getFields() as $tabField) {
 
-                        $newCategory['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                        $newCategory['fieldLayout'][$tab->name][] = $tabField->handle;
                         if ($tabField->required) {
-                            $newCategory['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                            $newCategory['requiredFields'][] =$tabField->handle;
                         }
                     }
                 }
@@ -80,33 +85,32 @@ class Categories extends BaseMigration
     public function createModel(Array $data)
     {
 
-        $category = new CategoryGroupModel();
+        $category = new CategoryGroup();
         if (array_key_exists('id', $data)){
             $category->id = $data['id'];
         }
 
         $category->name = $data['name'];
         $category->handle = $data['handle'];
-        $category->hasUrls = $data['hasUrls'];
-        $category->template = $data['template'];
         $category->maxLevels = $data['maxLevels'];
 
-        if (array_key_exists('locales', $data))
-        {
-            $locales = array();
-            foreach($data['locales'] as $key => $locale){
+        $allSiteSettings = [];
+        if (array_key_exists('sites', $data)) {
+            $sites = array();
+            foreach ($data['sites'] as $key => $siteData) {
                 //determine if locale exists
-                if (in_array($key, Craft::$app->i18n->getSiteLocaleIds())) {
-                    $locales[$key] = new CategoryGroupLocaleModel(array(
-                        'locale' => $key,
-                        'urlFormat' => $locale['urlFormat'],
-                        'nestedUrlFormat' => $locale['nestedUrlFormat'],
-                    ));
-                } else {
-                    $this->addError('error', 'missing locale: ' . $key . ' in category: ' . $category->handle . ', locale not defined in system');
-                }
+                $site = Craft::$app->getSites()->getSiteByHandle($key);
+                $siteSettings = new CategoryGroup_SiteSettings();
+                $siteSettings->siteId = $site->id;
+                $siteSettings->hasUrls = $siteData['hasUrls'];
+                $siteSettings->uriFormat = $siteData['uriFormat'];
+                $siteSettings->template = $siteData['template'];
+
+                $allSiteSettings[$site->id] = $siteSettings;
             }
-            $category->setLocales($locales);
+
+            $category->setSiteSettings($allSiteSettings);
+
         }
 
         if (array_key_exists('fieldLayout', $data)) {
@@ -137,7 +141,7 @@ class Categories extends BaseMigration
 
 
             $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-            $fieldLayout->type = ElementType::Category;
+            $fieldLayout->type = Category::class;
             $category->fieldLayout = $fieldLayout;
 
         }

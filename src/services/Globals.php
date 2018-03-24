@@ -2,6 +2,9 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+use craft\elements\GlobalSet;
+
 class Globals extends BaseMigration
 {
     /**
@@ -39,13 +42,16 @@ class Globals extends BaseMigration
         foreach ($fieldLayout->getTabs() as $tab) {
             $newSource['fieldLayout'][$tab->name] = array();
             foreach ($tab->getFields() as $tabField) {
+                Craft::error('tableField: ' . $tabField->handle);
 
-                $newSource['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                $newSource['fieldLayout'][$tab->name][] = $tabField->handle;
                 if ($tabField->required) {
-                    $newSource['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                    $newSource['requiredFields'][] = $tabField->handle;
                 }
             }
         }
+
+
 
         return $newSource;
     }
@@ -71,9 +77,10 @@ class Globals extends BaseMigration
      */
     public function createModel(array $data)
     {
-        $globalSet = new GlobalSetModel();
+        $globalSet = new GlobalSet();
         if (array_key_exists('id', $data)) {
             $globalSet->id = $data['id'];
+            $globalSet->contentId = $data['id'];
         }
 
         $globalSet->name = $data['name'];
@@ -106,7 +113,7 @@ class Globals extends BaseMigration
         }
 
         $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-        $fieldLayout->type = ElementType::GlobalSet;
+        $fieldLayout->type =  GlobalSet::class;
         $globalSet->setFieldLayout($fieldLayout);
 
         return $globalSet;

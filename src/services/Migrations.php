@@ -4,6 +4,7 @@ namespace firstborn\migrationmanager\services;
 
 use Craft;
 use craft\base\Component;
+use craft\helpers\App;
 use craft\helpers\FileHelper;
 use firstborn\migrationmanager\MigrationManager;
 use DateTime;
@@ -13,7 +14,7 @@ class Migrations extends Component
     private $_migrationTable;
 
     private $_settingsMigrationTypes = array(
-        'locale' => 'locales',
+        'site' => 'sites',
         'field' => 'fields',
         'section' => 'sections',
         'assetVolume' => 'assetVolumes',
@@ -27,7 +28,7 @@ class Migrations extends Component
     );
 
     private $_settingsDependencyTypes = array(
-        'locale' => 'locales',
+        'site' => 'sites',
         'section' => 'sections',
         'assetVolume' => 'assetVolumes',
         'assetTransform' => 'assetTransforms',
@@ -83,7 +84,7 @@ class Migrations extends Component
                 if ($service->hasErrors()) {
                     $errors = $service->getErrors();
                     foreach ($errors as $error) {
-                        MigrationManagerPlugin::log($error, LogLevel::Error);
+                        Craft::error($error, __METHOD__);
                     }
 
                     return false;
@@ -101,7 +102,7 @@ class Migrations extends Component
                 if ($service->hasErrors()) {
                     $errors = $service->getErrors();
                     foreach ($errors as $error) {
-                        MigrationManagerPlugin::log($error, LogLevel::Error);
+
                         Craft::error($log, __METHOD__);
                     }
 
@@ -312,10 +313,62 @@ class Migrations extends Component
      * @return bool
      * @throws \CDbException
      */
-    public function runToTop($migrationsToRun = null)
+    public function runMigrations($migrationNames = [])
+    {
+
+        Craft::error('runMigrations');
+
+        // This might take a while
+        App::maxPowerCaptain();
+
+        //$migrationNames = $this->getNewMigrations();
+
+        if (empty($migrationNames)) {
+            $migrationNames = $this->getNewMigrations();
+        }
+
+        $total = count($migrationNames);
+
+        /*if ($limit !== 0) {
+            $migrationNames = array_slice($migrationNames, 0, $limit);
+        }*/
+
+        $n = count($migrationNames);
+
+        if ($n === $total) {
+            $logMessage = "Total $n new ".($n === 1 ? 'migration' : 'migrations').' to be applied:';
+        } else {
+            $logMessage = "Total $n out of $total new ".($total === 1 ? 'migration' : 'migrations').' to be applied:';
+        }
+
+        foreach ($migrationNames as $migrationName) {
+            $logMessage .= "\n\t$migrationName";
+        }
+
+
+
+        foreach ($migrationNames as $migrationName) {
+            Craft::error('run migration: '. $migrationName);
+
+            try {
+                $migrator = Craft::$app->getContentMigrator();
+
+                $migrator->migrateUp($migrationName);
+            } catch (MigrationException $e) {
+                Craft::error('Migration failed. The rest of the migrations are cancelled.', __METHOD__);
+                throw $e;
+            }
+        }
+
+        return true;
+    }
+
+    public function xrunMigrations($migrationsToRun = null)
     {
         // This might take a while
         Craft::$app->config->maxPowerCaptain();
+
+
 
         $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
 
@@ -464,45 +517,11 @@ class Migrations extends Component
      * @return array
      * @throws Exception
      */
-    public function getNewMigrations($plugin = null)
+    public function getNewMigrations()
     {
-        $migrations = array();
-        if ($plugin == null) {
-            $plugin = Craft::$app->plugins->getPlugin('migrationmanager', false);
-        }
-
-        $migrationPath = Craft::$app->migrations->getMigrationPath($plugin) . 'generated/';
-
-        if (IOHelper::folderExists($migrationPath) && IOHelper::isReadable($migrationPath)) {
-            $applied = array();
-
-            foreach (Craft::$app->migrations->getMigrationHistory($plugin) as $migration) {
-                $applied[] = $migration['version'];
-            }
-
-            $handle = opendir($migrationPath);
-
-            while (($file = readdir($handle)) !== false) {
-                if ($file[0] === '.') {
-                    continue;
-                }
-
-                $migration = $this->getMigration($file, $plugin);
-                if ($migration) {
-
-                    // Have we already run this migration?
-                    if (in_array($migration, $applied)) {
-                        continue;
-                    }
-                    $migrations[] = $migration;
-                }
-            }
-
-            closedir($handle);
-            sort($migrations);
-        }
-
-        return $migrations;
+        $migrator = Craft::$app->getContentMigrator();
+        $newMigrations = $migrator->getNewMigrations();
+        return $newMigrations;
     }
 
     /**

@@ -72,7 +72,7 @@ class MigrationManager extends Plugin
 
         $this->setComponents([
             'migrations' => \firstborn\migrationmanager\services\Migrations::class,
-            'locales' => \firstborn\migrationmanager\services\Locales::class,
+            'locales' => \firstborn\migrationmanager\services\Sites::class,
             'fields' => \firstborn\migrationmanager\services\Fields::class,
             'sections' => \firstborn\migrationmanager\services\Sections::class,
             'assetVolumes' => \firstborn\migrationmanager\services\AssetVolumes::class,

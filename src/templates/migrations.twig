@@ -52,15 +52,12 @@
     <div id="applied" class="hidden">
         {% if applied | length > 0%}
             <p>
-                {{ 'Select the migration(s) you want to revert.'|t }}
+                {{ 'Select the migration(s) you want to run again.'|t }}
             </p>
 
             <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-                <input type="hidden" name="action" value="migrationManager/revert/start">
+                <input type="hidden" name="action" value="migrationmanager/migrations/rerun">
                 {{ getCsrfInput() }}
-
-
-
 
 
                 {% for migrationName, migration in applied %}
@@ -71,7 +68,7 @@
 
                 <div class="buttons clearafter">
                     <button class="btn submit export-btn" name="submit" value="create">
-                        {{ 'Revert migrations'|t }}
+                        {{ 'Reapply migrations'|t }}
                     </button>
                 </div>
 

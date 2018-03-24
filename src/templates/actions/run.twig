@@ -1,18 +1,21 @@
 {% requirePermission 'performUpdates' %}
-{% extends "_layouts/cp" %}
-
+{% extends "_layouts/basecp" %}
 {% set title = "Migrations"|t %}
-
-{% includecssresource "css/updates.css" %}
-{% includeJsResource "migrationmanager/js/MigrationManagerRunner.js" %}
 
 {% block pageHeader %}{% endblock %}
 
-{% block main %}
-    <div id="graphic" class="spinner big"></div>
-    <div id="status">{{ "Preparing migrations ..."|t }}</div>
+{% block body %}
+    <div id="content">
+        <div id="graphic" class="spinner big"></div>
+        <div id="status">{{ "Preparing migrations ..."|t }}</div>
+    </div>
 {% endblock %}
 
+{% do view.registerAssetBundle('craft\\web\\assets\\cp\\CpAsset') -%}
+
+{% do view.registerAssetBundle("firstborn\\migrationmanager\\assetbundles\\cp\\CpAssetBundle") %}
+
+
 {% includejs %}
-    new Craft.MigrationManagerRunner({{ data|json_encode|raw }});
+    new Craft.MigrationManagerRunner({{ data|json_encode|raw }}, '{{ nextAction }}');
 {% endincludejs %}

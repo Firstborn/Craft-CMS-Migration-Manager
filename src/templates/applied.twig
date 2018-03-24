@@ -16,8 +16,10 @@
             {{ 'Select the previously applied migration you want to rerun.'|t }}
         </p>
 
+
         <form class="field toolbar" action="" method="post" accept-charset="UTF-8">
-            <input type="hidden" name="action" value="migrationManager/run/rerunApplied">
+            <input type="hidden" name="action" value="migrationmanager/migrations/start">
+            <input type="hidden" name="nextAction" value="migrationmanager/migrations/rerun">
             <input type="hidden" name="applied" value="1">
             {{ getCsrfInput() }}
 

@@ -70,25 +70,35 @@ class MigrationsController extends Controller
     public function actionStart()
     {
         $this->requirePostRequest();
-
-        $plugin = MigrationManager::getInstance();
         $request = Craft::$app->getRequest();
-        $post = $request->post();
-
         $data = array(
             'data' => array(
-                'handle' => Craft::$app->security->hashData($plugin->getHandle()),
-                'uid' => Craft::$app->security->hashData(StringHelper::UUID()),
-                'migrations' =>  $post['migration']
-            ),
+                'migrations' =>  $request->getParam('migration', ''),
+                'applied' =>  $request->getParam('applied', 0),
+             ),
+            'nextAction' => 'migrationmanager/run/start'
         );
 
-        //$this->renderTemplate('migrationManager/migrations', array('pending' => $pending, 'applied' => $applied));
-
-        return $this->renderTemplate('migrationManager/actions/run', $data);
+        return $this->renderTemplate('migrationmanager/actions/run', $data);
     }
 
+    public function actionRerun(){
 
+        $this->requirePostRequest();
+        $request = Craft::$app->getRequest();
 
-
+        if ($request->getParam('migration') == false){
+            Craft::$app->getSession()->setError(Craft::t('migrationmanager', 'You must select a migration to re run'));
+            return $this->redirectToPostedUrl();
+        } else {
+            $data = array(
+                'data' => array(
+                    'migrations' => $request->getParam('migration', ''),
+                    'applied' => $request->getParam('applied', 0),
+                ),
+                'nextAction' => $request->getParam('nextAction', 'migrationmanager/run/start')
+            );
+            return $this->renderTemplate('migrationmanager/actions/run', $data);
+        }
+    }
 }

@@ -1,5 +1,3 @@
-(function($) {
-
 
 Craft.MigrationManagerRunner = Garnish.Base.extend(
 {
@@ -8,13 +6,12 @@ Craft.MigrationManagerRunner = Garnish.Base.extend(
 	$errorDetails: null,
 	data: null,
 
-	init: function(data)
+	init: function(data, nextAction)
 	{
 		this.$graphic = $('#graphic');
 		this.$status = $('#status');
-        this.data = data;
-
-		this.postActionRequest('migrationManager/run/prepare');
+		this.data = data;
+      this.postActionRequest(nextAction);
 	},
 
 	updateStatus: function(msg)
@@ -31,7 +28,7 @@ Craft.MigrationManagerRunner = Garnish.Base.extend(
 	postActionRequest: function(action)
 	{
 		var data = {
-			data: this.data
+			'data': this.data
 		};
 
 		Craft.postActionRequest(action, data, $.proxy(function(response, textStatus, jqXHR)
@@ -87,12 +84,13 @@ Craft.MigrationManagerRunner = Garnish.Base.extend(
 
 	onErrorResponse: function(jqXHR)
 	{
+
 		this.$graphic.addClass('error');
 		var errorText =
-			'<p>'+Craft.t('A fatal error has occurred:')+'</p>' +
+			'<p>'+Craft.t('app','A fatal error has occurred:')+'</p>' +
 			'<div id="error" class="code">' +
-				'<p><strong class="code">'+Craft.t('Status:')+'</strong> '+Craft.escapeHtml(jqXHR.statusText)+'</p>' +
-				'<p><strong class="code">'+Craft.t('Response:')+'</strong> '+Craft.escapeHtml(jqXHR.responseText)+'</p>' +
+				'<p><strong class="code">'+Craft.t('app','Status:')+'</strong> '+Craft.escapeHtml(jqXHR.statusText)+'</p>' +
+				'<p><strong class="code">'+Craft.t('app','Response:')+'</strong> '+Craft.escapeHtml(jqXHR.responseText)+'</p>' +
 			'</div>' +
 			'<a class="btn submit big" href="mailto:support@craftcms.com' +
 				'?subject='+encodeURIComponent('Craft update failure') +
@@ -103,7 +101,7 @@ Craft.MigrationManagerRunner = Garnish.Base.extend(
 					'Response: '+jqXHR.responseText
 				) +
 			'">' +
-				Craft.t('Send for help') +
+				Craft.t('app','Send for help') +
 			'</a>';
 
 		this.updateStatus(errorText);
@@ -146,5 +144,3 @@ Craft.MigrationManagerRunner = Garnish.Base.extend(
 	}
 });
 
-
-})(jQuery);

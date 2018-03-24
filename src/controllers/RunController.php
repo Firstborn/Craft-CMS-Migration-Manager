@@ -17,46 +17,68 @@ class RunController extends Controller
      */
     public function actionStart()
     {
-
-
-
         $this->requirePostRequest();
-
-        $plugin = MigrationManager::getInstance();
         $request = Craft::$app->getRequest();
-        $post = $request->post();
 
-        $data = array(
-            'data' => array(
-                'handle' => Craft::$app->security->hashData($plugin->getClassHandle()),
-                'uid' => Craft::$app->security->hashData(StringHelper::UUID()),
-                'migrations' =>  $post('migration')
-            ),
+        return $this->asJson(array(
+                'data' => $request->getParam('data'),
+                'alive' => true,
+                'nextAction' => 'migrationmanager/run/prepare'
+            )
         );
+    }
 
-        //$this->renderTemplate('migrationManager/migrations', array('pending' => $pending, 'applied' => $applied));
 
-        return $this->renderTemplate('migrationManager/actions/run', $data);
+    /**
+     * @throws HttpException
+     */
+    public function actionPrepare()
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        $data = Craft::$app->request->getRequiredParam('data');
+
+        return $this->asJson(array(
+            'alive' => true,
+            'nextStatus' => Craft::t('app', 'Backing-up database ...'),
+            'nextAction' => 'migrationmanager/run/backup',
+            'data' => $data,
+        ));
     }
 
     /**
      * @throws HttpException
      */
-    public function actionRerunApplied()
+    public function actionBackup()
     {
         $this->requirePostRequest();
 
-        $migrations = Craft::$app->request->getPost('migration');
-        if (empty($migrations)) {
+        $data = Craft::$app->request->getRequiredParam('data');
+        $backup = Craft::$app->getConfig()->getGeneral()->getBackupOnUpdate();
+        $db = Craft::$app->getDb();
 
-            Craft::$app->userSession->setError(Craft::t('You must select a migration to re run'));
-            $this->redirectToPostedUrl();
+        if ($backup) {
+            try {
+                $db->backup();
+                return $this->asJson(array(
+                    'alive' => true,
+                    'nextStatus' => Craft::t('migrationmanager', 'Running migrations ...'),
+                    'nextAction' => 'migrationmanager/run/migrations',
+                    'data' => $data,
+                ));
 
-        } else {
+            } catch (\Throwable $e) {
+                Craft::$app->disableMaintenanceMode();
 
-            // unset the selected migrations
-            Craft::$app->migrationManager_migrations->setMigrationsAsNotApplied($migrations);
-            $this->actionStart();
+                return $this->asJson(array(
+                    'alive' => true,
+                    'errorDetails' => $e->getMessage(),
+                    'nextStatus' => Craft::t('migrationmanager', 'An error was encountered. Rolling back ...'),
+                    'nextAction' => 'migrationmanager/run/rollback',
+                    'data' => $data,
+                ));
+            }
         }
     }
 
@@ -66,78 +88,36 @@ class RunController extends Controller
     public function actionMigrations()
     {
         $this->requirePostRequest();
-        $this->requireAjaxRequest();
-        $data = Craft::$app->request->getRequiredPost('data');
+        $this->requireAcceptsJson();
+        $data = Craft::$app->request->getParam('data');
+
+        $migrations = $data['migrations'];
+
+
+        if (!is_array($migrations)){
+            $migrations = [];
+        }
 
         // give a little on screen pause
         sleep(2);
 
-        if (Craft::$app->migrationManager_migrations->runToTop($data['migrations'])) {
-            $this->returnJson(array(
+        Craft::error('run:migrations: '. json_encode($migrations));
+
+        if (MigrationManager::getInstance()->migrations->runMigrations($migrations)) {
+            return $this->asJson(array(
                 'alive' => true,
                 'finished' => true,
-                'returnUrl' => 'migrationmanager/pending',
+                'returnUrl' => 'migrationmanager/migrations',
             ));
         } else {
-            $this->returnJson(array(
+            return $this->asJson(array(
                 'alive' => true,
-                'errorDetails' => 'Check the migration <a href="logs">log</a> for details. ',
-                'nextStatus' => Craft::t('An error was encountered. Rolling back…'),
-                'nextAction' => 'migrationManager/run/rollback',
+                'errorDetails' => 'Check the logs for details. ',
+                'nextStatus' => Craft::t('migrationmanager', 'An error was encountered. Rolling back ...'),
+                'nextAction' => 'migrationmanager/run/rollback',
                 'data' => $data,
             ));
         }
-    }
-
-    /**
-     * @throws HttpException
-     */
-    public function actionPrepare()
-    {
-        $this->requirePostRequest();
-        $this->requireAjaxRequest();
-
-        $data = Craft::$app->request->getRequiredPost('data');
-
-        $this->returnJson(array(
-            'alive' => true,
-            'nextStatus' => Craft::t('Backing-up database ...'),
-            'nextAction' => 'migrationManager/run/backupDatabase',
-            'data' => $data,
-        ));
-    }
-
-    /**
-     * @throws HttpException
-     */
-    public function actionBackupDatabase()
-    {
-        $this->requirePostRequest();
-        $this->requireAjaxRequest();
-        $data = Craft::$app->request->getRequiredPost('data');
-
-        if (Craft::$app->config->get('backupDbOnUpdate')) {
-            $return = Craft::$app->updates->backupDatabase();
-
-            MigrationManagerPlugin::log('running database backup', LogLevel::Info);
-
-            if (!$return['success']) {
-                $this->returnJson(array(
-                    'alive' => true,
-                    'errorDetails' => $return['message'],
-                    'nextStatus' => Craft::t('An error was encountered. Rolling back…'),
-                    'nextAction' => 'migrationManager/run/rollback',
-                    'data' => $data,
-                ));
-            }
-        }
-
-        $this->returnJson(array(
-            'alive' => true,
-            'nextStatus' => Craft::t('Running migrations ...'),
-            'nextAction' => 'migrationManager/run/migrations',
-            'data' => $data,
-        ));
     }
 
     /**
@@ -147,41 +127,12 @@ class RunController extends Controller
     public function actionRollback()
     {
         $this->requirePostRequest();
-        $this->requireAjaxRequest();
+        $this->requireAcceptsJson();
 
-        MigrationManagerPlugin::log('rolling back database', LogLevel::Error);
+        // give a little on screen pause
+        sleep(2);
 
-        $data = Craft::$app->request->getRequiredPost('data');
-        $handle = Craft::$app->security->validateData($data['uid']);
-        $uid = Craft::$app->security->validateData($data['uid']);
-
-        if (!$uid) {
-            throw new Exception(('Could not validate UID'));
-        }
-
-        if (isset($data['dbBackupPath'])) {
-            $dbBackupPath = Craft::$app->security->validateData($data['dbBackupPath']);
-
-            if (!$dbBackupPath) {
-                throw new Exception('Could not validate database backup path.');
-            }
-
-            $return = Craft::$app->updates->rollbackUpdate($uid, $handle, $dbBackupPath);
-        } else {
-            $return = Craft::$app->updates->rollbackUpdate($uid, $handle);
-        }
-
-        //reset the status of the migrations if they were reruns
-        if ($data['applied'] == 1) {
-            Craft::$app->migrationManager_migrations->setMigrationsAsApplied($data['migrations']);
-        }
-
-        if (!$return['success']) {
-            // Let the JS handle the exception response.
-            throw new Exception($return['message']);
-        }
-
-        $this->returnJson(array('alive' => true, 'finished' => true, 'rollBack' => true));
+        return $this->asJson(array('alive' => true, 'finished' => true, 'rollBack' => true));
     }
 
 

@@ -1,0 +1,40 @@
+<table class="data fullwidth collapsible">
+    <thead>
+    <tr>
+        <th>
+            <div class="field checkboxfield">
+                <input type="checkbox" id="allSites" class="checkbox checkbox-toggle" name="allSites" value="all" data-selector="site"> <label for="allSites">Name</label>
+            </div>
+        </th>
+        <th>Handle</th>
+        <th>Language</th>
+        <th>Primary</th>
+        <th>Base Url</th>
+        <th>Group</th>
+    </tr>
+    </thead>
+    <tbody class="routes">
+    {% for site in sites %}
+        <tr class="route" data-id="{{ site.id }}">
+            <th scope="row" class="name">
+                <input type="checkbox" id="site{{ site.id }}" class="checkbox" name="site[]" value="{{ site.id }}"> <label for="site{{ site.id }}">{{ site.name }}</label>
+            </th>
+            <td>
+                {{ site.handle }}
+            </td>
+            <td>
+                {{ site.language }}
+            </td>
+            <td>
+                {{ site.primary ? '<div data-icon="check"></div>' : '' }}
+            </td>
+            <td>
+                {{ site.baseUrl }}
+            </td>
+            <td>
+                {{ site.group.name }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

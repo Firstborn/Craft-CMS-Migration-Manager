@@ -2,6 +2,11 @@
 
 namespace firstborn\migrationmanager\services;
 
+use firstborn\migrationmanager\helpers\MigrationManagerHelper;
+use Craft;
+use craft\elements\User;
+use craft\models\UserGroup;
+
 class UserGroups extends BaseMigration
 {
     /**
@@ -35,15 +40,15 @@ class UserGroups extends BaseMigration
         if ($fullExport) {
             $newGroup['fieldLayout'] = array();
             $newGroup['requiredFields'] = array();
-            $fieldLayout = Craft::$app->fields->getLayoutByType('User');
+            $fieldLayout = Craft::$app->fields->getLayoutByType(User::class);
 
             foreach ($fieldLayout->getTabs() as $tab) {
                 $newGroup['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newGroup['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                    $newGroup['fieldLayout'][$tab->name][] = $tabField->handle;
                     if ($tabField->required) {
-                        $newGroup['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                        $newGroup['requiredFields'][] = $tabField->handle;
                     }
                 }
             }
@@ -105,7 +110,7 @@ class UserGroups extends BaseMigration
      */
     public function createModel(Array $data)
     {
-        $userGroup = new UserGroupModel();
+        $userGroup = new UserGroup();
         if (array_key_exists('id', $data)) {
             $userGroup->id = $data['id'];
         }
@@ -139,9 +144,9 @@ class UserGroups extends BaseMigration
             }
 
             $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-            $fieldLayout->type = ElementType::User;
+            $fieldLayout->type = User::class;
 
-            Craft::$app->fields->deleteLayoutsByType(ElementType::User);
+            Craft::$app->fields->deleteLayoutsByType(User::class);
 
             if (Craft::$app->fields->saveLayout($fieldLayout)) {
 

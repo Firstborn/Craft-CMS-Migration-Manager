@@ -1,7 +1,8 @@
 <?php
 
-namespace Craft;
+namespace firstborn\migrationmanager\helpers;
 
+use Craft;
 /**
  * Class MigrationManagerHelper
  */
@@ -12,7 +13,7 @@ class MigrationManagerHelper
      *
      * @return bool|AssetTransformModel
      */
-    public static function getTransformById($id)
+    /*public static function getTransformById($id)
     {
         $transforms = Craft::$app->assetTransforms->getAllTransforms();
         foreach ($transforms as $key => $transform) {
@@ -22,14 +23,14 @@ class MigrationManagerHelper
         }
 
         return false;
-    }
+    }*/
 
     /**
      * @param int $id
      *
      * @return bool|AssetSourceModel
      */
-    public static function getAssetSourceByFolderId($id)
+    /*public static function getAssetSourceByFolderId($id)
     {
         $folder = Craft::$app->assets->getFolderById($id);
         if ($folder) {
@@ -40,14 +41,14 @@ class MigrationManagerHelper
         }
 
         return false;
-    }
+    }*/
 
     /**
      * @param string $handle
      *
      * @return bool|AssetTransformModel
      */
-    public static function getAssetSourceByHandle($handle)
+    /*public static function getAssetSourceByHandle($handle)
     {
         $sources = Craft::$app->assetSources->getAllSources();
         foreach ($sources as $source) {
@@ -57,7 +58,7 @@ class MigrationManagerHelper
         }
 
         return false;
-    }
+    }*/
 
     /**
      * @param string            $handle
@@ -152,7 +153,7 @@ class MigrationManagerHelper
      * @return bool|BaseElementModel|null
      * @throws Exception
      */
-    public static function getCategoryByHandle($element)
+    /*public static function getCategoryByHandle($element)
     {
         $categoryGroup = Craft::$app->categories->getGroupByHandle($element['category']);
         if ($categoryGroup) {
@@ -168,7 +169,7 @@ class MigrationManagerHelper
         }
 
         return false;
-    }
+    }*/
 
     /**
      * @param array $element
@@ -176,7 +177,7 @@ class MigrationManagerHelper
      * @return bool|BaseElementModel|null
      * @throws Exception
      */
-    public static function getEntryByHandle($element)
+    /*public static function getEntryByHandle($element)
     {
         $section = Craft::$app->sections->getSectionByHandle($element['section']);
         if ($section) {
@@ -192,7 +193,7 @@ class MigrationManagerHelper
         }
 
         return false;
-    }
+    }*/
 
     /**
      * @param array $element

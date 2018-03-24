@@ -2,17 +2,19 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+
 class AssetVolumes extends BaseMigration
 {
     /**
      * @var string
      */
-    protected $source = 'assetSource';
+    protected $source = 'assetVolume';
 
     /**
      * @var string
      */
-    protected $destination = 'assetSources';
+    protected $destination = 'assetVolumes';
 
     /**
      * @param int  $id
@@ -22,40 +24,41 @@ class AssetVolumes extends BaseMigration
      */
     public function exportItem($id, $fullExport = false)
     {
-        $source = Craft::$app->assetSources->getSourceById($id);
-        if (!$source) {
+        $volume = Craft::$app->volumes->getVolumeById($id);
+        if (!$volume) {
             return false;
         }
 
-        $this->addManifest($source->handle);
+        $this->addManifest($volume->handle);
 
-        $newSource = [
-            'name' => $source->name,
-            'handle' => $source->handle,
-            'type' => $source->type,
-            'sortOrder' => $source->sortOrder,
-            'typesettings' => $source->settings,
+        $newVolume = [
+            'name' => $volume->name,
+            'handle' => $volume->handle,
+            'type' => get_class($volume),
+            'sortOrder' => $volume->sortOrder,
+            'typesettings' => $volume->settings,
         ];
 
+        if ($volume->hasUrls){
+            $newVolume['hasUrls'] = 1;
+            $newVolume['url'] = $volume->url;
+        }
+
         if ($fullExport) {
-
-            $newSource['fieldLayout'] = array();
-
-            $fieldLayout = $source->getFieldLayout();
+            $newVolume['fieldLayout'] = array();
+            $fieldLayout = $volume->getFieldLayout();
             foreach ($fieldLayout->getTabs() as $tab) {
-
-                $newSource['fieldLayout'][$tab->name] = array();
+                $newVolume['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newSource['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                    $newVolume['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     if ($tabField->required) {
-                        $newSource['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                        $newVolume['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
                     }
                 }
             }
         }
-
-        return $newSource;
+        return $newVolume;
     }
 
     /**
@@ -66,13 +69,14 @@ class AssetVolumes extends BaseMigration
      */
     public function importItem(Array $data)
     {
-        $existing = MigrationManagerHelper::getAssetSourceByHandle($data['handle']);
+        $existing = $volume = Craft::$app->volumes->getVolumeByHandle($data['handle']);
+
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
 
-        $source = $this->createModel($data);
-        $result = Craft::$app->assetSources->saveSource($source);
+        $volume = $this->createModel($data);
+        $result = Craft::$app->volumes->saveVolume($volume);
 
         return $result;
     }
@@ -80,20 +84,22 @@ class AssetVolumes extends BaseMigration
     /**
      * @param array $data
      *
-     * @return AssetSourceModel
+     * @return VolumeInterface
      */
     public function createModel(Array $data)
     {
-        $source = new AssetSourceModel();
-        if (array_key_exists('id', $data)) {
-            $source->id = $data['id'];
-        }
 
-        $source->name = $data['name'];
-        $source->handle = $data['handle'];
-        $source->type = $data['type'];
-        $source->sortOrder = $data['sortOrder'];
-        $source->settings = $data['typesettings'];
+        $volumes = Craft::$app->getVolumes();
+
+        $volume = $volumes->createVolume([
+            'id' => $data['id'],
+            'type' => $data['type'],
+            'name' => $data['name'],
+            'handle' => $data['handle'],
+            'hasUrls' => array_key_exists('hasUrls', $data) ? $data['hasUrls'] : false,
+            'url' => array_key_exists('hasUrls', $data) ? $data['url'] : '',
+            'settings' => $data['typesettings']
+        ]);
 
         if (array_key_exists('fieldLayout', $data)) {
             $requiredFields = array();
@@ -114,26 +120,26 @@ class AssetVolumes extends BaseMigration
                     if ($existingField) {
                         $fieldIds[] = $existingField->id;
                     } else {
-                        $this->addError('error', 'Missing field: '.$field.' can not add to field layout for Asset Volume: '.$source->handle);
+                        $this->addError('error', 'Missing field: '.$field.' can not add to field layout for Asset Volume: '.$volume->handle);
                     }
                 }
                 $layout[$key] = $fieldIds;
             }
 
             $fieldLayout = Craft::$app->fields->assembleLayout($layout, $requiredFields);
-            $fieldLayout->type = ElementType::Asset;
-            $source->fieldLayout = $fieldLayout;
+            $fieldLayout->type = Asset::class;
+            $volume->fieldLayout = $fieldLayout;
         }
 
-        return $source;
+        return $volume;
     }
 
     /**
-     * @param array               $newSource
-     * @param AssetTransformModel $source
+     * @param array               $newVolume
+     * @param AssetTransformModel $volume
      */
-    private function mergeUpdates(&$newSource, $source)
+    private function mergeUpdates(&$newVolume, $volume)
     {
-        $newSource['id'] = $source->id;
+        $newVolume['id'] = $volume->id;
     }
 }

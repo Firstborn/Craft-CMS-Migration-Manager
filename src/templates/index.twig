@@ -49,9 +49,9 @@
     {% set tabs = tabs | merge({ tags: { label: 'Tags'|t, url: '#tags' } }) %}
 {% endif %}
 
-{% set locales = craft.i18n.getSiteLocales() -%}
-{% if locales is not empty %}
-    {% set tabs = tabs | merge({ locales: { label: 'Locales'|t, url: '#locales' } }) %}
+{% set sites = craft.app.sites.getAllSites() -%}
+{% if sites is not empty %}
+    {% set tabs = tabs | merge({ sites: { label: 'Sites'|t, url: '#sites' } }) %}
 {% endif %}
 
 {% if CraftEdition > CraftClient %}
@@ -80,8 +80,6 @@
                 {% set firstRendered = true %}
             {% endif %}
         {% endfor %}
-
-
 
         <div class="field " id="title-field">
             <div class="heading">
