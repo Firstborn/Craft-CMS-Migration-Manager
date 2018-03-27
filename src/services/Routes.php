@@ -2,6 +2,9 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+use craft\db\Query;
+
 class Routes extends BaseMigration
 {
     /**
@@ -19,17 +22,18 @@ class Routes extends BaseMigration
      */
     public function export(array $ids, $fullExport = true)
     {
-        // ignore incoming ids are grab all routes ids
-        $ids = $this->getAllRouteIds();
+        // ignore incoming ids and grab all routes ids
+        $routes = $this->getDbRoutes();
 
         $items = array();
-        foreach ($ids as $id) {
-
-            $obj = $this->exportItem($id, $fullExport = false);
+        foreach ($routes as $route) {
+            $obj = $this->exportItem($route, $fullExport = false);
             if ($obj) {
                 $items[] = $obj;
             }
         }
+
+        $this->addManifest('all');
 
         return $items;
     }
@@ -37,21 +41,13 @@ class Routes extends BaseMigration
     /**
      * {@inheritdoc}
      */
-    public function exportItem($id, $fullExport = false)
+    public function exportItem($route, $fullExport = false)
     {
-        $route = $this->getRouteById($id);
-
-        $this->addManifest($id);
-
-        if (!$route) {
-            return false;
-        }
-
         $newRoute = [
-            'urlParts' => urlencode($route['urlParts']),
-            'urlPattern' => '',
+            'uriParts' => urlencode($route['uriParts']),
+            'uriPattern' => $route['uriPattern'],
             'template' => $route['template'],
-            'locale' => $route['locale'] !== null ? $route['locale'] : '',
+            'site' => $route['siteId'] !== null ? Craft::$app->sites->getSiteById($route['siteId'])->handle : '',
         ];
 
         return $newRoute;
@@ -74,16 +70,16 @@ class Routes extends BaseMigration
      */
     public function importItem(Array $data)
     {
-        $data['urlParts'] = urldecode($data['urlParts']);
-        $urlParts = json_decode($data['urlParts'], true);
+        $data['uriParts'] = urldecode($data['uriParts']);
+        $uriParts = json_decode($data['uriParts'], true);
 
-        if ($data['locale'] === '') {
-            $locale = null;
+        if ($data['site'] === '') {
+            $siteId = null;
         } else {
-            $locale = $data['locale'];
+            $siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
         }
 
-        $result = Craft::$app->routes->saveRoute($urlParts, $data['template'], null, $locale);
+        $result = Craft::$app->routes->saveRoute($uriParts, $data['template'], $siteId);
 
         return $result;
     }
@@ -93,44 +89,30 @@ class Routes extends BaseMigration
      */
     private function deleteAllRoutes()
     {
-        $ids = $this->getAllRouteIds();
-        foreach ($ids as $id) {
-            Craft::$app->routes->deleteRouteById($id);
-        }
-    }
-
-    /**
-     * @return array
-     */
-    private function getAllRouteIds()
-    {
-        $routes = Craft::$app->db->createCommand()
-            ->select('id')
-            ->from('routes')
-            ->order('sortOrder')
-            ->queryAll();
-
-        $ids = array();
+        $routes = $this->getDbRoutes();
         foreach ($routes as $route) {
-            $ids[] = $route['id'];
+            Craft::$app->routes->deleteRouteById($route['id']);
         }
-
-        return $ids;
     }
+
+
 
     /**
      * @param int $id
      *
      * @return \CDbDataReader|mixed
      */
-    private function getRouteById($id)
-    {
-        $route = Craft::$app->db->createCommand()
-            ->select('id, locale, urlParts, urlPattern, template')
-            ->from('routes')
-            ->where('id = :id', array(':id' => $id))
-            ->queryRow();
 
-        return $route;
+    private function getDbRoutes(): array
+    {
+
+        $results = (new Query())
+            ->select(['id', 'siteId', 'uriParts', 'uriPattern', 'template', 'sortOrder'])
+            ->from(['{{%routes}}'])
+            ->orderBy(['sortOrder' => SORT_ASC])
+            ->all();
+
+        return $results;
+
     }
 }

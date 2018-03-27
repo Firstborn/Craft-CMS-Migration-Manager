@@ -5,6 +5,7 @@ namespace firstborn\migrationmanager\controllers;
 use Craft;
 use craft\web\Controller;
 use firstborn\migrationmanager\MigrationManager;
+use craft\web\assets\updates\UpdatesAsset;
 
 
 /**
@@ -78,6 +79,8 @@ class MigrationsController extends Controller
              ),
             'nextAction' => 'migrationmanager/run/start'
         );
+
+
 
         return $this->renderTemplate('migrationmanager/actions/run', $data);
     }

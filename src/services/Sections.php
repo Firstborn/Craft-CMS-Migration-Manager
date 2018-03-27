@@ -113,7 +113,7 @@ class Sections extends BaseMigration
         }
 
         $section = $this->createModel($data);
-        Craft::error('create section model');
+
 
         if ($section) {
             if (Craft::$app->sections->saveSection($section)) {

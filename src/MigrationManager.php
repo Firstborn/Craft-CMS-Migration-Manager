@@ -82,7 +82,7 @@ class MigrationManager extends Plugin
             'categories' => \firstborn\migrationmanager\services\Categories::class,
             'routes' => \firstborn\migrationmanager\services\Routes::class,
             'userGroups' => \firstborn\migrationmanager\services\UserGroups::class,
-            'emailMessages' => \firstborn\migrationmanager\services\EmailMessages::class,
+            'systemMessages' => \firstborn\migrationmanager\services\SystemMessages::class,
             'categoriesContent' => \firstborn\migrationmanager\services\CategoriesContent::class,
             'entriesContent' => \firstborn\migrationmanager\services\EntriesContent::class,
             'globalsContent' => \firstborn\migrationmanager\services\GlobalsContent::class,

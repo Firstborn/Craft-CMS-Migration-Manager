@@ -2,27 +2,25 @@
 
 namespace firstborn\migrationmanager\services;
 
-class EmailMessages extends BaseMigration
+use Craft;
+use craft\db\Query;
+use craft\models\SystemMessage;
+
+class SystemMessages extends BaseMigration
 {
-    protected $source = 'settingsEmailMessages';
-    protected $destination = 'emailMessages';
+    protected $source = 'settingsSystemMessages';
+    protected $destination = 'systemMessages';
 
     public function export(Array $ids, $fullExport = true)
     {
         //ignore incoming ids are grab all messages
         $messages = array();
-        $locales = Craft::$app->i18n->getSiteLocaleIds();
+        $systemMessages = $this->getSystemMessages();
 
-        foreach($locales as $locale)
+        foreach($systemMessages as $systemMessage)
         {
-            $localeMessages = Craft::$app->emailMessages->getAllMessages($locale);
-            foreach ($localeMessages as $message)
-            {
-                $this->addManifest($message->key);
-
-                $m = Craft::$app->emailMessages->getMessage($message->key, $locale);
-                $messages[] = $this->exportItem($m);
-            }
+            $this->addManifest($systemMessage['key']);
+            $messages[] = $this->exportItem($systemMessage);
         }
 
         $settings = Craft::$app->systemSettings->getSettings('email');
@@ -30,16 +28,11 @@ class EmailMessages extends BaseMigration
         return array(
             'settings' => $settings,
             'messages' => $messages);
-
     }
 
     public function exportItem($data, $fullExport = true)
     {
-        $message['key'] = $data->key;
-        $message['locale'] = $data->locale;
-        $message['subject'] = $data->subject;
-        $message['body'] = $data->body;
-        return $message;
+        return $data;
     }
 
     public function import(Array $data)
@@ -52,33 +45,46 @@ class EmailMessages extends BaseMigration
         if (Craft::$app->systemSettings->saveSettings('email', $data['settings']))
         {
         } else {
-            $this->addError('error', 'Could not save email settings');
+            $this->addError('error', 'Could not save system message settings');
         }
+
 
     }
 
     public function importItem(Array $data)
     {
         $msg = $this->createModel($data);
-        if (Craft::$app->emailMessages->saveMessage($msg))
+        if (Craft::$app->systemMessages->saveMessage($msg, $data['language']))
         {
 
         }
         else
         {
-            $this->addError('error', Craft::t('There was a problem saving an email message.'));
+            $this->addError('error', Craft::t('There was a problem saving a system message.'));
         }
     }
 
     public function createModel(Array $data)
     {
-        $message = new RebrandEmailModel();
+        $message = new SystemMessage();
         $message->key = $data['key'];
         $message->subject = $data['subject'];
         $message->body = $data['body'];
-        $message->locale = $data['locale'];
+
 
         return $message;
+    }
+
+    private function getSystemMessages(): array
+    {
+        $results = (new Query())
+            ->select(['language', 'key', 'subject', 'body'])
+            ->from(['{{%systemmessages}}'])
+            ->all();
+
+        return $results;
+
+
     }
 
 

@@ -24,7 +24,7 @@ class Migrations extends Component
         'category' => 'categories',
         'route' => 'routes',
         'userGroup' => 'userGroups',
-        'emailMessages' => 'emailMessages',
+        'systemMessages' => 'systemMessages',
     );
 
     private $_settingsDependencyTypes = array(
@@ -94,10 +94,6 @@ class Migrations extends Component
 
         foreach ($this->_settingsMigrationTypes as $key => $value) {
             $service = $plugin->get($value);
-           Craft::error('getservice: '. $value);
-           Craft::error($service->getSource());
-           Craft::error(json_encode($data));
-
             if (array_key_exists($service->getSource(), $data)) {
                 $migration['settings']['elements'][$service->getDestination()] = $service->export($data[$service->getSource()], true);
                 $empty = false;
@@ -225,10 +221,10 @@ class Migrations extends Component
             $path = sprintf($migrationPath . '/%s.php', $filename);
         }
 
-        //$migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         //$migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
-        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT);
-        Craft::error($migration);
+        //$migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT);
+
         $content = Craft::$app->view->renderTemplate('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 
         FileHelper::writeToFile($path, $content);
@@ -245,7 +241,6 @@ class Migrations extends Component
      */
     public function import($data)
     {
-        //$data = json_decode(str_replace('\\', '\/', $data), true);
         $data = str_replace('\\', '\/', $data);
         $data = str_replace('\/r', '\r', $data);
         $data = str_replace('\/n', '\n', $data);
