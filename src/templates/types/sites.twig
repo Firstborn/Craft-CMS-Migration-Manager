@@ -13,9 +13,9 @@
         <th>Group</th>
     </tr>
     </thead>
-    <tbody class="routes">
+    <tbody class="sites">
     {% for site in sites %}
-        <tr class="route" data-id="{{ site.id }}">
+        <tr class="site" data-id="{{ site.id }}">
             <th scope="row" class="name">
                 <input type="checkbox" id="site{{ site.id }}" class="checkbox" name="site[]" value="{{ site.id }}"> <label for="site{{ site.id }}">{{ site.name }}</label>
             </th>

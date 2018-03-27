@@ -94,6 +94,9 @@ class Migrations extends Component
 
         foreach ($this->_settingsMigrationTypes as $key => $value) {
             $service = $plugin->get($value);
+           Craft::error('getservice: '. $value);
+           Craft::error($service->getSource());
+           Craft::error(json_encode($data));
 
             if (array_key_exists($service->getSource(), $data)) {
                 $migration['settings']['elements'][$service->getDestination()] = $service->export($data[$service->getSource()], true);

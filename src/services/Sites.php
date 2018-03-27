@@ -2,12 +2,14 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+
 class Sites extends BaseMigration
 {
     /**
      * @var string
      */
-    protected $source = 'sites';
+    protected $source = 'site';
 
     /**
      * @var string
@@ -19,11 +21,16 @@ class Sites extends BaseMigration
      */
     public function exportItem($id, $fullExport = false)
     {
-        $site =
+        $site = Craft::$app->sites->getSiteById($id);
         $newSite = [
+            'name' => $site->name,
             'handle' => $site->handle,
-            'group' => $site->getGroup()->handle,
-            'language' => $site->language
+            'group' => $site->group->name,
+            'language' => $site->language,
+            'hasUrls' => $site->hasUrls,
+            'baseUrl' => $site->baseUrl,
+            'primary' => $site->primary,
+            'sortOrder' => $site->sortOrder
         ];
 
         $this->addManifest($site->handle);
