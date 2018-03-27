@@ -78,5 +78,14 @@
       "[Fixed] settings for migrating structured sections",
       "[Added] export and import events for Asset Sources, Categories, Globals, Sections, Tags, User Groups to modify migration payload before migrations are created and to handle the modifications on import."
     ]
+  },
+  {
+    "version": "1.0.8.9",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.8.9.zip",
+    "date": "2018-03-27T13:20:00-00:00",
+    "notes": [
+      "[Added] schema version to prevent plugin updates from forcing Craft into maintenance mode",
+      "[Fixed] json escaping for unicode characters"
+    ]
   }
 ]
