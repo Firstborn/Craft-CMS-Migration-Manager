@@ -212,7 +212,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $path = sprintf($migrationPath . '/%s.php', $filename);
         }
 
-        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 
         IOHelper::writeToFile($path, $content);
