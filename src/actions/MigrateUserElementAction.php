@@ -1,31 +1,44 @@
 <?php
 
 namespace firstborn\migrationmanager\actions;
+use firstborn\migrationmanager\MigrationManager;
 use Craft;
+use craft\base\ElementAction;
+use craft\elements\db\ElementQueryInterface;
 
-class MigrateUserElementAction extends BaseElementAction
+
+class MigrateUserElementAction extends ElementAction
 {
+
+
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function getName()
+    public function getTriggerLabel(): string
     {
-        return Craft::t('Create migration');
+        return Craft::t('app', 'Create Migration');
     }
 
+
     /**
      * {@inheritdoc}
      */
-    public function performAction(ElementCriteriaModel $criteria)
+    public function performAction(ElementQueryInterface $query): bool
     {
-        $params['user'] = $criteria->ids();
-        if (Craft::$app->migrationManager_migrations->createContentMigration($params)) {
+        $params['user'] = [];
+        $elements = $query->all();
 
-            $this->setMessage(Craft::t('Migration created.'));
+        foreach ($elements as $element) {
+            $params['user'][] = $element->id;
+        }
+
+        if (MigrationManager::getInstance()->migrations->createContentMigration($params)) {
+
+            $this->setMessage(Craft::t('app', 'Migration created.'));
             return true;
         } else {
 
-            $this->setMessage(Craft::t('Migration could not be created.'));
+            $this->setMessage(Craft::t('app', 'Migration could not be created.'));
             return false;
         }
     }

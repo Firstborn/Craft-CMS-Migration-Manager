@@ -361,64 +361,6 @@ class Migrations extends Component
         return true;
     }
 
-    public function xrunMigrations($migrationsToRun = null)
-    {
-        // This might take a while
-        Craft::$app->config->maxPowerCaptain();
-
-
-
-        $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
-
-        if (is_array($migrationsToRun)) {
-            $migrations = array();
-            foreach ($migrationsToRun as $migrationFile) {
-                $migration = $this->getNewMigration($migrationFile);
-                if ($migration) {
-                    $migrations[] = $migration;
-                }
-            }
-        } else {
-            $migrations = $this->getNewMigrations();
-        }
-
-        $total = count($migrations);
-
-        if ($total == 0) {
-            Craft::info('No new migration(s) found. Your system is up-to-date.');
-            return true;
-        }
-
-        Craft::info("Total $total new " . ($total === 1 ? 'migration' : 'migrations') . " to be applied for Craft:");
-
-        foreach ($migrations as $migration) {
-            // Refresh the DB cache
-            Craft::$app->db->getSchema()->refresh();
-
-            if ($this->migrateUp($migration, $plugin) === false) {
-                Craft::info('Migration ' . $migration . ' failed . All later migrations are canceled.');
-
-                // Refresh the DB cache
-                Craft::$app->db->getSchema()->refresh();
-
-                return false;
-            } else {
-                Craft::info('Migration ' . $migration . ' successfully ran' . LogLevel::Info, true);
-            }
-        }
-
-        if ($plugin) {
-            MigrationManagerPlugin::log($plugin->getClassHandle() . ' migrated up successfully.', LogLevel::Info, true);
-        } else {
-            MigrationManagerPlugin::log('Craft migrated up successfully.', LogLevel::Info, true);
-        }
-
-        // Refresh the DB cache
-        Craft::$app->db->getSchema()->refresh();
-
-        return true;
-    }
-
     /**
      * Remove applied migrations from the migration table so they can be run again
      *

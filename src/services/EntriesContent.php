@@ -12,66 +12,60 @@ class EntriesContent extends BaseContentMigration
 
     public function exportItem($id, $fullExport = false)
     {
-        $primaryEntry = Craft::$app->entries->getEntryById($id);
+        $site = Craft::$app->sites->getPrimarySite();
+        $primaryEntry = Craft::$app->entries->getEntryById($id, $site->id);
+        $content = array();
 
-        $sites = $primaryEntry->getSection()->getSiteIds();
+        if ($primaryEntry) {
+            $sites = $primaryEntry->getSection()->getSiteIds();
 
+            $content = array(
+                'slug' => $primaryEntry->slug,
+                'section' => $primaryEntry->getSection()->handle,
+                'sites' => array()
+            );
 
+            $this->addManifest($content['slug']);
 
-        $content = array(
-            'slug' => $primaryEntry->slug,
-            'section' => $primaryEntry->getSection()->handle,
-            'sites' => array()
-        );
+            if ($primaryEntry->getParent()) {
+                $content['parent'] = $this->exportItem($primaryEntry->getParent()->id, true);
+            }
 
-        $this->addManifest($content['slug']);
+            foreach ($sites as $siteId) {
+                $site = Craft::$app->sites->getSiteById($siteId);
+                $entry = Craft::$app->entries->getEntryById($id, $siteId);
+                if ($entry) {
+                    $entryContent = array(
+                        'slug' => $entry->slug,
+                        'section' => $entry->getSection()->handle,
+                        'enabled' => $entry->enabled,
+                        'site' => $site->handle,
+                        'enabledForSite' => $entry->enabledForSite,
+                        'postDate' => $entry->postDate,
+                        'expiryDate' => $entry->expiryDate,
+                        'title' => $entry->title,
+                        'entryType' => $entry->type->handle
+                    );
 
-        if ($primaryEntry->getParent())
-        {
-            $content['parent'] = $this->exportItem($primaryEntry->getParent()->id, true);
-        }
+                    if ($entry->getParent()) {
+                        $entryContent['parent'] = $primaryEntry->getParent()->slug;
+                    }
 
-        foreach($sites as $siteId){
-            $site = Craft::$app->sites->getSiteById($siteId);
-            $entry = Craft::$app->entries->getEntryById($id, $siteId);
-            if ($entry) {
-                $entryContent = array(
-                    'slug' => $entry->slug,
-                    'section' => $entry->getSection()->handle,
-                    'enabled' => $entry->enabled,
-                    'site' => $site->handle,
-                    'enabledForSite' => $entry->enabledForSite,
-                    'postDate' => $entry->postDate,
-                    'expiryDate' => $entry->expiryDate,
-                    'title' => $entry->title,
-                    'entryType' => $entry->type->handle
-                );
-
-                if ($entry->getParent()) {
-                    $entryContent['parent'] = $primaryEntry->getParent()->slug;
+                    $this->getContent($entryContent, $entry);
+                    $content['sites'][$site->handle] = $entryContent;
                 }
-
-                $this->getContent($entryContent, $entry);
-                $content['sites'][$site->handle] = $entryContent;
             }
         }
-
         return $content;
     }
 
     public function importItem(Array $data)
     {
-
-        //$currentEntry = Craft::$app->getEntries()->getEntryById($entry->id, $entry->siteId);
-
-
         $primaryEntry = Entry::find()
             ->section($data['section'])
             ->slug($data['slug'])
             ->site('default')
             ->first();
-
-        Craft::error('existing entry: '. $primaryEntry->id);
 
         if (array_key_exists('parent', $data))
         {
@@ -88,17 +82,14 @@ class EntriesContent extends BaseContentMigration
             $this->validateImportValues($value);
             $entry->setFieldValues($value['fields']);
 
-            Craft::error('save entry: '. $entry->id);
-
-           // save entry
             $result = Craft::$app->getElements()->saveElement($entry);
-            Craft::error('saved entry: '. ($result ? 'yes' : 'no'));
+
             if (!$result) {
-                Craft::error('error saving entry');
                 throw new Exception(print_r($entry->getErrors(), true));
             }
 
             if (!$primaryEntry) {
+
                 $primaryEntry = $entry;
             }
         }
@@ -111,7 +102,6 @@ class EntriesContent extends BaseContentMigration
 
         if (array_key_exists('id', $data)){
             $entry->id = $data['id'];
-            $entry->contentId = $data['id'];
         }
 
         $section = Craft::$app->sections->getSectionByHandle($data['section']);
@@ -124,9 +114,10 @@ class EntriesContent extends BaseContentMigration
 
         $entry->slug = $data['slug'];
         $entry->postDate = DateTimeHelper::toDateTime($data['postDate']);
-        $entry->expiryDate = DateTimeHelper::toDateTime($data['expiryDate']);
+        $entry->expiryDate = is_null($data['expiryDate']) ? '' : DateTimeHelper::toDateTime($data['expiryDate']);
+
         $entry->enabled = $data['enabled'];
-        $entry->enabledForSite = $data['enabledForSite'];
+        //$entry->enabledForSite = $data['enabledForSite'];
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
 
         if (array_key_exists('parent', $data))
@@ -142,13 +133,14 @@ class EntriesContent extends BaseContentMigration
 
         $entry->title = $data['title'];
 
+        //grab the content id for existing entries
+        if (!is_null($entry->id)){
+            $contentEntry = Craft::$app->entries->getEntryById($entry->id, $entry->siteId);
+            if ($contentEntry) {
+                $entry->contentId = $contentEntry->contentId;
+            }
+        }
+
         return $entry;
     }
-
-
-
-
-
-
-
 }

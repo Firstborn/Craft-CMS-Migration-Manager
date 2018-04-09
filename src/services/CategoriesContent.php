@@ -3,6 +3,8 @@
 namespace firstborn\migrationmanager\services;
 
 use Craft;
+use craft\elements\Category;
+use craft\helpers\DateTimeHelper;
 
 class CategoriesContent extends BaseContentMigration
 {
@@ -12,7 +14,6 @@ class CategoriesContent extends BaseContentMigration
     public function exportItem($id, $fullExport = false)
     {
         $primaryCategory = Craft::$app->categories->getCategoryById($id);
-        //$locales = $primaryCategory->getGroup()->getLocales();
         $sites = $primaryCategory->getGroup()->getSiteSettings();
         $content = array(
             'slug' => $primaryCategory->slug,
@@ -53,26 +54,28 @@ class CategoriesContent extends BaseContentMigration
 
     public function importItem(Array $data)
     {
-        $criteria = Craft::$app->elements->getCriteria(ElementType::Category);
-        $criteria->group = $data['category'];
-        $criteria->slug = $data['slug'];
-        $primaryCategory = $criteria->first();
-        //$entry = false;
+        $primaryCategory = Category::find()
+            ->group($data['category'])
+            ->slug($data['slug'])
+            ->first();
 
         if (array_key_exists('parent', $data))
         {
             $this->importItem($data['parent']);
         }
 
-        foreach($data['locales'] as $value) {
+        foreach($data['sites'] as $value) {
             if ($primaryCategory) {
                 $value['id'] = $primaryCategory->id;
             }
 
             $category = $this->createModel($value);
+            $this->getSourceIds($value);
+            $this->validateImportValues($value);
+            $category->setFieldValues($value['fields']);
 
             // save entry
-            if (!$success = Craft::$app->categories->saveCategory($category)) {
+            if (!$success = Craft::$app->getElements()->saveElement($category)) {
                 throw new Exception(print_r($category->getErrors(), true));
             }
 
@@ -82,15 +85,11 @@ class CategoriesContent extends BaseContentMigration
         }
 
         return true;
-
     }
-
-
 
     public function createModel(Array $data)
     {
-
-        $category = new CategoryModel();
+        $category = new Category();
 
         if (array_key_exists('id', $data)){
             $category->id = $data['id'];
@@ -98,23 +97,30 @@ class CategoriesContent extends BaseContentMigration
 
         $group = Craft::$app->categories->getGroupByHandle($data['category']);
         $category->groupId = $group->id;
-        $category->locale = $data['locale'];
+        $category->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
         $category->slug = $data['slug'];
         $category->enabled = $data['enabled'];
-        $category->localeEnabled = $data['localeEnabled'];
-        $category->getContent()->title = $data['title'];
+        $category->title = $data['title'];
 
         if (array_key_exists('parent', $data))
         {
-            $parent = MigrationManagerHelper::getCategoryByHandle(array('slug' => $data['parent'], 'category' => $data['category']));
+            $parent =Category::find()
+                ->group($data['category'])
+                ->slug($data['parent'])
+                ->first();
             if ($parent) {
                 $category->newParentId = $parent->id;
             }
         }
 
-        $this->getSourceIds($data);
-        $this->validateImportValues($data);
-        $category->setContentFromPost($data);
+        //grab the content id for existing category
+        if (!is_null($category->id)){
+            $contentCategory = Craft::$app->categories->getCategoryById($category->id, $category->siteId);
+            if ($contentCategory) {
+                $category->contentId = $contentCategory->contentId;
+            }
+        }
+
         return $category;
     }
 

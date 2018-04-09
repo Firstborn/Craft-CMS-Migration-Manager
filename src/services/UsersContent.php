@@ -2,6 +2,10 @@
 
 namespace firstborn\migrationmanager\services;
 
+use Craft;
+use craft\elements\User;
+use firstborn\migrationmanager\helpers\MigrationManagerHelper;
+
 class UsersContent extends BaseContentMigration
 {
     /**
@@ -26,6 +30,10 @@ class UsersContent extends BaseContentMigration
         if ($user) {
             $attributes = $user->getAttributes();
             unset($attributes['id']);
+            unset($attributes['contentId']);
+            unset($attributes['uid']);
+            unset($attributes['siteId']);
+
 
             $content = array();
             $this->getContent($content, $user);
@@ -48,9 +56,12 @@ class UsersContent extends BaseContentMigration
             $data['id'] = $user->id;
         }
         $user = $this->createModel($data);
+        $this->getSourceIds($data);
+        $this->validateImportValues($data);
+        $user->setFieldValues($data['fields']);
 
         // save user
-        if (Craft::$app->users->saveUser($user)) {
+        if (Craft::$app->getElements()->saveElement($user, false)) {
 
             $groups = $this->getUserGroupIds($data['groups']);
             Craft::$app->userGroups->assignUserToGroups($user->id, $groups);
@@ -69,16 +80,16 @@ class UsersContent extends BaseContentMigration
      */
     public function createModel(array $data)
     {
-        $user = new UserModel();
+        $user = new User();
 
         if (array_key_exists('id', $data)) {
             $user->id = $data['id'];
         }
 
         $user->setAttributes($data);
-        $this->getSourceIds($data);
-        $this->validateImportValues($data);
-        $user->setContentFromPost($data);
+        //$this->getSourceIds($data);
+        //$//this->validateImportValues($data);
+        //$user->setContentFromPost($data);
 
         return $user;
     }

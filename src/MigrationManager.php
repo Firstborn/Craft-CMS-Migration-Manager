@@ -7,12 +7,11 @@ use craft\base\Element;
 use craft\base\Plugin;
 use craft\elements\Entry;
 use craft\elements\Category;
+use craft\elements\User;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterElementActionsEvent;
 use craft\web\UrlManager;
 use craft\web\View;
-
-
 use yii\base\Event;
 
 use firstborn\migrationmanager\assetbundles\cpsidebar\CpSideBarAssetBundle;
@@ -96,7 +95,6 @@ class MigrationManager extends Plugin
             function (RegisterUrlRulesEvent $event) {
                 $event->rules['migrationmanager/migrations'] = 'migrationmanager/cp/migrations';
                 $event->rules['migrationmanager'] = 'migrationmanager/cp/index';
-
             }
         );
 
@@ -107,12 +105,18 @@ class MigrationManager extends Plugin
             }
         );
 
-        // Register Element Actions
         Event::on(Category::class, Element::EVENT_REGISTER_ACTIONS,
             function(RegisterElementActionsEvent $event) {
                 $event->actions[] = MigrateCategoryElementAction::class;
             }
         );
+
+        Event::on(User::class, Element::EVENT_REGISTER_ACTIONS,
+            function(RegisterElementActionsEvent $event) {
+                $event->actions[] = MigrateUserElementAction::class;
+            }
+        );
+
 
 
         $view = Craft::$app->getView();
@@ -124,42 +128,6 @@ class MigrationManager extends Plugin
             $view->registerAssetBundle(CpGlobalsAssetBundle::class);
             $view->registerJs('new Craft.MigrationManagerGlobalsExport();', View::POS_END);
         }
-
-
-
-
-
-        /*Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
-            $event->rules['plugin-handle'] = 'migrationmanager/index';
-        });*/
-
-        /*Craft::import('plugins.migrationmanager.helpers.MigrationManagerHelper');
-        Craft::import('plugins.migrationmanager.services.MigrationManager_IMigrationService');
-        Craft::import('plugins.migrationmanager.service.MigrationManager_BaseMigrationService');
-        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateCategoryElementAction');
-        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateEntryElementAction');
-        Craft::import('plugins.migrationmanager.actions.MigrationManager_MigrateUserElementAction');
-
-         // check we have a cp request as we don't want to this js to run anywhere but the cp
-        // and while we're at it check for a logged in user as well
-        if ( Craft::$app->request->isCpRequest() && Craft::$app->userSession->isLoggedIn()) {
-
-            // add a Create Migration button to the globals screen
-            if (Craft::$app->request->getSegment(1) == 'globals' ) {
-                // the includeJsResource method will add a js file to the bottom of the page
-                Craft::$app->templates->includeJsResource('migrationmanager/js/MigrationManagerGlobalsExport.js');
-                Craft::$app->templates->includeJs("new Craft.MigrationManagerGlobalsExport();");
-            }
-
-            //show alert on sidebar if migrations are pending
-            $pendingMigrations = count(Craft::$app->migrationManager_migrations->getNewMigrations());
-            if ($pendingMigrations > 0) {
-                Craft::$app->templates->includeCssResource('migrationmanager/css/styles.css');
-                Craft::$app->templates->includeJsResource('migrationmanager/js/MigrationManagerSideBar.js');
-                Craft::$app->templates->includeJs("new Craft.MigrationManagerSideBar({$pendingMigrations});");
-            }
-        }*/
-
     }
 
     public function getCpNavItem()
