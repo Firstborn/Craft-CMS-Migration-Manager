@@ -567,7 +567,9 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
 
         if ($field['type'] == 'Neo' && key_exists('blockTypes', $field['typesettings']))
         {
+
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
+                //find teh blocktype id and use id
                 //import each neo field
                 foreach($blockType['fieldLayout'] as &$fieldLayout) {
                     $fieldIds = [];
@@ -739,6 +741,11 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
             {
                 $this->mergeSuperTable($newField, $field);
             }
+
+            if ($field->type == 'Neo')
+            {
+                $this->mergeNeo($newField, $field);
+            }
         }
     }
 
@@ -848,6 +855,31 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
         $newBlock['fields'] = $newFields;
     }
 
+    private function mergeNeo(&$newField, $field)
+    {
+        if (array_key_exists('blockTypes', $newField['typesettings'])) {
+
+            $blockTypes = $newField['typesettings']['blockTypes'];
+            $newBlocks = [];
+
+            foreach ($blockTypes as $key => &$block) {
+
+                $existingBlock = $this->getNeoBlockByHandle($block['handle'], $field->id);
+
+                if ($existingBlock) {
+                    $newBlocks[$existingBlock->id] = $block;
+                } else {
+                    $newBlocks[$key] = $block;
+                }
+            }
+
+            $settings = $newField['typesettings'];
+            $settings['blockTypes'] = $newBlocks;
+            $newField['typesettings'] = $settings;
+
+        }
+    }
+
     private function getMatrixFieldByHandle($handle, $fields)
     {
         foreach($fields as $field)
@@ -862,6 +894,18 @@ class MigrationManager_FieldsService extends MigrationManager_BaseMigrationServi
     private function getMatrixBlockByHandle($handle, $id)
     {
         $blocks = craft()->matrix->getBlockTypesByFieldId($id);
+        foreach($blocks as $block)
+        {
+            if ($block->handle == $handle){
+                return $block;
+            }
+        }
+
+        return false;
+    }
+
+    private function getNeoBlockByHandle($handle, $id){
+        $blocks = craft()->neo->getBlockTypesByFieldId($id);
         foreach($blocks as $block)
         {
             if ($block->handle == $handle){
