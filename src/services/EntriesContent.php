@@ -10,11 +10,9 @@ class EntriesContent extends BaseContentMigration
     protected $source = 'entry';
     protected $destination = 'entries';
 
-    public function exportItem($id, $fullExport = false)
+    public function exportItem($element, $fullExport = false)
     {
-        $site = Craft::$app->sites->getPrimarySite();
-        $primaryEntry = Craft::$app->entries->getEntryById($id, $site->id);
-        $content = array();
+        $primaryEntry = Craft::$app->entries->getEntryById($element->id, $element->siteId);
 
         if ($primaryEntry) {
             $sites = $primaryEntry->getSection()->getSiteIds();
@@ -28,12 +26,12 @@ class EntriesContent extends BaseContentMigration
             $this->addManifest($content['slug']);
 
             if ($primaryEntry->getParent()) {
-                $content['parent'] = $this->exportItem($primaryEntry->getParent()->id, true);
+                $content['parent'] = $this->exportItem($primaryEntry->getParent(), true);
             }
 
             foreach ($sites as $siteId) {
                 $site = Craft::$app->sites->getSiteById($siteId);
-                $entry = Craft::$app->entries->getEntryById($id, $siteId);
+                $entry = Craft::$app->entries->getEntryById($element->id, $siteId);
                 if ($entry) {
                     $entryContent = array(
                         'slug' => $entry->slug,
@@ -117,17 +115,17 @@ class EntriesContent extends BaseContentMigration
         $entry->expiryDate = is_null($data['expiryDate']) ? '' : DateTimeHelper::toDateTime($data['expiryDate']);
 
         $entry->enabled = $data['enabled'];
-        //$entry->enabledForSite = $data['enabledForSite'];
         $entry->siteId = Craft::$app->sites->getSiteByHandle($data['site'])->id;
 
         if (array_key_exists('parent', $data))
         {
-            $criteria = Craft::$app->elements->getCriteria(ElementType::Entry);
-            $criteria->slug = $data['parent'];
-            $criteria->section = $section;
-            $parent = $criteria->first();
+            $query = Entry::find();
+            $query->sectionId($entry->sectionId);
+            $query->siteId($entry->siteId);
+            $query->slug($data['parent']);
+            $parent = $query->one();
             if ($parent) {
-                $entry->parentId = $parent->id;
+                $entry->newParentId = $parent->id;
             }
         }
 

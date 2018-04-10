@@ -19,14 +19,8 @@ abstract class BaseContentMigration extends BaseMigration
 
     protected function getFieldContent(&$content, $fieldModel, $parent)
     {
-        $field = $fieldModel;//->getField();
+        $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);
-
-        // Fire an 'onExportField' event
-        /*$event = new FieldEvent(array(
-            'field' => $field,
-            'value' => $newField
-        ));*/
 
         // Fire an 'onExportField' event
         $event = new FieldEvent(array(

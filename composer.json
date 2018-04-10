@@ -1,7 +1,7 @@
 {
   "name": "firstborn/migrationmanager",
   "description": "Craft CMS Migration Manager",
-  "version" : "1.0.0",
+  "version" : "3.0.0",
   "authors": [
     {
       "name": "Derrick Grigg",

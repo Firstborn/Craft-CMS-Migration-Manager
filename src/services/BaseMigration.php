@@ -45,37 +45,6 @@ abstract class BaseMigration extends Component implements IMigrationService
         return $this->source;
     }
 
-    /**
-     * @param $value
-     */
-    /*public function addError($value)
-    {
-        $this->errors[] = $value;
-    }*/
-
-    /**
-     * @return array
-     */
-    /*public function getErrors($attribute = NULL)
-    {
-        return $this->errors;
-    }*/
-
-    /**
-     * @return bool
-     */
-    /*public function hasErrors($attribute = NULL)
-    {
-        return count($this->errors) > 0;
-    }*/
-
-    /**
-     * @return void
-     */
-    /*public function resetErrors()
-    {
-        $this->errors = array();
-    }*/
 
     /**
      * @return void

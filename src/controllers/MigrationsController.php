@@ -4,6 +4,7 @@ namespace firstborn\migrationmanager\controllers;
 
 use Craft;
 use craft\web\Controller;
+use craft\elements\GlobalSet;
 use firstborn\migrationmanager\MigrationManager;
 use craft\web\assets\updates\UpdatesAsset;
 
@@ -40,29 +41,19 @@ class MigrationsController extends Controller
     public function actionCreateGlobalsContentMigration()
     {
         $this->requirePostRequest();
-        Craft::$app->userSession->requireAdmin();
+        $this->requireAdmin();
 
-        $globalSet = new GlobalSetModel();
+        $request = Craft::$app->getRequest();
+        $post = $request->post();
+        $params['global'] = array($post['setId']);
 
-        // Set the simple stuff
-        $globalSet->id = Craft::$app->request->getPost('setId');
-        $globalSet->name = Craft::$app->request->getPost('name');
-        $globalSet->handle = Craft::$app->request->getPost('handle');
-
-        // Set the field layout
-        $fieldLayout = Craft::$app->fields->assembleLayoutFromPost();
-        $fieldLayout->type = ElementType::GlobalSet;
-        $globalSet->setFieldLayout($fieldLayout);
-
-        $params['global'] = array(Craft::$app->request->getPost('setId'));
-
-        if (Craft::$app->migrationManager_migrations->createContentMigration($params)) {
-            Craft::$app->userSession->setNotice(Craft::t('Migration created.'));
+        if (MigrationManager::getInstance()->migrations->createContentMigration($params)) {
+            Craft::$app->getSession()->setNotice(Craft::t('migrationmanager','Migration created.'));
         } else {
-            Craft::$app->userSession->setError(Craft::t('Could not create migration, check log tab for errors.'));
+            Craft::$app->getSession()->setError(Craft::t('migrationmanager','Could not create migration, check log tab for errors.'));
         }
 
-        $this->redirectToPostedUrl($globalSet);
+        return $this->redirectToPostedUrl();
     }
 
     /**
@@ -79,8 +70,6 @@ class MigrationsController extends Controller
              ),
             'nextAction' => 'migrationmanager/run/start'
         );
-
-
 
         return $this->renderTemplate('migrationmanager/actions/run', $data);
     }

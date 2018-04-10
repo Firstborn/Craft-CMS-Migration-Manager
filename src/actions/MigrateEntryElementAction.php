@@ -31,7 +31,9 @@ class MigrateEntryElementAction extends ElementAction
         $elements = $query->all();
 
         foreach ($elements as $element) {
-            $params['entry'][] = $element->id;
+            //$params['entry'][] = ['id'=>$element->id,'siteId' => $element->siteId];
+            //$params['site'][] = $element->siteId;
+            $params['entry'][] = $element;
         }
 
         if (MigrationManager::getInstance()->migrations->createContentMigration($params)) {

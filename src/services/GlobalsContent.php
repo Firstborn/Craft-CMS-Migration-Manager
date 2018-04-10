@@ -1,6 +1,7 @@
 <?php
 
 namespace firstborn\migrationmanager\services;
+use Craft;
 
 class GlobalsContent extends BaseContentMigration
 {
@@ -11,7 +12,7 @@ class GlobalsContent extends BaseContentMigration
     {
 
         $globalSet = Craft::$app->globals->getSetById($id);
-        $locales = $globalSet->getLocales();
+        $sites = Craft::$app->sites->getAllSiteIds();
 
         $content = array(
             'handle' => $globalSet->handle,
@@ -20,16 +21,16 @@ class GlobalsContent extends BaseContentMigration
 
         $this->addManifest($globalSet->handle);
 
-
-        foreach($locales as $locale){
-            $set = Craft::$app->globals->getSetById($id, $locale);
+        foreach($sites as $siteId){
+            $site = Craft::$app->sites->getSiteById($siteId);
+            $set = Craft::$app->globals->getSetById($id, $site->id);
 
             $setContent = array(
                 'slug' => $set->handle,
             );
 
             $this->getContent($setContent, $set);
-            $content['locales'][$locale] = $setContent;
+            $content['sites'][$site->handle] = $setContent;
         }
 
         return $content;
@@ -39,16 +40,16 @@ class GlobalsContent extends BaseContentMigration
     {
         $globalSet = Craft::$app->globals->getSetByHandle($data['handle']);
 
-        foreach($data['locales'] as $key => $value) {
-
-            $set = Craft::$app->globals->getSetById($globalSet->id, $key);
+        foreach($data['sites'] as $key => $value) {
+            $site = Craft::$app->sites->getSiteByHandle($key);
+            $set = Craft::$app->globals->getSetById($globalSet->id, $site->id);
 
             $this->getSourceIds($value);
             $this->validateImportValues($value);
-            $set->setContentFromPost($value);
+            $set->setFieldValues($value['fields']);
 
             // save set
-            if (!$success = Craft::$app->globals->saveContent($set)) {
+            if (!$success = Craft::$app->getElements()->saveElement($set)) {
                 throw new Exception(print_r($set->getErrors(), true));
             }
         }
