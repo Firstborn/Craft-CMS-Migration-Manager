@@ -207,8 +207,6 @@ class Migrations extends Component
         $filename = substr($filename, 0, 250);
         $filename = str_replace('-', '_', $filename);
 
-        //$plugin = Craft::$app->plugins->getPlugin('migrationmanager', false);
-        //$migrationPath = Craft::$app->migrations->getMigrationPath($plugin) . '/generated';
         $migrator = Craft::$app->getContentMigrator();
         $migrationPath = $migrator->migrationPath;
 
@@ -222,8 +220,6 @@ class Migrations extends Component
         }
 
         $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        //$migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
-        //$migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT);
 
         $content = Craft::$app->view->renderTemplate('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 
@@ -231,8 +227,7 @@ class Migrations extends Component
 
         // mark the migration as completed if it's not a blank one
         if (!$empty) {
-            //TODO turn this back on
-            //$migrator->addMigrationHistory($filename);
+            $migrator->addMigrationHistory($filename);
         }
     }
 

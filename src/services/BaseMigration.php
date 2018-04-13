@@ -3,12 +3,32 @@
 namespace firstborn\migrationmanager\services;
 
 use craft\base\Component;
+use craft\base\Element;
+use firstborn\migrationmanager\events\ExportEvent;
+use firstborn\migrationmanager\events\ImportEvent;
 
 /**
  * Class MigrationManager_BaseMigrationService
  */
 abstract class BaseMigration extends Component implements IMigrationService
 {
+    /**
+     * @event ElementEvent The event that is triggered before an element is exported
+     */
+
+    const EVENT_BEFORE_EXPORT_ELEMENT = 'beforeExport';
+
+    /**
+     * @event ElementEvent The event that is triggered before an element is imported
+     */
+    const EVENT_BEFORE_IMPORT_ELEMENT = 'beforeImport';
+
+    /**
+     * @event ElementEvent The event that is triggered before an element is imported
+     */
+    const EVENT_AFTER_IMPORT_ELEMENT = 'afterImport';
+
+
     /**
      * @var array
      */
@@ -133,4 +153,64 @@ abstract class BaseMigration extends Component implements IMigrationService
      * @return mixed
      */
     abstract public function importItem(array $data);
+
+    /**
+     * Fires an 'onBeforeExport' event.
+     *
+     * @param Event $event
+     *          $event->params['element'] - element being exported via migration
+     *          $event->params['value'] - current element value, change this value in the event handler to migrate a different value
+     *
+     * @return null
+     */
+    public function onBeforeExport($element , array $newElement)
+    {
+        $event = new ExportEvent(array(
+            'element' => $element,
+            'value' => $newElement
+        ));
+
+        $this->trigger($this::EVENT_BEFORE_EXPORT_ELEMENT, $event);
+        return $event->value;
+    }
+
+    /**
+     * Fires an 'onBeforeImport' event.
+     *
+     * @param Event $event
+     *          $event->params['element'] - model to be imported, manipulate this to change the model before it is saved
+     *          $event->params['value'] - data used to create the element model
+     *
+     * @return null
+     */
+    public function onBeforeImport($element, array $data)
+    {
+        $event = new ImportEvent(array(
+            'element' => $element,
+            'value' => $data
+        ));
+        $this->trigger($this::EVENT_BEFORE_IMPORT_ELEMENT, $event);
+        return $event;
+    }
+
+    /**
+     * Fires an 'onAfterImport' event.
+     *
+     * @param Event $event
+     *          $event->params['element'] - model that was imported
+     *          $event->params['value'] - data used to create the element model
+     *
+     * @return null
+     */
+    public function onAfterImport($element, array $data)
+    {
+        $event = new ImportEvent(array(
+            'element' => $element,
+            'value' => $data
+        ));
+
+        $this->trigger($this::EVENT_AFTER_IMPORT_ELEMENT, $event);
+    }
+
+
 }

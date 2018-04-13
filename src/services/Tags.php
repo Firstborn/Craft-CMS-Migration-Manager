@@ -5,6 +5,7 @@ namespace firstborn\migrationmanager\services;
 use Craft;
 use craft\elements\Tag;
 use craft\models\TagGroup;
+use firstborn\migrationmanager\events\ExportEvent;
 
 class Tags extends BaseMigration
 {
@@ -51,6 +52,11 @@ class Tags extends BaseMigration
             }
         }
 
+        if ($fullExport) {
+            $newTag = $this->onBeforeExport($tag, $newTag);
+        }
+
+
         return $newTag;
     }
 
@@ -66,7 +72,20 @@ class Tags extends BaseMigration
         }
 
         $tag = $this->createModel($data);
-        $result = Craft::$app->tags->saveTagGroup($tag);
+        $event = $this->onBeforeImport($tag, $data);
+
+        if ($event->isValid) {
+            $result = Craft::$app->tags->saveTagGroup($event->element);
+            if ($result) {
+                $this->onAfterImport($event->element, $data);
+            } else {
+                $this->addError('error', 'Could not save the ' . $data['handle'] . ' tag.');
+            }
+        } else {
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' tag.');
+            $this->addError('error', $event->error);
+            return false;
+        }
 
         return $result;
     }

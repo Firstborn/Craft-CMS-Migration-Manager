@@ -4,6 +4,7 @@ namespace firstborn\migrationmanager\services;
 
 use Craft;
 use craft\elements\GlobalSet;
+use firstborn\migrationmanager\events\ExportEvent;
 
 class Globals extends BaseMigration
 {
@@ -22,38 +23,40 @@ class Globals extends BaseMigration
      */
     public function exportItem($id, $fullExport = false)
     {
-        $source = Craft::$app->globals->getSetById($id);
+        $set = Craft::$app->globals->getSetById($id);
 
-        if (!$source) {
+        if (!$set) {
             return false;
         }
 
-        $newSource = [
-            'name' => $source->name,
-            'handle' => $source->handle,
+        $newSet = [
+            'name' => $set->name,
+            'handle' => $set->handle,
             'fieldLayout' => array(),
             'requiredFields' => array(),
         ];
 
-        $this->addManifest($source->handle);
+        $this->addManifest($set->handle);
 
-        $fieldLayout = $source->getFieldLayout();
+        $fieldLayout = $set->getFieldLayout();
 
         foreach ($fieldLayout->getTabs() as $tab) {
-            $newSource['fieldLayout'][$tab->name] = array();
+            $newSet['fieldLayout'][$tab->name] = array();
             foreach ($tab->getFields() as $tabField) {
-                Craft::error('tableField: ' . $tabField->handle);
-
-                $newSource['fieldLayout'][$tab->name][] = $tabField->handle;
+                $newSet['fieldLayout'][$tab->name][] = $tabField->handle;
                 if ($tabField->required) {
-                    $newSource['requiredFields'][] = $tabField->handle;
+                    $newSet['requiredFields'][] = $tabField->handle;
                 }
             }
         }
 
+        if ($fullExport) {
+            $newSet = $this->onBeforeExport($set, $newSet);
+        }
 
 
-        return $newSource;
+
+        return $newSet;
     }
 
     /**
@@ -67,7 +70,21 @@ class Globals extends BaseMigration
         }
 
         $set = $this->createModel($data);
-        $result = Craft::$app->globals->saveSet($set);
+
+        $event = $this->onBeforeImport($set, $data);
+        if ($event->isValid) {
+            $result = Craft::$app->globals->saveSet($event->element);
+
+            if ($result) {
+                $this->onAfterImport($event->element, $data);
+            } else {
+                $this->addError('error', 'Could not save the ' . $data['handle'] . ' global.');
+            }
+        } else {
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' global.');
+            $this->addError('error', $event->error);
+            return false;
+        }
 
         return $result;
     }

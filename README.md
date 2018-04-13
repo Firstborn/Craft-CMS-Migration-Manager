@@ -101,6 +101,19 @@ To export content field values for custom field types use (ideal for complex fie
 - migrationManager_fields.exportFieldContent
 
 
+AssetSource
+AssetTransform * (only after)
+Categories
+Field
+Globals
+Sections
+Sites
+Tags
+UserGroups
+
+
+
+
 Any values in the field data that contains id's should be converted to handles/slug or some string based value that can be looked up on the destination site without depending on matching id values as id values can differ between website database instances.
 
 For importing custom fields the imported value should match the fields required input structure. Check the field type's fieldtypes/[type] `prepValueFromPost` and `prepValue` methods for help on determining the correct structure.

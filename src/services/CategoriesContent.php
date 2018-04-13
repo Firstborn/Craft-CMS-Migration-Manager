@@ -46,8 +46,12 @@ class CategoriesContent extends BaseContentMigration
             }
 
             $this->getContent($categoryContent, $category);
+
+            $categoryContent = $this->onBeforeExport($category, $categoryContent);
             $content['sites'][$site->handle] = $categoryContent;
+
         }
+
 
         return $content;
     }
@@ -72,16 +76,31 @@ class CategoriesContent extends BaseContentMigration
             $category = $this->createModel($value);
             $this->getSourceIds($value);
             $this->validateImportValues($value);
+
             $category->setFieldValues($value['fields']);
 
-            // save entry
-            if (!$success = Craft::$app->getElements()->saveElement($category)) {
-                throw new Exception(print_r($category->getErrors(), true));
+            $event = $this->onBeforeImport($category, $value);
+            if ($event->isValid) {
+
+                // save category
+                $result = Craft::$app->getElements()->saveElement($event->element);
+                if ($result) {
+                    $this->onAfterImport($event->element, $data);
+                } else {
+                    $this->addError('error', 'Could not save the ' . $data['slug'] . ' category.');
+                    $this->addError('error', join(',', $event->element->getErrors()));
+                    return false;
+                }
+            } else {
+                $this->addError('error', 'Error importing ' . $data['slug'] . ' category.');
+                $this->addError('error', $event->error);
+                return false;
             }
 
             if (!$primaryCategory) {
                 $primaryCategory = $category;
             }
+
         }
 
         return true;

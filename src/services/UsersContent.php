@@ -34,10 +34,11 @@ class UsersContent extends BaseContentMigration
             unset($attributes['uid']);
             unset($attributes['siteId']);
 
-
             $content = array();
             $this->getContent($content, $user);
             $content = array_merge($content, $attributes);
+
+            $content = $this->onBeforeExport($user, $content);
 
             return $content;
         }
@@ -54,22 +55,38 @@ class UsersContent extends BaseContentMigration
 
         if ($user) {
             $data['id'] = $user->id;
+            $data['contentId'] = $user->contentId;
         }
         $user = $this->createModel($data);
         $this->getSourceIds($data);
         $this->validateImportValues($data);
-        $user->setFieldValues($data['fields']);
 
-        // save user
-        if (Craft::$app->getElements()->saveElement($user, false)) {
+        if (array_key_exists('fields', $data)) {
+            $user->setFieldValues($data['fields']);
+        }
 
-            $groups = $this->getUserGroupIds($data['groups']);
-            Craft::$app->userGroups->assignUserToGroups($user->id, $groups);
+        $event = $this->onBeforeImport($user, $data);
+        if ($event->isValid) {
 
-            $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
-            Craft::$app->userPermissions->saveUserPermissions($user->id, $permissions);
+            // save user
+            $result = Craft::$app->getElements()->saveElement($event->element);
+            if ($result) {
+                $groups = $this->getUserGroupIds($data['groups']);
+                Craft::$app->users->assignUserToGroups($user->id, $groups);
+
+                $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
+                Craft::$app->userPermissions->saveUserPermissions($user->id, $permissions);
+
+                $this->onAfterImport($event->element, $data);
+            } else {
+                $this->addError('error', 'Could not save the ' . $data['email'] . ' users.');
+                $this->addError('error', join(',', $event->element->getErrors()));
+                return false;
+            }
         } else {
-            throw new Exception(print_r($user->getErrors(), true));
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' global.');
+            $this->addError('error', $event->error);
+            return false;
         }
 
         return true;

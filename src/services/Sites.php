@@ -5,6 +5,7 @@ namespace firstborn\migrationmanager\services;
 use Craft;
 use craft\models\Site;
 use craft\models\SiteGroup;
+use firstborn\migrationmanager\events\ExportEvent;
 
 class Sites extends BaseMigration
 {
@@ -37,6 +38,18 @@ class Sites extends BaseMigration
 
         $this->addManifest($site->handle);
 
+        /*if ($fullExport) {
+            // Fire an 'onExport' event
+            $event = new ElementEvent(array(
+                'element' => $site,
+                'value' => $newSite
+            ));
+            $this->onExport($event);
+        }*/
+        if ($fullExport) {
+            $newSite = $this->onBeforeExport($site, $newSite);
+        }
+
         return $newSite;
     }
 
@@ -62,12 +75,20 @@ class Sites extends BaseMigration
         $data['groupId'] = $group->id;
         $site = $this->createModel($data);
 
-        if ($site) {
-           if (Craft::$app->sites->saveSite($site)) {
-               $result = true;
+        $event = $this->onBeforeImport($site, $data);
+
+        if ($event->isValid){
+           $result = Craft::$app->sites->saveSite($event->element);
+           if ($result) {
+               $this->onAfterImport($event->element, $data);
+           } else {
+               $this->addError('error', 'Could not save the ' . $data['handle'] . ' site.');
            }
+
         } else {
-            $result = false;
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' site.');
+            $this->addError('error', $event->error);
+            return false;
         }
 
         return $result;

@@ -4,9 +4,8 @@ namespace firstborn\migrationmanager\services;
 
 use Craft;
 use craft\models\AssetTransform;
-/**
- * Class MigrationManager_AssetTransformsService
- */
+use firstborn\migrationmanager\events\ExportEvent;
+
 class AssetTransforms extends BaseMigration
 {
     /**
@@ -46,7 +45,9 @@ class AssetTransforms extends BaseMigration
             'interlace' => $transform->interlace
         ];
 
-
+        if ($fullExport) {
+            $newTransform = $this->onBeforeExport($transform, $newTransform);
+        }
 
         return $newTransform;
     }
@@ -60,6 +61,13 @@ class AssetTransforms extends BaseMigration
 
         $transform = $this->createModel($data);
         $result = Craft::$app->assetTransforms->saveTransform($transform);
+
+        if ($result) {
+            $this->onAfterImport($transform, $data);
+        } else {
+            $this->addError('error', 'Could not save the ' . $data['handle'] . ' field.');
+        }
+
 
         return $result;
     }

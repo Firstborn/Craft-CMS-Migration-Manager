@@ -3,7 +3,7 @@
 namespace firstborn\migrationmanager\services;
 
 use firstborn\migrationmanager\MigrationManager;
-use firstborn\migrationmanager\events\FieldEvent;
+use firstborn\migrationmanager\events\ImportEvent;
 use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
@@ -22,18 +22,16 @@ abstract class BaseContentMigration extends BaseMigration
         $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);
 
-        // Fire an 'onExportField' event
-        $event = new FieldEvent(array(
-            'field' => $field,
+        /*$event = new ExportEvent(array(
+            'element' => $field,
             'parent' => $parent,
             'value' => $value
-        ));
+        ));*/
 
-        $this->onExportFieldContent($event);
+        //$this->onExportFieldContent($event);
 
-        if ($event->isValid == false) {
-            $value = $event->value;
-        } else {
+        //if ($event->isValid == false) {
+        //    $value = $event->value;
             switch ($field->className()) {
                 case 'RichText':
                     if ($value){
@@ -105,7 +103,7 @@ abstract class BaseContentMigration extends BaseMigration
                     }
                     break;
             }
-        }
+        //}
 
         $content[$field->handle] = $value;
     }
@@ -122,8 +120,8 @@ abstract class BaseContentMigration extends BaseMigration
         $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
 
         if ($field) {
-            // Fire an 'onImportFieldContent' event
-            $event = new FieldEvent(array(
+
+            $event = new ImportEvent(array(
                 'field' => $field,
                 'parent' => $parent,
                 'value' => &$fieldValue
@@ -395,12 +393,12 @@ abstract class BaseContentMigration extends BaseMigration
      *
      * @return null
      */
-    public function onExportFieldContent(FieldEvent $event)
+    /*public function onExportFieldContent(ImportEvent $event)
     {
         //route this through fields service for simplified event listening
         $plugin = MigrationManager::getInstance();
         $plugin->fields->onExportFieldContent($event);
-    }
+    }*/
 
     /**
      * Fires an 'onImportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
@@ -412,12 +410,12 @@ abstract class BaseContentMigration extends BaseMigration
      *
      * @return null
      */
-    public function onImportFieldContent(FieldEvent $event)
+    /*public function onImportFieldContent(ImportEvent $event)
     {
         //route this through fields service for simplified event listening
         $plugin = MigrationManager::getInstance();
         $plugin->fields->onImportFieldContent($event);
-    }
+    }*/
 
 
 

@@ -6,7 +6,8 @@ use Craft;
 use craft\models\FieldGroup;
 use craft\db\Query;
 use yii\base\Event;
-use firstborn\migrationmanager\events\FieldEvent;
+use firstborn\migrationmanager\events\ImportEvent;
+use firstborn\migrationmanager\events\ExportEvent;
 
 
 class Fields extends BaseMigration
@@ -79,21 +80,11 @@ class Fields extends BaseMigration
         $this->getSettingHandles($newField);
 
 
-        // Fire an 'onExportField' event
-        $event = new FieldEvent(array(
-            'field' => $field,
-            'value' => $newField
-        ));
-        $this->onExportField($event);
-
-        if ($event->isValid){
-            return $event->value;
-        } else {
-            $this->addError('error', 'Error exporting ' . $field->handle . ' field.');
-            $this->addError('error', $event->params['error']);
-            return false;
+        if ($fullExport) {
+            $newField = $this->onBeforeExport($field, $newField);
         }
 
+        return $newField;
     }
 
 
@@ -108,18 +99,13 @@ class Fields extends BaseMigration
             $data['id'] = 'new';
         }
 
-        // Fire an 'onImportField' event
-        $event = new FieldEvent(array(
-            'field' => $existing,
-            'value' => $data
-        ));
-        $this->onImportField($event);
+        $field = $this->createModel($data);
+        $event = $this->onBeforeImport($field, $data);
 
         if ($event->isValid) {
-            $field = $this->createModel($event->value);
-
-            $result = Craft::$app->fields->saveField($field);
+            $result = Craft::$app->fields->saveField($event->element);
             if ($result) {
+                $this->onAfterImport($event->element, $data);
              } else {
                 $this->addError('error', 'Could not save the ' . $data['handle'] . ' field.');
             }
@@ -127,7 +113,7 @@ class Fields extends BaseMigration
             return $result;
         } else {
             $this->addError('error', 'Error importing ' . $data['handle'] . ' field.');
-            $this->addError('error', $event->params['error']);
+            $this->addError('error', $event->error);
             return false;
         }
     }
@@ -192,7 +178,7 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onExportField(FieldEvent $event)
+    public function onExportField(ImportEvent $event)
     {
         if ($this->hasEventHandlers(self::EVENT_EXPORT_FIELD)) {
             $this->trigger(self::EVENT_EXPORT_FIELD, $event);
@@ -209,7 +195,7 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onExportFieldContent(FieldEvent $event)
+    public function onExportFieldContent(ImportEvent $event)
     {
         $this->trigger(Fields::EVENT_EXPORT_FIELD_CONTENT, $event);
     }
@@ -223,7 +209,7 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onImportField(FieldEvent $event)
+    public function onImportField(ImportEvent $event)
     {
         $this->trigger(Fields::EVENT_IMPORT_FIELD, $event);
     }
@@ -238,7 +224,7 @@ class Fields extends BaseMigration
      *
      * @return null
      */
-    public function onImportFieldContent(FieldEvent $event)
+    public function onImportFieldContent(ImportEvent $event)
     {
         $this->trigger(Fields::EVENT_IMPORT_FIELD_CONTENT, $event);
     }

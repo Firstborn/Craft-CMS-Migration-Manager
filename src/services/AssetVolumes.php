@@ -3,6 +3,9 @@
 namespace firstborn\migrationmanager\services;
 
 use Craft;
+use firstborn\migrationmanager\events\ExportEvent;
+use craft\volumes\Local;
+use craft\volumes\MissingVolume;
 
 class AssetVolumes extends BaseMigration
 {
@@ -34,7 +37,7 @@ class AssetVolumes extends BaseMigration
         $newVolume = [
             'name' => $volume->name,
             'handle' => $volume->handle,
-            'type' => get_class($volume),
+            'type' => $volume->className(),
             'sortOrder' => $volume->sortOrder,
             'typesettings' => $volume->settings,
         ];
@@ -58,6 +61,11 @@ class AssetVolumes extends BaseMigration
                 }
             }
         }
+
+        if ($fullExport) {
+            $newVolume = $this->onBeforeExport($volume, $newVolume);
+        }
+
         return $newVolume;
     }
 
@@ -69,14 +77,32 @@ class AssetVolumes extends BaseMigration
      */
     public function importItem(Array $data)
     {
-        $existing = $volume = Craft::$app->volumes->getVolumeByHandle($data['handle']);
-
+        $existing = Craft::$app->volumes->getVolumeByHandle($data['handle']);
         if ($existing) {
             $this->mergeUpdates($data, $existing);
         }
 
         $volume = $this->createModel($data);
-        $result = Craft::$app->volumes->saveVolume($volume);
+        $event = $this->onBeforeImport($volume, $data);
+        if ($event->isValid) {
+            $result = Craft::$app->volumes->saveVolume($event->element);
+            if ($result){
+                $this->onAfterImport($event->element, $data);
+            } else {
+                $this->addError('error', 'Failed to save asset volume.');
+                $errors = $event->element->getErrors();
+                foreach($errors as $error) {
+                    $this->addError('error', $error);
+                }
+                return false;
+            }
+        } else {
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' asset volume.');
+            $this->addError('error', $event->error);
+            return false;
+        }
+
+        $result = true;
 
         return $result;
     }
@@ -88,16 +114,16 @@ class AssetVolumes extends BaseMigration
      */
     public function createModel(Array $data)
     {
-
         $volumes = Craft::$app->getVolumes();
-
+        $type = str_replace('/', '\\', $data['type']);
         $volume = $volumes->createVolume([
-            'id' => $data['id'],
-            'type' => $data['type'],
+            'id' => array_key_exists('id', $data) ? $data['id'] : null,
+            'type' => $type,
             'name' => $data['name'],
             'handle' => $data['handle'],
             'hasUrls' => array_key_exists('hasUrls', $data) ? $data['hasUrls'] : false,
             'url' => array_key_exists('hasUrls', $data) ? $data['url'] : '',
+            'sortOrder' => $data['sortOrder'],
             'settings' => $data['typesettings']
         ]);
 
@@ -130,7 +156,6 @@ class AssetVolumes extends BaseMigration
             $fieldLayout->type = Asset::class;
             $volume->fieldLayout = $fieldLayout;
         }
-
         return $volume;
     }
 

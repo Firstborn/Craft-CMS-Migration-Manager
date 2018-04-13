@@ -12,6 +12,7 @@ class EntriesContent extends BaseContentMigration
 
     public function exportItem($element, $fullExport = false)
     {
+        Craft::error('export entry ' . ($fullExport ? 'yes':'no'));
         $primaryEntry = Craft::$app->entries->getEntryById($element->id, $element->siteId);
 
         if ($primaryEntry) {
@@ -50,10 +51,13 @@ class EntriesContent extends BaseContentMigration
                     }
 
                     $this->getContent($entryContent, $entry);
+                    $entryContent = $this->onBeforeExport($entry, $entryContent);
+
                     $content['sites'][$site->handle] = $entryContent;
                 }
             }
         }
+
         return $content;
     }
 
@@ -80,14 +84,25 @@ class EntriesContent extends BaseContentMigration
             $this->validateImportValues($value);
             $entry->setFieldValues($value['fields']);
 
-            $result = Craft::$app->getElements()->saveElement($entry);
+            $event = $this->onBeforeImport($entry, $value);
+            if ($event->isValid) {
 
-            if (!$result) {
-                throw new Exception(print_r($entry->getErrors(), true));
+                $result = Craft::$app->getElements()->saveElement($event->element);
+
+                if ($result) {
+                    $this->onAfterImport($event->element, $data);
+                } else {
+                    $this->addError('error', 'Could not save the ' . $data['slug'] . ' entry.');
+                    $this->addError('error', join(',', $event->element->getErrors()));
+                    return false;
+                }
+            } else {
+                $this->addError('error', 'Error importing ' . $data['slug'] . ' field.');
+                $this->addError('error', $event->error);
+                return false;
             }
 
             if (!$primaryEntry) {
-
                 $primaryEntry = $entry;
             }
         }

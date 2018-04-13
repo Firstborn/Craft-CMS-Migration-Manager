@@ -7,6 +7,7 @@ use craft\models\Section;
 use craft\models\Section_SiteSettings;
 use craft\models\EntryType;
 use craft\models\Entry;
+use firstborn\migrationmanager\events\ExportEvent;
 
 
 class Sections extends BaseMigration
@@ -97,6 +98,11 @@ class Sections extends BaseMigration
             array_push($newSection['entrytypes'], $newEntryType);
         }
 
+
+        if ($fullExport) {
+            $newSection = $this->onBeforeExport($section, $newSection);
+        }
+
         return $newSection;
     }
 
@@ -114,10 +120,11 @@ class Sections extends BaseMigration
 
         $section = $this->createModel($data);
 
-
-        if ($section) {
-            if (Craft::$app->sections->saveSection($section)) {
-                if (!$existing){
+        $event = $this->onBeforeImport($section, $data);
+        if ($event->isValid) {
+            if (Craft::$app->sections->saveSection($event->element)) {
+                $this->onAfterImport($event->element, $data);
+                if (!$existing) {
                     //wipe out the default entry type
                     $defaultEntryType = Craft::$app->sections->getEntryTypesBySectionId($section->id);
                     if ($defaultEntryType) {
@@ -126,7 +133,6 @@ class Sections extends BaseMigration
                 }
 
                 //add entry types
-                Craft::error('create entry type');
                 foreach ($data['entrytypes'] as $key => $newEntryType) {
                     $existingType = $this->getSectionEntryTypeByHandle($newEntryType['handle'], $section->id);
                     if ($existingType) {
@@ -140,11 +146,14 @@ class Sections extends BaseMigration
                     }
                 }
             } else {
-                Craft::info('failed to create section');
+                $this->addError('error', 'Could not save the ' . $data['handle'] . ' section.');
                 $result = false;
             }
+
         } else {
-            $result = false;
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' section.');
+            $this->addError('error', $event->error);
+            return false;
         }
 
         return $result;

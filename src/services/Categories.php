@@ -6,6 +6,7 @@ use Craft;
 use craft\elements\Category;
 use craft\models\CategoryGroup;
 use craft\models\CategoryGroup_SiteSettings;
+use firstborn\migrationmanager\events\ExportEvent;
 
 class Categories extends BaseMigration
 {
@@ -63,6 +64,10 @@ class Categories extends BaseMigration
             }
         }
 
+        if ($fullExport) {
+            $newCategory = $this->onBeforeExport($category, $newCategory);
+        }
+
         return $newCategory;
     }
 
@@ -77,7 +82,21 @@ class Categories extends BaseMigration
         }
 
         $category = $this->createModel($data);
-        $result = Craft::$app->categories->saveGroup($category);
+        $event = $this->onBeforeImport($category, $data);
+
+        if ($event->isValid) {
+            $result = Craft::$app->categories->saveGroup($event->element);
+            if ($result) {
+                $this->onAfterImport($event->element, $data);
+            } else {
+                $this->addError('error', 'Could not save the ' . $data['handle'] . ' category.');
+            }
+
+        } else {
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' field.');
+            $this->addError('error', $event->error);
+            return false;
+        }
 
         return $result;
     }

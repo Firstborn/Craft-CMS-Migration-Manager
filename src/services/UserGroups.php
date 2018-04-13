@@ -6,6 +6,7 @@ use firstborn\migrationmanager\helpers\MigrationManagerHelper;
 use Craft;
 use craft\elements\User;
 use craft\models\UserGroup;
+use firstborn\migrationmanager\events\ExportEvent;
 
 class UserGroups extends BaseMigration
 {
@@ -61,6 +62,10 @@ class UserGroups extends BaseMigration
             }
         }
 
+        if ($fullExport) {
+            $newGroup = $this->onBeforeExport($group, $newGroup);
+        }
+
         return $newGroup;
     }
 
@@ -76,30 +81,43 @@ class UserGroups extends BaseMigration
         }
 
         $userGroup = $this->createModel($data);
-        $result = Craft::$app->userGroups->saveGroup($userGroup);
-        if ($result) {
-            if (array_key_exists('permissions', $data)) {
-                $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
-                if (Craft::$app->userPermissions->saveGroupPermissions($userGroup->id, $permissions)) {
+        $event = $this->onBeforeImport($userGroup, $data);
 
-                } else {
-                    $this->addError('error', 'Could not save user group permissions');
+        if ($event->isValid) {
+            $result = Craft::$app->userGroups->saveGroup($event->element);
+            if ($result) {
+
+                if (array_key_exists('permissions', $data)) {
+                    $permissions = MigrationManagerHelper::getPermissionIds($data['permissions']);
+                    if (Craft::$app->userPermissions->saveGroupPermissions($userGroup->id, $permissions)) {
+
+                    } else {
+                        $this->addError('error', 'Could not save user group permissions');
+                    }
                 }
+
+                if (array_key_exists('settings', $data)) {
+
+                    if ($data['settings']['defaultGroup'] != null) {
+                        $group = Craft::$app->userGroups->getGroupByHandle($data['settings']['defaultGroup']);
+                        $data['settings']['defaultGroup'] = $group->id;
+                    }
+
+                    if (Craft::$app->systemSettings->saveSettings('users', $data['settings'])) {
+
+                    } else {
+                        $this->addError('error', 'Could not save user group settings');
+                    }
+                }
+
+                $this->onAfterImport($event->element, $data);
+            } else {
+                $this->addError('error', 'Could not save the ' . $data['handle'] . ' user group.');
             }
-
-            if (array_key_exists('settings', $data)) {
-
-                if ($data['settings']['defaultGroup'] != null) {
-                    $group = Craft::$app->userGroups->getGroupByHandle($data['settings']['defaultGroup']);
-                    $data['settings']['defaultGroup'] = $group->id;
-                }
-
-                if (Craft::$app->systemSettings->saveSettings('users', $data['settings'])) {
-
-                } else {
-                    $this->addError('error', 'Could not save user group settings');
-                }
-            }
+        } else {
+            $this->addError('error', 'Error importing ' . $data['handle'] . ' user group.');
+            $this->addError('error', $event->error);
+            return false;
         }
 
         return $result;

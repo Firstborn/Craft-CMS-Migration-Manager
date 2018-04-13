@@ -64,6 +64,10 @@ class MigrationManager extends Plugin
      * you do not need to load it in your init() method.
      *
      */
+
+    public function label(){
+        return 'hi';
+    }
     public function init()
     {
         parent::init();
@@ -94,6 +98,7 @@ class MigrationManager extends Plugin
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
                 $event->rules['migrationmanager/migrations'] = 'migrationmanager/cp/migrations';
+                $event->rules['migrationmanager/create'] = 'migrationmanager/cp/index';
                 $event->rules['migrationmanager'] = 'migrationmanager/cp/index';
             }
         );
@@ -133,11 +138,17 @@ class MigrationManager extends Plugin
     public function getCpNavItem()
     {
         $item = parent::getCpNavItem();
+        $item['badgeCount'] = $this->getBadgeCount();
         $item['subnav'] = [
             'create' => ['label' => 'Create', 'url' => 'migrationmanager'],
             'migrations' => ['label' => 'Migrations', 'url' => 'migrationmanager/migrations']
         ];
         return $item;
+    }
+
+    public function getBadgeCount(){
+        $count =  count($this->migrations->getNewMigrations());
+        return $count;
     }
 
 }

@@ -30,6 +30,8 @@ class GlobalsContent extends BaseContentMigration
             );
 
             $this->getContent($setContent, $set);
+
+            $setContent = $this->onBeforeExport($set, $setContent);
             $content['sites'][$site->handle] = $setContent;
         }
 
@@ -48,9 +50,21 @@ class GlobalsContent extends BaseContentMigration
             $this->validateImportValues($value);
             $set->setFieldValues($value['fields']);
 
-            // save set
-            if (!$success = Craft::$app->getElements()->saveElement($set)) {
-                throw new Exception(print_r($set->getErrors(), true));
+            $event = $this->onBeforeImport($set, $value);
+            if ($event->isValid) {
+                // save set
+                $result = Craft::$app->getElements()->saveElement($event->element);
+                if ($result) {
+                    $this->onAfterImport($event->element, $data);
+                } else {
+                    $this->addError('error', 'Could not save the ' . $data['handle'] . ' global.');
+                    $this->addError('error', join(',', $event->element->getErrors()));
+                    return false;
+                }
+            } else {
+                $this->addError('error', 'Error importing ' . $data['handle'] . ' global.');
+                $this->addError('error', $event->error);
+                return false;
             }
         }
         return true;
