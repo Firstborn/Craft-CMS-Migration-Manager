@@ -2,112 +2,128 @@
 
 namespace firstborn\migrationmanager\services;
 
-use firstborn\migrationmanager\MigrationManager;
+use firstborn\migrationmanager\helpers\MigrationManagerHelper;
 use firstborn\migrationmanager\events\ImportEvent;
 use Craft;
 use craft\fields\BaseOptionsField;
 use craft\fields\BaseRelationField;
+use craft\base\Element;
 
 abstract class BaseContentMigration extends BaseMigration
 {
 
+    /**
+     * @param $content
+     * @param $element
+     */
     protected function getContent(&$content, $element){
         foreach ($element->getFieldLayout()->getFields() as $fieldModel) {
             $this->getFieldContent($content['fields'], $fieldModel, $element);
         }
     }
 
+    /**
+     * @param $content
+     * @param $fieldModel
+     * @param $parent
+     */
+
     protected function getFieldContent(&$content, $fieldModel, $parent)
     {
         $field = $fieldModel;
         $value = $parent->getFieldValue($field->handle);
 
-        /*$event = new ExportEvent(array(
-            'element' => $field,
-            'parent' => $parent,
-            'value' => $value
-        ));*/
+        Craft::error('FIELD: ' . $field->handle . ' ' .$field->className());
 
-        //$this->onExportFieldContent($event);
+        switch ($field->className()) {
+             case 'craft\redactor\Field':
+                if ($value){
+                    $value = $value->getRawContent();
+                } else {
+                    $value = '';
+                }
 
-        //if ($event->isValid == false) {
-        //    $value = $event->value;
-            switch ($field->className()) {
-                case 'RichText':
-                    if ($value){
-                        $value = $value->getRawContent();
-                    } else {
-                        $value = '';
-                    }
+                break;
+            case 'craft\fields\Matrix':
+                $model = $parent[$field->handle];
+                $model->limit = null;
+                $value = $this->getIteratorValues($model, function ($item) {
+                    $itemType = $item->getType();
+                    $value = [
+                        'type' => $itemType->handle,
+                        'enabled' => $item->enabled,
+                        'fields' => []
+                    ];
 
-                    break;
-                case 'Matrix':
-                    $model = $parent[$field->handle];
+                    return $value;
+                });
+                break;
+            case 'Neo':
+                $model = $parent[$field->handle];
+                $value = $this->getIteratorValues($model, function ($item) {
+                    $itemType = $item->getType();
+                    $value = [
+                        'type' => $itemType->handle,
+                        'enabled' => $item->enabled,
+                        'modified' => $item->enabled,
+                        'collapsed' => $item->collapsed,
+                        'level' => $item->level,
+                        'fields' => []
+                    ];
+
+                    return $value;
+                });
+                break;
+            case 'verbb\supertable\fields\SuperTableField':
+                $model = $parent[$field->handle];
+
+                /*if ($field->settings['staticField'] == 1){
+                    $value = [
+                        'new1' => [
+                            'type' => $model->typeId,
+                            'fields' => []
+                        ]
+                    ];
+                    //Craft::error();
+                    //TODO NEED TO FIGURE THIS OUT
+                    //$this->getContent($value['new1']['fields'], $model);
+                } else {
+
                     $value = $this->getIteratorValues($model, function ($item) {
-                        $itemType = $item->getType();
                         $value = [
-                            'type' => $itemType->handle,
-                            'enabled' => $item->enabled,
+                            'type' => $item->typeId,
                             'fields' => []
                         ];
-
                         return $value;
                     });
-                    break;
-                case 'Neo':
-                    $model = $parent[$field->handle];
-                    $value = $this->getIteratorValues($model, function ($item) {
-                        $itemType = $item->getType();
-                        $value = [
-                            'type' => $itemType->handle,
-                            'enabled' => $item->enabled,
-                            'modified' => $item->enabled,
-                            'collapsed' => $item->collapsed,
-                            'level' => $item->level,
-                            'fields' => []
-                        ];
+                }*/
+                $value = $this->getIteratorValues($model, function ($item) {
+                    $value = [
+                        'type' => $item->typeId,
+                        'fields' => []
+                    ];
+                    return $value;
+                });
 
-                        return $value;
-                    });
-                    break;
-                case 'SuperTable':
-                    $model = $parent[$field->handle];
-
-                    if ($field->settings['staticField'] == 1){
-                        $value = [
-                            'new1' => [
-                                'type' => $model->typeId,
-                                'fields' => []
-                            ]
-                        ];
-                        $this->getContent($value['new1']['fields'], $model);
-                    } else {
-
-                        $value = $this->getIteratorValues($model, function ($item) {
-                            $value = [
-                                'type' => $item->typeId,
-                                'fields' => []
-                            ];
-                            return $value;
-                        });
-                    }
-                    break;
-                case 'Dropdown':
-                    $value = $value->value;
-                    break;
-                default:
-                    if ($field instanceof BaseRelationField) {
-                        $this->getSourceHandles($value);
-                    } elseif ($field instanceof BaseOptionsField){
-                        $this->getSelectedOptions($value);
-                    }
-                    break;
-            }
-        //}
-
+                break;
+            case 'craft\fields\Dropdown':
+                $value = $value->value;
+                break;
+            default:
+                if ($field instanceof BaseRelationField) {
+                    $this->getSourceHandles($value);
+                } elseif ($field instanceof BaseOptionsField){
+                    $this->getSelectedOptions($value);
+                }
+                break;
+        }
         $content[$field->handle] = $value;
     }
 
+
+    /**
+     * @param $values
+     */
     protected function validateImportValues(&$values)
     {
         foreach ($values as $key => &$value) {
@@ -115,12 +131,16 @@ abstract class BaseContentMigration extends BaseMigration
         }
     }
 
+    /**
+     * @param $parent
+     * @param $fieldHandle
+     * @param $fieldValue
+     */
+
     protected function validateFieldValue($parent, $fieldHandle, &$fieldValue)
     {
         $field = Craft::$app->fields->getFieldByHandle($fieldHandle);
-
         if ($field) {
-
             $event = new ImportEvent(array(
                 'field' => $field,
                 'parent' => $parent,
@@ -134,13 +154,13 @@ abstract class BaseContentMigration extends BaseMigration
 
             } else {
                 switch ($field->className()) {
-                    case 'Matrix':
+                    case 'craft\fields\Matrix':
                         foreach($fieldValue as $key => &$matrixBlock){
                             $blockType = MigrationManagerHelper::getMatrixBlockType($matrixBlock['type'], $field->id);
                             if ($blockType) {
                                 $blockFields = Craft::$app->fields->getAllFields(null, 'matrixBlockType:' . $blockType->id);
                                 foreach($blockFields as &$blockField){
-                                    if ($blockField->className() == 'SuperTable') {
+                                    if ($blockField->className() == 'verbb\supertable\fields\SuperTableField') {
                                         $matrixBlockFieldValue = &$matrixBlock['fields'][$blockField->handle];
                                         $this->updateSupertableFieldValue($matrixBlockFieldValue, $blockField);
                                     }
@@ -157,7 +177,7 @@ abstract class BaseContentMigration extends BaseMigration
                                     $blockFields = $blockTab->getFields();
                                     foreach($blockFields as &$blockTabField){
                                         $neoBlockField = Craft::$app->fields->getFieldById($blockTabField->fieldId);
-                                        if ($neoBlockField->className() == 'SuperTable') {
+                                        if ($neoBlockField->className() == 'verbb\supertable\fields\SuperTableField') {
                                             $neoBlockFieldValue = &$neoBlock['fields'][$neoBlockField->handle];
                                             $this->updateSupertableFieldValue($neoBlockFieldValue, $neoBlockField);
                                         }
@@ -167,15 +187,18 @@ abstract class BaseContentMigration extends BaseMigration
                         }
 
                         break;
-                    case 'SuperTable':
+                    case 'verbb\supertable\fields\SuperTableField':
                         $this->updateSupertableFieldValue($fieldValue, $field);
                         break;
                 }
             }
         }
-
     }
 
+    /**
+     * @param $fieldValue
+     * @param $field
+     */
     protected function updateSupertableFieldValue(&$fieldValue, $field){
         $blockType = Craft::$app->superTable->getBlockTypesByFieldId($field->id)[0];
         foreach ($fieldValue as $key => &$value) {
@@ -183,6 +206,11 @@ abstract class BaseContentMigration extends BaseMigration
         }
     }
 
+    /**
+     * @param $element
+     * @param $settingsFunc
+     * @return array
+     */
     protected function getIteratorValues($element, $settingsFunc)
     {
         $items = $element->getIterator();
@@ -206,6 +234,11 @@ abstract class BaseContentMigration extends BaseMigration
         return $value;
     }
 
+    /**
+     * @param $handle
+     * @param $sectionId
+     * @return bool
+     */
     protected function getEntryType($handle, $sectionId)
     {
         $entryTypes = Craft::$app->sections->getEntryTypesBySectionId($sectionId);
@@ -220,49 +253,52 @@ abstract class BaseContentMigration extends BaseMigration
         return false;
     }
 
+    /**
+     * @param $value
+     * @return array
+     */
     protected function getSourceHandles(&$value)
     {
-        $elements = $value->elements();
+        $elements = $value->all();
         $value = [];
         if ($elements) {
             foreach ($elements as $element) {
-
-                switch ($element->getElementType()) {
-                    case 'Asset':
+                switch ($element->className()) {
+                    case 'craft\elements\Asset':
                         $item = [
-                            'elementType' => 'Asset',
+                            'elementType' => $element->className(),
                             'filename' => $element->filename,
                             'folder' => $element->getFolder()->name,
-                            'source' => $element->getSource()->handle
+                            'source' => $element->getVolume()->handle
                         ];
                         break;
-                    case 'Category':
+                    case 'craft\elements\Category':
                         $item = [
-                            'elementType' => 'Category',
+                            'elementType' => $element->className(),
                             'slug' => $element->slug,
                             'category' => $element->getGroup()->handle
                         ];
                         break;
-                    case 'Entry':
+                    case 'craft\elements\Entry':
                         $item = [
-                            'elementType' => 'Entry',
+                            'elementType' => $element->className(),
                             'slug' => $element->slug,
                             'section' => $element->getSection()->handle
                         ];
                         break;
-                    case 'Tag':
+                    case 'craft\elements\Tag':
                         $tagValue = [];
                         $this->getContent($tagValue, $element);
                         $item = [
-                            'elementType' => 'Tag',
+                            'elementType' => $element->className(),
                             'slug' => $element->slug,
                             'group' => $element->getGroup()->handle,
                             'value' => $tagValue
                         ];
                         break;
-                    case 'User':
+                    case 'craft\elements\User':
                         $item = [
-                            'elementType' => 'User',
+                            'elementType' => $element->className(),
                             'username' => $element->username
                         ];
                         break;
@@ -282,6 +318,9 @@ abstract class BaseContentMigration extends BaseMigration
         return $value;
     }
 
+    /**
+     * @param $value
+     */
     protected function getSourceIds(&$value)
     {
         if (is_array($value))
@@ -295,6 +334,10 @@ abstract class BaseContentMigration extends BaseMigration
         return;
     }
 
+    /**
+     * @param $value
+     * @return array
+     */
     protected function getSelectedOptions(&$value){
         $options = $value->getOptions();
         $value = [];
@@ -308,28 +351,33 @@ abstract class BaseContentMigration extends BaseMigration
 
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     protected function populateIds(&$value)
     {
         $isElementField = true;
         $ids = [];
         foreach ($value as &$element) {
             if (is_array($element) && key_exists('elementType', $element)) {
+                $elementType = str_replace('/', '\\', $element['elementType']);
                 $func = null;
-                switch ($element['elementType']) {
-                    case 'Asset':
-                        $func = '\Craft\MigrationManagerHelper::getAssetByHandle';
+                switch ($elementType) {
+                    case 'craft\elements\Asset':
+                         $func = 'firstborn\migrationmanager\helpers\MigrationManagerHelper::getAssetByHandle';
                         break;
-                    case 'Category':
-                        $func = '\Craft\MigrationManagerHelper::getCategoryByHandle';
+                    case 'craft\elements\Category':
+                        $func = 'firstborn\migrationmanager\helpers\MigrationManagerHelper::getCategoryByHandle';
                         break;
-                    case 'Entry':
-                        $func = '\Craft\MigrationManagerHelper::getEntryByHandle';
+                    case 'craft\elements\Entry':
+                        $func = 'firstborn\migrationmanager\helpers\MigrationManagerHelper::getEntryByHandle';
                         break;
-                    case 'Tag':
-                        $func = '\Craft\MigrationManagerHelper::getTagByHandle';
+                    case 'craft\elements\Tag':
+                        $func = 'firstborn\migrationmanager\helpers\MigrationManagerHelper::getTagByHandle';
                         break;
-                    case 'User':
-                        $func = '\Craft\MigrationManagerHelper::getUserByHandle';
+                    case 'craft\elements\User':
+                        $func = 'firstborn\migrationmanager\helpers\MigrationManagerHelper::getUserByHandle';
                         break;
                     default:
                         break;
@@ -355,20 +403,24 @@ abstract class BaseContentMigration extends BaseMigration
         return true;
     }
 
-    protected function localizeData(BaseElementModel $element, Array &$data)
+    /**
+     * @param BaseElementModel $element
+     * @param array $data function foo($method)
+    **/
+    protected function localizeData(Element $element, Array &$data)
     {
         //look for matrix/supertables/neo that are not localized and update the keys to ensure the locale values on child elements remain intact
         $fieldLayout = $element->getFieldLayout();
-
         foreach ($fieldLayout->getTabs() as $tab) {
             foreach ($tab->getFields() as $tabField) {
                 $field = craft()->fields->getFieldById($tabField->fieldId);
                 $fieldValue = $element[$field->handle];
+                Craft::error('check is field translatable: ' . $field->handle . ' '. $field->translatable);
                 if ($field->translatable == false) {
-                    if ( in_array ($field->type , ['Matrix', 'SuperTable', 'Neo']) ) {
-                        if ($field->type == 'SuperTable' && $field->settings['staticField'] == 1){
-                            $data[$field->handle][$fieldValue->id] = $data[$field->handle]['new1'];
-                        } else {
+                    if ( in_array ($field->type , ['craft\fields\Matrix', 'verbb\supertable\fields\SuperTableField', 'Neo']) ) {
+                        //if ($field->type == 'SuperTable' && $field->settings['staticField'] == 1){
+                        //    $data[$field->handle][$fieldValue->id] = $data[$field->handle]['new1'];
+                        //} else {
                             $items = $fieldValue->getIterator();
                             $i = 1;
                             foreach ($items as $item) {
@@ -376,48 +428,11 @@ abstract class BaseContentMigration extends BaseMigration
                                 unset($data[$field->handle]['new' . $i]);
                                 $i++;
                             }
-                        }
+                        //}
                     }
                 }
             }
         }
     }
-
-    /**
-     * Fires an 'onExportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
-     *
-     * @param Event $event
-     *          $event->params['field'] - field
-     *          $event->params['parent'] - field parent
-     *          $event->params['value'] - current field value, change this value in the event handler to output a different value
-     *
-     * @return null
-     */
-    /*public function onExportFieldContent(ImportEvent $event)
-    {
-        //route this through fields service for simplified event listening
-        $plugin = MigrationManager::getInstance();
-        $plugin->fields->onExportFieldContent($event);
-    }*/
-
-    /**
-     * Fires an 'onImportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
-     *
-     * @param Event $event
-     *          $event->params['field'] - field
-     *          $event->params['parent'] - field parent
-     *          $event->params['value'] - current field value, change this value in the event handler to import a different value
-     *
-     * @return null
-     */
-    /*public function onImportFieldContent(ImportEvent $event)
-    {
-        //route this through fields service for simplified event listening
-        $plugin = MigrationManager::getInstance();
-        $plugin->fields->onImportFieldContent($event);
-    }*/
-
-
-
 
 }

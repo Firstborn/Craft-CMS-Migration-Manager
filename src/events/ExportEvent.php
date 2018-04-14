@@ -7,7 +7,7 @@ use yii\base\Event;
 use yii\base\Component;
 
 /**
- * Migration event class.
+ * Migration ExportEvent class.
  *
  */
 class ExportEvent extends Event

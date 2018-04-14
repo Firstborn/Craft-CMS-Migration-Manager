@@ -52,6 +52,11 @@ class AssetTransforms extends BaseMigration
         return $newTransform;
     }
 
+    /**
+     * @param array $data
+     * @return mixed
+     */
+
     public function importItem(Array $data)
     {
         $existing = Craft::$app->assetTransforms->getTransformByHandle($data['handle']);
@@ -72,13 +77,17 @@ class AssetTransforms extends BaseMigration
         return $result;
     }
 
+    /**
+     * @param array $data
+     * @return AssetTransform
+     */
+
     public function createModel(Array $data)
     {
         $transform = new AssetTransform();
         if (array_key_exists('id', $data)) {
             $transform->id = $data['id'];
         }
-
         $transform->name = $data['name'];
         $transform->handle = $data['handle'];
         $transform->width = $data['width'];
@@ -91,6 +100,11 @@ class AssetTransforms extends BaseMigration
 
         return $transform;
     }
+
+    /**
+     * @param $newSource
+     * @param $source
+     */
 
     private function mergeUpdates(&$newSource, $source)
     {

@@ -6,7 +6,7 @@ use craft\events\CancelableEvent;
 use yii\base\Component;
 
 /**
- * Field event class.
+ * Migration ImportEvent class.
  */
 class ImportEvent extends CancelableEvent
 {

@@ -43,11 +43,6 @@ class Migrations extends Component
         'global' => 'globalsContent',
     );
 
-    public function init()
-    {
-        //$migration = new MigrationRecord('migrationmanager');
-        //$this->_migrationTable = $migration->getTableName();
-    }
 
     /**
      * create a new migration file based on input element types
@@ -261,7 +256,6 @@ class Migrations extends Component
                 }
 
                 foreach ($this->_settingsMigrationTypes as $key => $value) {
-                    //$service = Craft::$app->getComponent($value);
                     $service = $plugin->get($value);
                     if (array_key_exists($service->getDestination(), $data['settings']['elements'])) {
                         $service->import($data['settings']['elements'][$service->getDestination()]);
@@ -292,7 +286,6 @@ class Migrations extends Component
                 }
             }
         } catch (\Exception $e) {
-            Craft::error(json_encode($e));
             Craft::error('Exception handled: ' . $e->getMessage());
             return false;
         }
@@ -309,8 +302,6 @@ class Migrations extends Component
     public function runMigrations($migrationNames = [])
     {
 
-        Craft::error('runMigrations');
-
         // This might take a while
         App::maxPowerCaptain();
 
@@ -321,11 +312,6 @@ class Migrations extends Component
         }
 
         $total = count($migrationNames);
-
-        /*if ($limit !== 0) {
-            $migrationNames = array_slice($migrationNames, 0, $limit);
-        }*/
-
         $n = count($migrationNames);
 
         if ($n === $total) {
@@ -338,14 +324,9 @@ class Migrations extends Component
             $logMessage .= "\n\t$migrationName";
         }
 
-
-
         foreach ($migrationNames as $migrationName) {
-            Craft::error('run migration: '. $migrationName);
-
-            try {
+             try {
                 $migrator = Craft::$app->getContentMigrator();
-
                 $migrator->migrateUp($migrationName);
             } catch (MigrationException $e) {
                 Craft::error('Migration failed. The rest of the migrations are cancelled.', __METHOD__);
@@ -361,7 +342,7 @@ class Migrations extends Component
      *
      * @param $migrations
      */
-    public function setMigrationsAsNotApplied($migrations)
+    /*public function setMigrationsAsNotApplied($migrations)
     {
         $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
         $pluginInfo = Craft::$app->plugins->getPluginInfo($plugin);
@@ -372,14 +353,14 @@ class Migrations extends Component
                 'pluginId' => $pluginInfo['id'],
             ));
         }
-    }
+    }*/
 
     /**
      * Add applied migrations to the migration table
      *
      * @param $migrations
      */
-    public function setMigrationsAsApplied($migrations)
+    /*public function setMigrationsAsApplied($migrations)
     {
         $plugin = Craft::$app->plugins->getPlugin('migrationmanager');
         $pluginInfo = Craft::$app->plugins->getPluginInfo($plugin);
@@ -394,7 +375,7 @@ class Migrations extends Component
                 'pluginId' => $pluginInfo['id'],
             ));
         }
-    }
+    }*/
 
     /**
      * Gets migrations that have no been applied yet
@@ -404,7 +385,7 @@ class Migrations extends Component
      * @return array
      * @throws Exception
      */
-    public function getAppliedMigrations($plugin = null)
+    /*public function getAppliedMigrations($plugin = null)
     {
         $migrations = array();
         if ($plugin == null) {
@@ -442,7 +423,7 @@ class Migrations extends Component
         }
 
         return $migrations;
-    }
+    }*/
 
     /**
      * Gets migrations that have no been applied yet
@@ -465,7 +446,7 @@ class Migrations extends Component
      * @return bool|string
      * @throws Exception
      */
-    public function getNewMigration($id)
+    /*public function getNewMigration($id)
     {
         $plugin = Craft::$app->plugins->getPlugin('migrationmanager', false);
 
@@ -487,7 +468,7 @@ class Migrations extends Component
         }
 
         return false;
-    }
+    }*/
 
     /**
      * @param string          $file
@@ -496,7 +477,7 @@ class Migrations extends Component
      * @return bool|string
      * @throws Exception
      */
-    public function getMigration($file, $plugin)
+    /*public function getMigration($file, $plugin)
     {
         $migrationPath = Craft::$app->migrations->getMigrationPath($plugin) . 'generated/';
         $path = IOHelper::normalizePathSeparators($migrationPath . $file);
@@ -507,7 +488,7 @@ class Migrations extends Component
         } else {
             return false;
         }
-    }
+    }*/
 
     /**
      * @param string          $class
@@ -516,7 +497,7 @@ class Migrations extends Component
      * @return bool|null
      * @throws Exception
      */
-    private function migrateUp($class, $plugin = null)
+    /*private function migrateUp($class, $plugin = null)
     {
         if ($class === Craft::$app->migrations->getBaseMigration()) {
             return null;
@@ -554,7 +535,7 @@ class Migrations extends Component
         }
 
         return false;
-    }
+    }*/
 
     /**
      * @param string          $class
@@ -563,7 +544,7 @@ class Migrations extends Component
      * @throws Exception
      * @return mixed
      */
-    private function instantiateMigration($class, $plugin = null)
+    /*private function instantiateMigration($class, $plugin = null)
     {
         $file = IOHelper::normalizePathSeparators(Craft::$app->migrations->getMigrationPath($plugin) . 'generated/' . $class . '.php');
 
@@ -579,5 +560,5 @@ class Migrations extends Component
         $migration->setDbConnection(Craft::$app->db);
 
         return $migration;
-    }
+    }*/
 }

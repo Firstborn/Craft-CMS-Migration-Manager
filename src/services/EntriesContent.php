@@ -10,9 +10,13 @@ class EntriesContent extends BaseContentMigration
     protected $source = 'entry';
     protected $destination = 'entries';
 
+    /**
+     * @param int $element
+     * @param bool $fullExport
+     * @return array
+     */
     public function exportItem($element, $fullExport = false)
     {
-        Craft::error('export entry ' . ($fullExport ? 'yes':'no'));
         $primaryEntry = Craft::$app->entries->getEntryById($element->id, $element->siteId);
 
         if ($primaryEntry) {
@@ -57,10 +61,13 @@ class EntriesContent extends BaseContentMigration
                 }
             }
         }
-
         return $content;
     }
 
+    /**
+     * @param array $data
+     * @return bool
+     */
     public function importItem(Array $data)
     {
         $primaryEntry = Entry::find()
@@ -109,6 +116,10 @@ class EntriesContent extends BaseContentMigration
         return true;
     }
 
+    /**
+     * @param array $data
+     * @return Entry
+     */
     public function createModel(Array $data)
     {
         $entry = new Entry();

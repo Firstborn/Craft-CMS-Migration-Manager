@@ -19,7 +19,7 @@ abstract class BaseMigration extends Component implements IMigrationService
     const EVENT_BEFORE_EXPORT_ELEMENT = 'beforeExport';
 
     /**
-     * @event ElementEvent The event that is triggered before an element is imported
+     * @event ElementEvent The event that is triggered before an element is imported, can be cancelled
      */
     const EVENT_BEFORE_IMPORT_ELEMENT = 'beforeImport';
 

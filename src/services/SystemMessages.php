@@ -11,6 +11,11 @@ class SystemMessages extends BaseMigration
     protected $source = 'settingsSystemMessages';
     protected $destination = 'systemMessages';
 
+    /**
+     * @param array $ids
+     * @param bool $fullExport
+     * @return array
+     */
     public function export(Array $ids, $fullExport = true)
     {
         //ignore incoming ids are grab all messages
@@ -30,6 +35,11 @@ class SystemMessages extends BaseMigration
             'messages' => $messages);
     }
 
+    /**
+     * @param int $data
+     * @param bool $fullExport
+     * @return int
+     */
     public function exportItem($data, $fullExport = true)
     {
         return $data;
@@ -47,10 +57,11 @@ class SystemMessages extends BaseMigration
         } else {
             $this->addError('error', 'Could not save system message settings');
         }
-
-
     }
 
+    /**
+     * @param array $data
+     */
     public function importItem(Array $data)
     {
         $msg = $this->createModel($data);
@@ -64,6 +75,10 @@ class SystemMessages extends BaseMigration
         }
     }
 
+    /**
+     * @param array $data
+     * @return SystemMessage
+     */
     public function createModel(Array $data)
     {
         $message = new SystemMessage();
@@ -75,6 +90,9 @@ class SystemMessages extends BaseMigration
         return $message;
     }
 
+    /**
+     * @return array
+     */
     private function getSystemMessages(): array
     {
         $results = (new Query())

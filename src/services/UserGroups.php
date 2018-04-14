@@ -194,7 +194,6 @@ class UserGroups extends BaseMigration
     {
         $permissions = Craft::$app->userPermissions->getPermissionsByGroupId($id);
         $permissions = MigrationManagerHelper::getPermissionHandles($permissions);
-
         return $permissions;
     }
 }

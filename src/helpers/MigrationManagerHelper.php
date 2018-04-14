@@ -3,63 +3,18 @@
 namespace firstborn\migrationmanager\helpers;
 
 use Craft;
+use craft\models\FolderCriteria;
+use craft\elements\Asset;
+use craft\elements\Category;
+use craft\elements\Entry;
+use craft\elements\Tag;
+use craft\elements\User;
+
 /**
  * Class MigrationManagerHelper
  */
 class MigrationManagerHelper
 {
-    /**
-     * @param $id
-     *
-     * @return bool|AssetTransformModel
-     */
-    /*public static function getTransformById($id)
-    {
-        $transforms = Craft::$app->assetTransforms->getAllTransforms();
-        foreach ($transforms as $key => $transform) {
-            if ($transform->id == $id) {
-                return $transform;
-            }
-        }
-
-        return false;
-    }*/
-
-    /**
-     * @param int $id
-     *
-     * @return bool|AssetSourceModel
-     */
-    /*public static function getAssetSourceByFolderId($id)
-    {
-        $folder = Craft::$app->assets->getFolderById($id);
-        if ($folder) {
-            $source = Craft::$app->assetSources->getSourceById($folder->sourceId);
-            if ($source) {
-                return $source;
-            }
-        }
-
-        return false;
-    }*/
-
-    /**
-     * @param string $handle
-     *
-     * @return bool|AssetTransformModel
-     */
-    /*public static function getAssetSourceByHandle($handle)
-    {
-        $sources = Craft::$app->assetSources->getAllSources();
-        foreach ($sources as $source) {
-            if ($source->handle == $handle) {
-                return $source;
-            }
-        }
-
-        return false;
-    }*/
-
     /**
      * @param string            $handle
      * @param string|array|null $context
@@ -122,22 +77,30 @@ class MigrationManagerHelper
      */
     public static function getAssetByHandle($element)
     {
-        $source = MigrationManagerHelper::getAssetSourceByHandle($element['source']);
-        if ($source) {
+        $volume = Craft::$app->volumes->getVolumeByHandle($element['source']);
+        if ($volume) {
 
-            $folderCriteria = new FolderCriteriaModel();
+            $folderCriteria = new FolderCriteria();
             $folderCriteria->name = $element['folder'];
-            $folderCriteria->sourceId = $source->id;
+            $folderCriteria->volumeId = $volume->id;
 
             $folder = Craft::$app->assets->findFolder($folderCriteria);
             if ($folder) {
 
-                $criteria = Craft::$app->elements->getCriteria(ElementType::Asset);
+                $query = Asset::find();
+                $query->volumeId($volume->id);
+                $query->folderId($folder->id);
+                $query->filename($element['filename']);
+                $asset = $query->one();
+
+
+
+                /*$criteria = Craft::$app->elements->getCriteria(Asset::class);
                 $criteria->sourceId = $source->id;
                 $criteria->folderId = $folder->id;
-                $criteria->filename = $element['filename'];
+                $criteria->filename = $element['filename'];*/
 
-                $asset = $criteria->first();
+                //$asset = $criteria->first();
                 if ($asset) {
                     return $asset;
                 }
@@ -153,23 +116,28 @@ class MigrationManagerHelper
      * @return bool|BaseElementModel|null
      * @throws Exception
      */
-    /*public static function getCategoryByHandle($element)
+    public static function getCategoryByHandle($element)
     {
         $categoryGroup = Craft::$app->categories->getGroupByHandle($element['category']);
         if ($categoryGroup) {
 
-            $criteria = Craft::$app->elements->getCriteria(ElementType::Category);
+            $query = Category::find();
+            $query->groupId($categoryGroup->id);
+            $query->slug($element['slug']);
+            $category = $query->one();
+
+
+            /*$criteria = Craft::$app->elements->getCriteria(Category::class);
             $criteria->groupId = $categoryGroup->id;
             $criteria->slug = $element['slug'];
-
-            $category = $criteria->first();
+            $category = $criteria->first();*/
             if ($category) {
                 return $category;
             }
         }
 
         return false;
-    }*/
+    }
 
     /**
      * @param array $element
@@ -177,23 +145,28 @@ class MigrationManagerHelper
      * @return bool|BaseElementModel|null
      * @throws Exception
      */
-    /*public static function getEntryByHandle($element)
+    public static function getEntryByHandle($element)
     {
         $section = Craft::$app->sections->getSectionByHandle($element['section']);
         if ($section) {
 
-            $criteria = Craft::$app->elements->getCriteria(ElementType::Entry);
+            $query = Entry::find();
+            $query->sectionId($section->id);
+            $query->slug($element['slug']);
+            $entry = $query->one();
+
+            /*$criteria = Craft::$app->elements->getCriteria(Entry::class);
             $criteria->slug = $element['slug'];
             $criteria->sectionId = $section->id;
 
-            $entry = $criteria->first();
+            $entry = $criteria->first();*/
             if ($entry) {
                 return $entry;
             }
         }
 
         return false;
-    }*/
+    }
 
     /**
      * @param array $element
@@ -221,11 +194,16 @@ class MigrationManagerHelper
         $group = Craft::$app->tags->getTagGroupByHandle($element['group']);
         if ($group) {
 
-            $criteria = Craft::$app->elements->getCriteria(ElementType::Tag);
+            $query = Tag::find();
+            $query->groupId($group->id);
+            $query->slug($element['slug']);
+            $tag = $query->one();
+
+            /*$criteria = Craft::$app->elements->getCriteria(ElementType::Tag);
             $criteria->groupId = $group->id;
             $criteria->slug = 'tag1';
 
-            $tag = $criteria->first();
+            $tag = $criteria->first();*/
             if ($tag) {
                 return $tag;
             }

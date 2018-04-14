@@ -11,6 +11,11 @@ class CategoriesContent extends BaseContentMigration
     protected $source = 'category';
     protected $destination = 'categories';
 
+    /**
+     * @param int $id
+     * @param bool $fullExport
+     * @return array
+     */
     public function exportItem($id, $fullExport = false)
     {
         $primaryCategory = Craft::$app->categories->getCategoryById($id);
@@ -56,6 +61,10 @@ class CategoriesContent extends BaseContentMigration
         return $content;
     }
 
+    /**
+     * @param array $data
+     * @return bool
+     */
     public function importItem(Array $data)
     {
         $primaryCategory = Category::find()
@@ -100,12 +109,15 @@ class CategoriesContent extends BaseContentMigration
             if (!$primaryCategory) {
                 $primaryCategory = $category;
             }
-
         }
 
         return true;
     }
 
+    /**
+     * @param array $data
+     * @return Category
+     */
     public function createModel(Array $data)
     {
         $category = new Category();
@@ -142,9 +154,4 @@ class CategoriesContent extends BaseContentMigration
 
         return $category;
     }
-
-
-
-
-
 }

@@ -6,7 +6,6 @@ use Craft;
 use craft\web\Controller;
 use firstborn\migrationmanager\MigrationManager;
 
-
 /**
  * Class MigrationManagerController
  */
@@ -14,9 +13,8 @@ class CpController extends Controller
 {
 
     /**
-     * Index redirects to creation page
+     * Index
      */
-
 
     public function actionIndex()
     {
@@ -29,8 +27,6 @@ class CpController extends Controller
 
     /**
      * Shows migrations
-     *
-     * @throws HttpException
      */
     public function actionMigrations()
     {

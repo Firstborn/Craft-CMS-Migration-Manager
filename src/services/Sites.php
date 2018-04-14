@@ -38,14 +38,6 @@ class Sites extends BaseMigration
 
         $this->addManifest($site->handle);
 
-        /*if ($fullExport) {
-            // Fire an 'onExport' event
-            $event = new ElementEvent(array(
-                'element' => $site,
-                'value' => $newSite
-            ));
-            $this->onExport($event);
-        }*/
         if ($fullExport) {
             $newSite = $this->onBeforeExport($site, $newSite);
         }
@@ -58,8 +50,7 @@ class Sites extends BaseMigration
      */
     public function importItem(Array $data)
     {
-        $result = true;
-        $existing = Craft::$app->sites->getSiteByHandle($data['handle']);
+         $existing = Craft::$app->sites->getSiteByHandle($data['handle']);
 
         if ($existing){
             $this->mergeUpdates($data, $existing);

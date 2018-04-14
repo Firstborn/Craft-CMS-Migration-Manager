@@ -104,10 +104,6 @@ class UsersContent extends BaseContentMigration
         }
 
         $user->setAttributes($data);
-        //$this->getSourceIds($data);
-        //$//this->validateImportValues($data);
-        //$user->setContentFromPost($data);
-
         return $user;
     }
 

@@ -8,6 +8,11 @@ class GlobalsContent extends BaseContentMigration
     protected $source = 'global';
     protected $destination = 'globals';
 
+    /**
+     * @param int $id
+     * @param bool $fullExport
+     * @return array
+     */
     public function exportItem($id, $fullExport = false)
     {
 
@@ -38,6 +43,10 @@ class GlobalsContent extends BaseContentMigration
         return $content;
     }
 
+    /**
+     * @param array $data
+     * @return bool
+     */
     public function importItem(Array $data)
     {
         $globalSet = Craft::$app->globals->getSetByHandle($data['handle']);
@@ -69,6 +78,11 @@ class GlobalsContent extends BaseContentMigration
         }
         return true;
     }
+
+    /**
+     * @param array $data
+     * @return null
+     */
 
     public function createModel(Array $data)
     {

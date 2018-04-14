@@ -9,41 +9,16 @@ use yii\base\Event;
 use firstborn\migrationmanager\events\ImportEvent;
 use firstborn\migrationmanager\events\ExportEvent;
 
-
 class Fields extends BaseMigration
 {
-    // Constants
-    // =========================================================================
-
-    /**
-     * @event FieldEvent The event that is triggered before a field is exported
-     * You may set [[FieldEvent::isValid]] to `false` to prevent the field from being exported.
-     */
-
-    const EVENT_EXPORT_FIELD = 'exportField';
-
-    /**
-     * @event FieldEvent The event that is triggered before a field is imported
-     * You may set [[FieldEvent::isValid]] to `false` to prevent the field from being imported
-     */
-    const EVENT_IMPORT_FIELD = 'importField';
-
-    /**
-     * @event FieldEvent The event that is triggered before a field's content is exported
-     * You may set [[FieldEvent::isValid]] to `false` to prevent the content from being exported
-     */
-    const EVENT_EXPORT_FIELD_CONTENT = 'exportFieldContent';
-
-    /**
-     * @event FieldEvent The event that is triggered before a field's content is imported
-     * You may set [[FieldEvent::isValid]] to `false` to prevent the content from being imported
-     */
-    const EVENT_IMPORT_FIELD_CONTENT = 'importFieldContent';
-
-
     protected $source = 'field';
     protected $destination = 'fields';
 
+    /**
+     * @param int $id
+     * @param bool $fullExport
+     * @return array|bool|null
+     */
     public function exportItem($id, $fullExport = false){
         $includeID = false;
         $field = Craft::$app->fields->getFieldById($id);
@@ -65,11 +40,13 @@ class Fields extends BaseMigration
             'typesettings' => $field->settings
         ];
 
-        if ($field->className() == 'Matrix') {
+        Craft::error('FIELD: ' . $field->handle . ' ' .$field->className());
+
+        if ($field->className() == 'craft\fields\Matrix') {
             $this->getMatrixField($newField, $field->id, $includeID);
         }
 
-        if ($field->className() == 'SuperTable') {
+        if ($field->className() == 'verbb\supertable\fields\SuperTableField') {
             $this->getSuperTableField($newField, $field->id, $includeID);
         }
 
@@ -87,10 +64,12 @@ class Fields extends BaseMigration
         return $newField;
     }
 
-
+    /**
+     * @param array $data
+     * @return bool
+     */
     public function importItem(Array $data)
     {
-
         $existing = Craft::$app->fields->getFieldByHandle($data['handle']);
 
         if ($existing) {
@@ -118,6 +97,10 @@ class Fields extends BaseMigration
         }
     }
 
+    /**
+     * @param array $data
+     * @return mixed
+     */
     public function createModel(Array $data)
     {
         $fieldsService = Craft::$app->getFields();
@@ -147,6 +130,10 @@ class Fields extends BaseMigration
         return $field;
     }
 
+    /**
+     * @param $name
+     * @return bool|FieldGroup
+     */
     private function getFieldGroupByName($name)
     {
         $query = (new Query())
@@ -170,65 +157,10 @@ class Fields extends BaseMigration
     }
 
     /**
-     * Fires an 'onExportField' event. To prevent execution of the export set $event->performAction to false and set a reason in $event->params['error'] to be logged.
-     *
-     * @param Event $event
-     *          $event->params['field'] - field to export
-     *          $event->params['value'] - field data that will be written to migration file, change this value to affect the migration export
-     *
-     * @return null
+     * @param $newField
+     * @param $fieldId
+     * @param bool $includeID
      */
-    public function onExportField(ImportEvent $event)
-    {
-        if ($this->hasEventHandlers(self::EVENT_EXPORT_FIELD)) {
-            $this->trigger(self::EVENT_EXPORT_FIELD, $event);
-        }
-    }
-
-    /**
-     * Fires an 'onExportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
-     *
-     * @param Event $event
-     *          $event->params['field'] - field
-     *          $event->params['parent'] - field parent
-     *          $event->params['value'] - current field value, change this value in the event handler to output a different value
-     *
-     * @return null
-     */
-    public function onExportFieldContent(ImportEvent $event)
-    {
-        $this->trigger(Fields::EVENT_EXPORT_FIELD_CONTENT, $event);
-    }
-
-    /**
-     * Fires an 'onImportField' event. To prevent execution of the import set $event->performAction to false and set a reason in $event->params['error'] to be logged. When checking the field type use the $event->params['value'] object as the ['field'] could be empty (ie field doesn't exist yet)
-     *
-     * @param Event $event
-     *          $event->params['field'] - field
-     *          $event->params['value'] - field data that will be imported, change this value to affect the migration import
-     *
-     * @return null
-     */
-    public function onImportField(ImportEvent $event)
-    {
-        $this->trigger(Fields::EVENT_IMPORT_FIELD, $event);
-    }
-
-    /**
-     * Fires an 'onImportFieldContent' event. Event handlers can prevent the default field handling by setting $event->performAction to false.
-     *
-     * @param Event $event
-     *          $event->params['field'] - field
-     *          $event->params['parent'] - field parent
-     *          $event->params['value'] - current field value, change this value in the event handler to output a different value
-     *
-     * @return null
-     */
-    public function onImportFieldContent(ImportEvent $event)
-    {
-        $this->trigger(Fields::EVENT_IMPORT_FIELD_CONTENT, $event);
-    }
-
     private function getMatrixField(&$newField, $fieldId, $includeID = false)
     {
         $blockTypes = Craft::$app->matrix->getBlockTypesByFieldId($fieldId);
@@ -263,18 +195,12 @@ class Fields extends BaseMigration
                     'instructions' => $blockField->instructions,
                     'required' => $blockField->required,
                     'type' => $blockField->className(),
+                    'translationMethod' => $blockField->translationMethod,
+                    'translationKeyFormat' => $blockField->translationKeyFormat,
                     'typesettings' => $blockField->settings,
                 ];
-                /*if ($blockField->type == 'PositionSelect')
-                {
-                    $options = [];
-                    foreach ($blockField->settings['options'] as $value) {
-                        $options[$value] = true;
-                    }
-                    $newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId]['typesettings']['options'] = $options;
-                }*/
 
-                if ($blockField->className() == 'SuperTable') {
+                if ($blockField->className() == 'verbb\supertable\fields\SuperTableField') {
                     $this->getSuperTableField($newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId], $blockField->id);
                 }
 
@@ -283,6 +209,12 @@ class Fields extends BaseMigration
             ++$blockCount;
         }
     }
+
+    /**
+     * @param $newField
+     * @param $fieldId
+     * @param bool $includeID
+     */
 
     private function getSuperTableField(&$newField, $fieldId, $includeID = false)
     {
@@ -311,14 +243,7 @@ class Fields extends BaseMigration
                     'typesettings' => $field->settings,
                 ];
 
-                /*if ($field->type == 'PositionSelect') {
-                    $options = [];
-                    foreach ($field->settings['options'] as $value) {
-                        $options[$value] = true;
-                    }
-                    $newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId]['typesettings']['options'] = $options;
-                }*/
-                if ($field->className() == 'Matrix') {
+                if ($field->className() == 'craft\fields\Matrix') {
                     $this->getMatrixField($newField['typesettings']['blockTypes'][$blockId]['fields'][$fieldId], $field->id);
                 }
 
@@ -328,6 +253,11 @@ class Fields extends BaseMigration
         unset($newField['typesettings']['columns']);
     }
 
+    /**
+     * @param $newField
+     * @param $fieldId
+     * @param bool $includeID
+     */
     private function getNeoField(&$newField, $fieldId, $includeID = false)
     {
         $groups = Craft::$app->neo->getGroupsByFieldId($fieldId);
@@ -392,7 +322,7 @@ class Fields extends BaseMigration
         $this->getSourceHandles($field);
         $this->getTransformHandles($field);
 
-        if ($field['type'] == 'Matrix' && key_exists('blockTypes', $field['typesettings']))
+        if ($field['type'] == 'craft\fields\Matrix' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
@@ -401,7 +331,7 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'SuperTable' && key_exists('blockTypes', $field['typesettings']))
+        if ($field['type'] == 'verbb\supertable\fields\SuperTableField' && key_exists('blockTypes', $field['typesettings']))
         {
             foreach ($field['typesettings']['blockTypes'] as &$blockType) {
                 foreach ($blockType['fields'] as &$childField) {
@@ -412,9 +342,13 @@ class Fields extends BaseMigration
 
     }
 
+    /**
+     * @param $field
+     */
+
     private function getSourceHandles(&$field)
     {
-        if ($field['type'] == 'Assets') {
+        if ($field['type'] == 'craft\fields\Assets') {
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 7) == 'folder:') {
@@ -446,7 +380,7 @@ class Fields extends BaseMigration
 
         }
 
-        if ($field['type'] == 'RichText') {
+        if ($field['type'] == 'craft\redactor\Field') {
             if (array_key_exists('availableAssetSources', $field['typesettings']) && is_array($field['typesettings']['availableAssetSources'])) {
                 if ($field['typesettings']['availableAssetSources'] !== '*' && $field['typesettings']['availableAssetSources'] != '') {
                     foreach ($field['typesettings']['availableAssetSources'] as $key => $value) {
@@ -476,7 +410,7 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'Categories') {
+        if ($field['type'] == 'craft\fields\Categories') {
             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
                 $value = $field['typesettings']['source'];
                 if (substr($value, 0, 6) == 'group:') {
@@ -497,7 +431,7 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'Entries') {
+        if ($field['type'] == 'craft\fields\Entries') {
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 8) == 'section:') {
@@ -512,22 +446,20 @@ class Fields extends BaseMigration
             }
         }
 
-        if ($field['type'] == 'Tags') {
-
+        if ($field['type'] == 'craft\fields\Tags') {
             if (array_key_exists('source', $field['typesettings']) && is_string($field['typesettings']['source'])) {
                 $value = $field['typesettings']['source'];
-                //foreach ($field['typesettings']['source'] as $key => $value) {
                 if (substr($value, 0, 9) == 'taggroup:') {
                     $tag = Craft::$app->tags->getTagGroupById(intval(substr($value, 9)));
                     if ($tag) {
                         $field['typesettings']['source'] = $tag->handle;
                     }
                 }
-                //}
+
             }
         }
 
-        if ($field['type'] == 'Users') {
+        if ($field['type'] == 'craft\fields\Users') {
             if (array_key_exists('sources', $field['typesettings']) && is_array($field['typesettings']['sources'])) {
                 foreach ($field['typesettings']['sources'] as $key => $value) {
                     if (substr($value, 0, 6) == 'group:') {
@@ -543,13 +475,16 @@ class Fields extends BaseMigration
         }
     }
 
+    /**
+     * @param $field
+     */
+
     private function getTransformHandles(&$field)
     {
         if ($field['type'] == 'RichText') {
             if (array_key_exists('availableTransforms', $field['typesettings']) && is_array($field['typesettings']['availableTransforms'])) {
                 foreach ($field['typesettings']['availableTransforms'] as $key => $value) {
                     $transform = MigrationManagerHelper::getTransformById($value);
-
                     if ($transform) {
                         $field['typesettings']['availableTransforms'][$key] = $transform->handle;
                     }
@@ -557,6 +492,10 @@ class Fields extends BaseMigration
             }
         }
     }
+
+    /**
+     * @param $field
+     */
 
     private function getSettingIds(&$field)
     {
@@ -598,6 +537,10 @@ class Fields extends BaseMigration
         }
     }
 
+    /**
+     * @param $field
+     */
+
     private function getTransformIds(&$field)
     {
         if ($field['type'] == 'RichText') {
@@ -613,6 +556,10 @@ class Fields extends BaseMigration
             }
         }
     }
+
+    /**
+     * @param $field
+     */
 
     private function getSourceIds(&$field)
     {
@@ -739,6 +686,10 @@ class Fields extends BaseMigration
         }
     }
 
+    /**
+     * @param $newField
+     * @param $field
+     */
 
     private function mergeUpdates(&$newField, $field)
     {
@@ -755,8 +706,18 @@ class Fields extends BaseMigration
             {
                 $this->mergeSuperTable($newField, $field);
             }
+
+            if ($field->className() == 'Neo')
+            {
+                $this->mergeNeo($newField, $field);
+            }
         }
     }
+
+    /**
+     * @param $newField
+     * @param $field
+     */
 
     private function mergeSuperTable(&$newField, $field)
     {
@@ -779,6 +740,11 @@ class Fields extends BaseMigration
         $settings['blockTypes'] = $newBlockTypes;
         $newField['typesettings'] = $settings;
     }
+
+    /**
+     * @param $newBlockType
+     * @param $existingBlockType
+     */
 
     private function mergeSuperTableBlockType(&$newBlockType, $existingBlockType)
     {
@@ -803,6 +769,11 @@ class Fields extends BaseMigration
         $newBlockType['fields'] = $newFields;
     }
 
+    /**
+     * @param $handle
+     * @param $fields
+     * @return bool
+     */
     private function getSuperTableFieldByHandle($handle, $fields)
     {
         foreach($fields as $field)
@@ -814,6 +785,10 @@ class Fields extends BaseMigration
         return false;
     }
 
+    /**
+     * @param $newField
+     * @param $field
+     */
     private function mergeMatrix(&$newField, $field)
     {
         if (array_key_exists('blockTypes', $newField['typesettings'])) {
@@ -840,6 +815,10 @@ class Fields extends BaseMigration
         }
     }
 
+    /**
+     * @param $newBlock
+     * @param $block
+     */
     private function mergeMatrixBlock(&$newBlock, $block)
     {
         $newBlock['fieldLayoutId'] = $block->fieldLayoutId;
@@ -864,6 +843,11 @@ class Fields extends BaseMigration
         $newBlock['fields'] = $newFields;
     }
 
+    /**
+     * @param $handle
+     * @param $fields
+     * @return bool
+     */
     private function getMatrixFieldByHandle($handle, $fields)
     {
         foreach($fields as $field)
@@ -875,9 +859,54 @@ class Fields extends BaseMigration
         return false;
     }
 
+    /**
+     * @param $handle
+     * @param $id
+     * @return bool
+     */
+
     private function getMatrixBlockByHandle($handle, $id)
     {
         $blocks = Craft::$app->matrix->getBlockTypesByFieldId($id);
+        foreach($blocks as $block)
+        {
+            if ($block->handle == $handle){
+                return $block;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $newField
+     * @param $field
+     */
+
+    private function mergeNeo(&$newField, $field)
+    {
+        if (array_key_exists('blockTypes', $newField['typesettings'])) {
+            $blockTypes = $newField['typesettings']['blockTypes'];
+            $newBlocks = [];
+            foreach ($blockTypes as $key => &$block) {
+                $existingBlock = $this->getNeoBlockByHandle($block['handle'], $field->id);
+
+                if ($existingBlock) {
+                    $newBlocks[$existingBlock->id] = $block;
+                } else {
+                    $newBlocks[$key] = $block;
+                }
+            }
+
+            $settings = $newField['typesettings'];
+            $settings['blockTypes'] = $newBlocks;
+            $newField['typesettings'] = $settings;
+
+        }
+    }
+
+    private function getNeoBlockByHandle($handle, $id){
+        $blocks = craft()->neo->getBlockTypesByFieldId($id);
         foreach($blocks as $block)
         {
             if ($block->handle == $handle){

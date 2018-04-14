@@ -50,17 +50,18 @@ class AssetVolumes extends BaseMigration
         if ($fullExport) {
             $newVolume['fieldLayout'] = array();
             $fieldLayout = $volume->getFieldLayout();
+
             foreach ($fieldLayout->getTabs() as $tab) {
                 $newVolume['fieldLayout'][$tab->name] = array();
                 foreach ($tab->getFields() as $tabField) {
 
-                    $newVolume['fieldLayout'][$tab->name][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                    $newVolume['fieldLayout'][$tab->name][] = $tabField->handle;
                     if ($tabField->required) {
-                        $newVolume['requiredFields'][] = Craft::$app->fields->getFieldById($tabField->fieldId)->handle;
+                        $newVolume['requiredFields'][] =$tabField->handle;
                     }
                 }
             }
-        }
+         }
 
         if ($fullExport) {
             $newVolume = $this->onBeforeExport($volume, $newVolume);

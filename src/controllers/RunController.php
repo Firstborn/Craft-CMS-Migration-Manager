@@ -6,7 +6,6 @@ use Craft;
 use craft\web\Controller;
 use firstborn\migrationmanager\MigrationManager;
 
-
 /**
  * Class MigrationManager_RunController
  */
@@ -27,7 +26,6 @@ class RunController extends Controller
             )
         );
     }
-
 
     /**
      * @throws HttpException
@@ -100,8 +98,6 @@ class RunController extends Controller
 
         // give a little on screen pause
         sleep(2);
-
-        Craft::error('run:migrations: '. json_encode($migrations));
 
         if (MigrationManager::getInstance()->migrations->runMigrations($migrations)) {
             return $this->asJson(array(

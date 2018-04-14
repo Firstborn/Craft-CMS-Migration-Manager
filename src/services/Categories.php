@@ -13,6 +13,11 @@ class Categories extends BaseMigration
     protected $source = 'category';
     protected $destination = 'categories';
 
+    /**
+     * @param int $id
+     * @param bool $fullExport
+     * @return array|bool
+     */
     public function exportItem($id, $fullExport = false)
     {
         $category = Craft::$app->categories->getGroupById($id);
@@ -71,7 +76,10 @@ class Categories extends BaseMigration
         return $newCategory;
     }
 
-
+    /**
+     * @param array $data
+     * @return bool
+     */
     public function importItem(Array $data)
     {
 
@@ -101,9 +109,12 @@ class Categories extends BaseMigration
         return $result;
     }
 
+    /**
+     * @param array $data
+     * @return CategoryGroup
+     */
     public function createModel(Array $data)
     {
-
         $category = new CategoryGroup();
         if (array_key_exists('id', $data)){
             $category->id = $data['id'];
@@ -115,7 +126,6 @@ class Categories extends BaseMigration
 
         $allSiteSettings = [];
         if (array_key_exists('sites', $data)) {
-            $sites = array();
             foreach ($data['sites'] as $key => $siteData) {
                 //determine if locale exists
                 $site = Craft::$app->getSites()->getSiteByHandle($key);
@@ -124,12 +134,9 @@ class Categories extends BaseMigration
                 $siteSettings->hasUrls = $siteData['hasUrls'];
                 $siteSettings->uriFormat = $siteData['uriFormat'];
                 $siteSettings->template = $siteData['template'];
-
                 $allSiteSettings[$site->id] = $siteSettings;
             }
-
             $category->setSiteSettings($allSiteSettings);
-
         }
 
         if (array_key_exists('fieldLayout', $data)) {
@@ -168,6 +175,10 @@ class Categories extends BaseMigration
 
     }
 
+    /**
+     * @param $newSource
+     * @param $source
+     */
     private function mergeUpdates(&$newSource, $source)
     {
         $newSource['id'] = $source->id;
