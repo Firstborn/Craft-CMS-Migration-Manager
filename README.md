@@ -82,7 +82,7 @@ To support additional field types and special content you can use event handlers
 
 To handle export/import of custom field types your plugin/module should listen for the Export/Import events that are triggered from elements that utilize fields. Following is the list of elements that the Migration Manager has events for that allow you to modify the export/import data to support custom fields.
 
-###Settings
+### Settings
 - AssetSource
 - AssetTransform (only after import)
 - Categories
@@ -95,13 +95,13 @@ To handle export/import of custom field types your plugin/module should listen f
 
 You can also listen for export/import events on pure content migrations to modify data or perform additional actions as part of a migration. 
 
-###Content
+### Content
 - Entries
 - Categories
 - Globals
 - Users
 
-###Using events
+### Using events
 During the export event you can modify the $event->value data to include any additional settings not already in the data to be exported.
 ```php
 //Custom field example
@@ -144,13 +144,13 @@ Any values in the field data that contains id's should be converted to handles/s
 
 For importing custom fields the imported value should match the fields required input structure. Check the field type's documentation and code for help on determining the correct structure.
 
-##Content migrations
+## Content migrations
 
 With migrations you also have the ability to create content migrations directly from element index pages (ie the entry, category and user list pages). Select the entries you wish to export and then click the 'create migration' option in the action list. Content migrations are dependent on a workflow where you migrate related/dependent elements first. For example, if you have an entry that has some selected categories, the categories need exist on the destination site before the entry migration will work correctly. This means creating a migration of the category(ies) first. This holds true for users, assets other other entries. In the case of assets you will need to ensure the matching asset (based on asset source/folder/filename) exists on the destination site. For Global values, use the 'Create Migration' button on the global screen.
 
  ![Pending Migration](screenshots/content-migration.png)
 
-##Custom migrations
+## Custom migrations
 
 In addition to generated migrations you can use the MigrationManger to create empty migrations that can be used for tasks like deleting fields and creating content. To create an empty migration simply click the 'Create Migration' on the Migration Manager/Create Migrations tab. A new empty migration will be added to the `craft/migrations` folder.
 
