@@ -84,6 +84,7 @@ class EntriesContent extends BaseContentMigration
         foreach($data['sites'] as $value) {
             if ($primaryEntry) {
                 $value['id'] = $primaryEntry->id;
+                $this->localizeData($primaryEntry, $value);
             }
 
             $entry = $this->createModel($value);

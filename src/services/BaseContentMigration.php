@@ -404,31 +404,27 @@ abstract class BaseContentMigration extends BaseMigration
     }
 
     /**
+     * Look for matrix/supertables/neo that are not localized and update the keys to
+     * ensure the site/locale values on child elements remain intact
      * @param BaseElementModel $element
      * @param array $data function foo($method)
     **/
     protected function localizeData(Element $element, Array &$data)
     {
-        //look for matrix/supertables/neo that are not localized and update the keys to ensure the locale values on child elements remain intact
         $fieldLayout = $element->getFieldLayout();
         foreach ($fieldLayout->getTabs() as $tab) {
             foreach ($tab->getFields() as $tabField) {
-                $field = craft()->fields->getFieldById($tabField->fieldId);
+                $field = Craft::$app->fields->getFieldById($tabField->id);
                 $fieldValue = $element[$field->handle];
-                Craft::error('check is field translatable: ' . $field->handle . ' '. $field->translatable);
-                if ($field->translatable == false) {
-                    if ( in_array ($field->type , ['craft\fields\Matrix', 'verbb\supertable\fields\SuperTableField', 'Neo']) ) {
-                        //if ($field->type == 'SuperTable' && $field->settings['staticField'] == 1){
-                        //    $data[$field->handle][$fieldValue->id] = $data[$field->handle]['new1'];
-                        //} else {
-                            $items = $fieldValue->getIterator();
-                            $i = 1;
-                            foreach ($items as $item) {
-                                $data[$field->handle][$item->id] = $data[$field->handle]['new' . $i];
-                                unset($data[$field->handle]['new' . $i]);
-                                $i++;
-                            }
-                        //}
+                if ( in_array ($field->className() , ['craft\fields\Matrix', 'verbb\supertable\fields\SuperTableField', 'Neo']) ) {
+                    if ($field->localizeBlocks == false) {
+                        $items = $fieldValue->getIterator();
+                        $i = 1;
+                        foreach ($items as $item) {
+                            $data['fields'][$field->handle][$item->id] = $data['fields'][$field->handle]['new' . $i];
+                            unset($data['fields'][$field->handle]['new' . $i]);
+                            $i++;
+                        }
                     }
                 }
             }
