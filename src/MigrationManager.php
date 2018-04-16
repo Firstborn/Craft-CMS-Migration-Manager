@@ -19,7 +19,6 @@ use firstborn\migrationmanager\assetbundles\cpglobals\CpGlobalsAssetBundle;
 use firstborn\migrationmanager\actions\MigrateCategoryElementAction;
 use firstborn\migrationmanager\actions\MigrateEntryElementAction;
 use firstborn\migrationmanager\actions\MigrateUserElementAction;
-use firstborn\migrationmanager\services\Migrations as MigrationsService;
 
 
 /**
@@ -28,7 +27,7 @@ use firstborn\migrationmanager\services\Migrations as MigrationsService;
  * Create Craft migrations to easily migrate settings and content between website environments.
  *
  * @author    Derrick Grigg
- * @copyright Copyright (c) 2017 Firstborn
+ * @copyright Copyright (c) 2018 Firstborn
  * @link      https://firstborn.com
  * @package   MigrationManager
  * @since     1.0.0

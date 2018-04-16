@@ -95,8 +95,6 @@ class Routes extends BaseMigration
         }
     }
 
-
-
     /**
      * @param int $id
      *

@@ -40,8 +40,6 @@ class Fields extends BaseMigration
             'typesettings' => $field->settings
         ];
 
-        Craft::error('FIELD: ' . $field->handle . ' ' .$field->className());
-
         if ($field->className() == 'craft\fields\Matrix') {
             $this->getMatrixField($newField, $field->id, $includeID);
         }
@@ -365,14 +363,14 @@ class Fields extends BaseMigration
             }
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
+                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['defaultUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
                 }
             }
 
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
+                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['singleUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }
@@ -384,7 +382,7 @@ class Fields extends BaseMigration
             if (array_key_exists('availableAssetSources', $field['typesettings']) && is_array($field['typesettings']['availableAssetSources'])) {
                 if ($field['typesettings']['availableAssetSources'] !== '*' && $field['typesettings']['availableAssetSources'] != '') {
                     foreach ($field['typesettings']['availableAssetSources'] as $key => $value) {
-                        $source = Craft::$app->assetSources->getSourceById($value);
+                        $source = Craft::$app->volumes->getVolumeById($value);
                         if ($source) {
                             $field['typesettings']['availableAssetSources'][$key] = $source->handle;
                         }
@@ -395,7 +393,7 @@ class Fields extends BaseMigration
             }
 
             if (array_key_exists('defaultUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['defaultUploadLocationSource']));
+                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['defaultUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['defaultUploadLocationSource'] = $source->handle;
                 }
@@ -403,7 +401,7 @@ class Fields extends BaseMigration
             }
 
             if (array_key_exists('singleUploadLocationSource', $field['typesettings'])) {
-                $source = Craft::$app->assetSources->getSourceById(intval($field['typesettings']['singleUploadLocationSource']));
+                $source = Craft::$app->volumes->getVolumeById(intval($field['typesettings']['singleUploadLocationSource']));
                 if ($source) {
                     $field['typesettings']['singleUploadLocationSource'] = $source->handle;
                 }

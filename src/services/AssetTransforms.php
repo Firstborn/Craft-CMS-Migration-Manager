@@ -45,10 +45,6 @@ class AssetTransforms extends BaseMigration
             'interlace' => $transform->interlace
         ];
 
-        if ($fullExport) {
-            $newTransform = $this->onBeforeExport($transform, $newTransform);
-        }
-
         return $newTransform;
     }
 

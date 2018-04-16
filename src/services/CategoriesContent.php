@@ -80,6 +80,7 @@ class CategoriesContent extends BaseContentMigration
         foreach($data['sites'] as $value) {
             if ($primaryCategory) {
                 $value['id'] = $primaryCategory->id;
+                $this->localizeData($primaryCategory, $value);
             }
 
             $category = $this->createModel($value);

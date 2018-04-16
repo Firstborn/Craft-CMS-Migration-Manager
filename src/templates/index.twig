@@ -24,24 +24,14 @@
     {% set tabs = tabs | merge({ sections: { label: 'Sections'|t, url: '#sections' } }) %}
 {% endif %}
 
-{% set assetVolumes = craft.app.getVolumes().getAllVolumes() -%}
-{% if assetVolumes is not empty %}
-    {% set tabs = tabs | merge({ assetVolumes: { label: 'Asset Volumes'|t, url: '#assetVolumes' } }) %}
-{% endif %}
-
-{% set imageTransforms = craft.app.getAssetTransforms().getAllTransforms() -%}
-{% if imageTransforms is not empty %}
-    {% set tabs = tabs | merge({ imageTransforms: { label: 'Image Transforms'|t, url: '#imageTransforms' } }) %}
+{% set categories = craft.categoryGroups.getAllGroups() -%}
+{% if categories is not empty %}
+    {% set tabs = tabs | merge({ categories: { label: 'Categories'|t, url: '#categories' } }) %}
 {% endif %}
 
 {% set globals = craft.globals.getAllSets() -%}
 {% if globals is not empty %}
     {% set tabs = tabs | merge({ globals: { label: 'Globals'|t, url: '#globals' } }) %}
-{% endif %}
-
-{% set categories = craft.categoryGroups.getAllGroups() -%}
-{% if categories is not empty %}
-    {% set tabs = tabs | merge({ categories: { label: 'Categories'|t, url: '#categories' } }) %}
 {% endif %}
 
 {% set tags = craft.app.getTags().getAllTagGroups() -%}
@@ -53,6 +43,19 @@
 {% if sites is not empty %}
     {% set tabs = tabs | merge({ sites: { label: 'Sites'|t, url: '#sites' } }) %}
 {% endif %}
+
+
+
+{% set assetVolumes = craft.app.getVolumes().getAllVolumes() -%}
+{% if assetVolumes is not empty %}
+    {% set tabs = tabs | merge({ assetVolumes: { label: 'Asset Volumes'|t, url: '#assetVolumes' } }) %}
+{% endif %}
+
+{% set imageTransforms = craft.app.getAssetTransforms().getAllTransforms() -%}
+{% if imageTransforms is not empty %}
+    {% set tabs = tabs | merge({ imageTransforms: { label: 'Image Transforms'|t, url: '#imageTransforms' } }) %}
+{% endif %}
+
 
 {% if CraftEdition > CraftClient %}
     {% set userGroups = craft.userGroups.getAllGroups() -%}

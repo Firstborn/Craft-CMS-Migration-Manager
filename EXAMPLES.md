@@ -46,60 +46,22 @@ $section = Craft::$app->sections->getSectionByHandle('sectionHandle');
 return Craft::$app->sections->deleteSectionById($section->id);
 ```
 
-### Add category values
-
+### Add a category value
 ```php
 $categoryGroup = Craft::$app->categories->getGroupByHandle('category');
-$locale = Craft::$app->i18n->getPrimarySiteLocale();
 
 if ($categoryGroup) {
-    $category = new CategoryModel();
+    $category = new Category();
     $category->groupId = $categoryGroup->id;
-
-    if ($locale) {
-        $category->locale = $locale->id;
-    }
-
     $category->enabled = true;
-    $category->getContent()->title = 'New Category 2';
-    $fieldData = array('plaintext' => 'hello world');
-    $category->setContentFromPost($fieldData);
+    $category->enabledForSite = 1;
+    $category->title = 'Hello World';
 
-    return Craft::$app->categories->saveCategory($category);
+    $fieldData = array('plainText' => 'hey there');
+    $category->setFieldValues($fieldData);
+    return Craft::$app->getElements()->saveElement($category);
 } else {
+    Craft::error('no category added');
     return false;
 }
-```
-
-### Add a new locale and update sections
-
-```php
-$newLocale = 'es_us';
-$locales = Craft::$app->i18n->getSiteLocaleIds();
-
-if (in_array($newLocale, $locales) === false) {
-    $locale = Craft::$app->i18n->addSiteLocale($newLocale);
-} else {
-    $locale = Craft::$app->i18n->getLocaleById($newLocale);
-}
-
-$sectionIds = Craft::$app->sections->getAllSectionIds();
-foreach($sectionIds as $id){
-    
-    $section = Craft::$app->sections->getSectionById($id);
-    $locales = $section->getLocales();
-    $sectionLocale = new SectionLocaleModel(array(
-        'locale' => $locale,
-        'enabledByDefault' => false,
-        'urlFormat' => $section->getUrlFormat(),
-        'nestedUrlFormat' => null
-    ));
-
-    $locales[$newLocale] = $sectionLocale;
-    $section->setLocales($locales);
-
-    Craft::$app->sections->saveSection($section);
-}
-
-return true;
 ```
