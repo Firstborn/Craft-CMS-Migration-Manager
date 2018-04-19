@@ -2,7 +2,7 @@
 
 Create migrations to easily move settings and content between CraftCMS website installations. You can select which elements to migrate and create a migration file that can be committed to your version control system. The migration(s) can then be applied on different CraftCMS installations to instantly create and update settings and content, without needing to enter data multiple times. By using migrations you can ensure your various website environments (local, staging, production, etc.) stay in sync and up to date.
 
-Related: [Migration Manager for Craft 3.x](github.com/Firstborn/Craft-Migration-Manager)
+Related: [Migration Manager for Craft 3.x](https://github.com/Firstborn/Craft-Migration-Manager)
 
 ## Installation
 
