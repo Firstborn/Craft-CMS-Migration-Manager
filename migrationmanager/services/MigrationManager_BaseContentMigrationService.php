@@ -39,6 +39,7 @@ abstract class MigrationManager_BaseContentMigrationService extends MigrationMan
                     break;
                 case 'Matrix':
                     $model = $parent[$field->handle];
+                    $model->limit = null;
                     $value = $this->getIteratorValues($model, function ($item) {
                         $itemType = $item->getType();
                         $value = [
