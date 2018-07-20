@@ -7,6 +7,8 @@ namespace Craft;
  */
 class {{ className }} extends BaseMigration
 {
+
+{% if empty == false %}
     /**
     Migration manifest:
     {% for key, value in manifest %}
@@ -16,8 +18,13 @@ class {{ className }} extends BaseMigration
     - {{ item }}
     {% endfor %}
     {% endfor %}
-
     */
+
+private $json = <<<JSON
+{{ migration|raw }}
+JSON;
+{% endif %}
+
 	/**
 	 * Any migration code in here is wrapped inside of a transaction.
 	 * Returning false will rollback the migration
@@ -31,8 +38,7 @@ class {{ className }} extends BaseMigration
         //add your custom migration code, see the EXAMPLES.md for examples
         return true;
         {% else %}
-        $json = '{{ migration|raw }}';
-        return craft()->migrationManager_migrations->import($json);
+        return craft()->migrationManager_migrations->import($this->json);
         {% endif %}
         {% endspaceless %}
     }

@@ -95,5 +95,14 @@
     "notes": [
       "[Fixed] Neo field migrations that created new field blocks causing entries to lose Neo content "
     ]
+  },
+  {
+    "version": "1.0.9.1",
+    "downloadUrl": "https://github.com/Firstborn/Craft-CMS-Migration-Manager/archive/v1.0.9.1.zip",
+    "date": "2018-07-20T13:05:00-00:00",
+    "notes": [
+      "[Added] switched JSON in migration from string to heredoc",
+      "[Fixed] escaping bug with single quotes and double quotes in field names and instructions"
+    ]
   }
 ]

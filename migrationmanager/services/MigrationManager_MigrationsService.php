@@ -212,7 +212,7 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
             $path = sprintf($migrationPath . '/%s.php', $filename);
         }
 
-        $migration = json_encode($migration, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $migration = $this->encode($migration);
         $content = craft()->templates->render('migrationmanager/_migration', array('empty' => $empty, 'migration' => $migration, 'className' => $filename, 'manifest' => $manifest, true));
 
         IOHelper::writeToFile($path, $content);
@@ -235,10 +235,11 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
      */
     public function import($data)
     {
-        $data = str_replace('\\', '\/', $data);
-        $data = str_replace('\/r', '\r', $data);
-        $data = str_replace('\/n', '\n', $data);
-        $data = json_decode($data, true);
+        $data = $this->decode($data);
+       
+        if (!$data){
+          return false;
+        }
 
         try {
             if (array_key_exists('settings', $data)) {
@@ -626,5 +627,26 @@ class MigrationManager_MigrationsService extends BaseApplicationComponent
         $migration->setDbConnection(craft()->db);
 
         return $migration;
+    }
+    
+    private function encode($str){
+       $str = json_encode($str, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+       //escape linebreaks
+       $pattern = '/(\\\\)([rn])/i';
+       $replace = '\\\\$1$2';
+       $str = preg_replace($pattern, $replace, $str);
+       return $str;
+    }
+    
+    private function decode($data){
+       $data = iconv('UTF-8', 'UTF-8//IGNORE', utf8_encode($data));
+       $data = json_decode($data, TRUE);
+       if (json_last_error() != JSON_ERROR_NONE){
+          MigrationManagerPlugin::log('Migration Manager JSON error', LogLevel::Error);
+          MigrationManagerPlugin::log(json_last_error(), LogLevel::Error);
+          MigrationManagerPlugin::log(json_last_error_msg(), LogLevel::Error);
+          return false;
+       }
+       return $data;
     }
 }
