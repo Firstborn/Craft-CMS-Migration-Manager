@@ -31,7 +31,7 @@ class MigrationManagerPlugin extends BasePlugin
      */
     public function getVersion()
     {
-        return '1.0.9.1';
+        return '1.0.9.2';
     }
 
     /**

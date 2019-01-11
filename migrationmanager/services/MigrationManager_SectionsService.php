@@ -43,20 +43,20 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
         $locales = $section->getLocales();
 
         if ((bool)$section->attributes['hasUrls'] === false) {
-            $newSection['locales'] = [];
-            foreach ($locales as $locale => $attributes) {
-                $newSection['locales'][$locale] = $attributes['enabledByDefault'];
-            }
-        } else {
-
             $newSection['locales'] = array();
 
-            foreach ($locales as $key => $locale) {
-                $newSection['locales'][$key] = [
-                    'locale' => $locale->locale,
-                    'urlFormat' => $locale->urlFormat,
-                    'nestedUrlFormat' => $locale->nestedUrlFormat,
-                    'enabledByDefault' => $locale->enabledByDefault,
+            foreach ($locales as $localeId => $attributes) {
+                $newSection['locales'][$localeId] = $attributes['enabledByDefault'];
+            }
+        } else {
+            $newSection['locales'] = array();
+
+            foreach ($locales as $localeId => $attributes) {
+                $newSection['locales'][$localeId] = [
+                    'locale' => $attributes->locale,
+                    'urlFormat' => $attributes->urlFormat,
+                    'nestedUrlFormat' => $attributes->nestedUrlFormat,
+                    'enabledByDefault' => $attributes->enabledByDefault,
                 ];
             }
         }
@@ -169,7 +169,6 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
      */
     public function createModel(array $data)
     {
-
         $section = new SectionModel();
         if (array_key_exists('id', $data)) {
             $section->id = $data['id'];
@@ -199,23 +198,29 @@ class MigrationManager_SectionsService extends MigrationManager_BaseMigrationSer
 
         if (array_key_exists('locales', $data)) {
             $locales = array();
-            foreach ($data['locales'] as $key => $locale) {
+
+            foreach ($data['locales'] as $localeId => $localeAttributes) {
                 //determine if locale exists
-                if (in_array($key, craft()->i18n->getSiteLocaleIds())) {
+                if (in_array($localeId, craft()->i18n->getSiteLocaleIds())) {
+
+                    // depending if the migration had $section->hasUrls enabled,
+                    // then $localeAttributes will either hold an array of locale attributes
+                    // or will be a boolean indicating the locale default entry status
                     if ($section->hasUrls) {
-                        $locales[$key] = new SectionLocaleModel(array(
-                            'locale' => $key,
-                            'enabledByDefault' => array_key_exists('enabledByDefault', $locale) ? $locale['enabledByDefault'] : true,
-                            'urlFormat' => $locale['urlFormat'],
-                            'nestedUrlFormat' => !empty($locale['nestedUrlFormat'])? $locale['nestedUrlFormat'] : '',
+                        $locales[$localeId] = new SectionLocaleModel(array(
+                            'locale' => $localeId,
+                            'enabledByDefault' => array_key_exists('enabledByDefault', $localeAttributes) ? $localeAttributes['enabledByDefault'] : true,
+                            'urlFormat' => $localeAttributes['urlFormat'],
+                            'nestedUrlFormat' => !empty($localeAttributes['nestedUrlFormat'])? $localeAttributes['nestedUrlFormat'] : '',
                         ));
                     } else {
-                        $locales[$key] = new SectionLocaleModel(array(
-                            'locale' => $key,
+                        $locales[$localeId] = new SectionLocaleModel(array(
+                            'locale' => $localeId,
+                            'enabledByDefault' => $localeAttributes,
                         ));
                     }
                 } else {
-                    $this->addError('missing locale: ' . $key . ' in section: ' . $section->handle . ', locale not defined in system');
+                    $this->addError('missing locale: ' . $localeId . ' in section: ' . $section->handle . ', locale not defined in system');
                 }
             }
             $section->setLocales($locales);
